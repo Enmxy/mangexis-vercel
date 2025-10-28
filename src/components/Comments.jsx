@@ -19,9 +19,9 @@ const Comments = ({ identifier, title }) => {
     const script = document.createElement('script')
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'Enmxy/Mangexis')
-    script.setAttribute('data-repo-id', 'YOUR_REPO_ID') // Will be set after Giscus setup
+    script.setAttribute('data-repo-id', 'R_kgDOPo9WYg')
     script.setAttribute('data-category', 'Comments')
-    script.setAttribute('data-category-id', 'YOUR_CATEGORY_ID') // Will be set after Giscus setup
+    script.setAttribute('data-category-id', 'DIC_kwDOPo9WYs4CxK8m')
     script.setAttribute('data-mapping', 'specific')
     script.setAttribute('data-term', identifier)
     script.setAttribute('data-strict', '0')
