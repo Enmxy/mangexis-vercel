@@ -7,6 +7,8 @@ import Reader from './pages/Reader'
 import Discover from './pages/Discover'
 import About from './pages/About'
 import Disclaimer from './pages/Disclaimer'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -44,6 +46,20 @@ function App() {
         <div className="min-h-screen bg-black">
           <Navbar />
           <Disclaimer />
+          <Footer />
+        </div>
+      } />
+      <Route path="/privacy" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <Privacy />
+          <Footer />
+        </div>
+      } />
+      <Route path="/terms" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <Terms />
           <Footer />
         </div>
       } />
