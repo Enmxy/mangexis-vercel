@@ -13,12 +13,26 @@ const Reader = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [showControls, setShowControls] = useState(true)
   const [selectedFansub, setSelectedFansub] = useState(0)
-  const [readingMode, setReadingMode] = useState('single') // single, double, scroll
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
   const imageRef = useRef(null)
   const controlsTimer = useRef(null)
+
+  // Get current chapter info
+  const currentChapterIndex = manga?.chapters.findIndex(c => c.id === chapterId) ?? -1
+  const prevChapter = currentChapterIndex > 0 ? manga.chapters[currentChapterIndex - 1] : null
+  const nextChapter = currentChapterIndex < (manga?.chapters.length ?? 0) - 1 ? manga.chapters[currentChapterIndex + 1] : null
+
+  // Get current images
+  const getCurrentImages = () => {
+    if (!chapter) return []
+    if (chapter.fansubs && chapter.fansubs[selectedFansub]?.images) {
+      return chapter.fansubs[selectedFansub].images
+    }
+    return chapter.imageLinks || []
+  }
+
+  const images = getCurrentImages()
 
   // Auto-hide controls
   useEffect(() => {
@@ -26,44 +40,19 @@ const Reader = () => {
     return () => clearTimeout(controlsTimer.current)
   }, [])
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'd') {
-        handleNextPage()
-      } else if (e.key === 'ArrowLeft' || e.key === 'a') {
-        handlePrevPage()
-      } else if (e.key === 'f') {
-        toggleFullscreen()
-      } else if (e.key === 'Escape') {
-        if (isFullscreen) exitFullscreen()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [currentPage, chapter, isFullscreen])
-
   // Reset page on chapter change
   useEffect(() => {
     setCurrentPage(0)
     setImageLoaded(false)
   }, [chapterId])
 
-  // Mouse move handler
-  const handleMouseMove = () => {
-    setShowControls(true)
-    if (controlsTimer.current) clearTimeout(controlsTimer.current)
-    controlsTimer.current = setTimeout(() => setShowControls(false), 3000)
-  }
-
   // Navigation functions
   const handleNextPage = () => {
-    if (currentPage < chapter.imageLinks.length - 1) {
+    if (currentPage < images.length - 1) {
       setCurrentPage(prev => prev + 1)
       setImageLoaded(false)
     } else if (nextChapter) {
-      handleChapterChange(nextChapter.id)
+      navigate(`/manga/${slug}/chapter/${nextChapter.id}`)
     }
   }
 
@@ -109,19 +98,30 @@ const Reader = () => {
     }
   }
 
-  const currentChapterIndex = manga.chapters.findIndex(c => c.id === chapterId)
-  const prevChapter = currentChapterIndex > 0 ? manga.chapters[currentChapterIndex - 1] : null
-  const nextChapter = currentChapterIndex < manga.chapters.length - 1 ? manga.chapters[currentChapterIndex + 1] : null
-
-  // Get current images
-  const getCurrentImages = () => {
-    if (chapter.fansubs && chapter.fansubs[selectedFansub]?.images) {
-      return chapter.fansubs[selectedFansub].images
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'd') {
+        handleNextPage()
+      } else if (e.key === 'ArrowLeft' || e.key === 'a') {
+        handlePrevPage()
+      } else if (e.key === 'f') {
+        toggleFullscreen()
+      } else if (e.key === 'Escape') {
+        if (isFullscreen) exitFullscreen()
+      }
     }
-    return chapter.imageLinks
-  }
 
-  const images = getCurrentImages()
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [currentPage, images.length, nextChapter, isFullscreen])
+
+  // Mouse move handler
+  const handleMouseMove = () => {
+    setShowControls(true)
+    if (controlsTimer.current) clearTimeout(controlsTimer.current)
+    controlsTimer.current = setTimeout(() => setShowControls(false), 3000)
+  }
 
   if (!manga || !chapter) {
     return (
@@ -303,11 +303,10 @@ const Reader = () => {
         </AnimatePresence>
       </div>
 
-      {/* Side Navigation Zones (Visual Indicators) */}
+      {/* Side Navigation Zones */}
       <AnimatePresence>
         {showControls && (
           <>
-            {/* Left Zone */}
             {currentPage > 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -326,7 +325,6 @@ const Reader = () => {
               </motion.div>
             )}
 
-            {/* Right Zone */}
             {currentPage < images.length - 1 && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -368,7 +366,7 @@ const Reader = () => {
         )}
       </AnimatePresence>
 
-      {/* Comments Section - After last page */}
+      {/* Comments Section */}
       {currentPage === images.length - 1 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
