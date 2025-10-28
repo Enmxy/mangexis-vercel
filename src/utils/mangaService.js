@@ -3,7 +3,22 @@
 const API_URL = '/.netlify/functions/manga-operations';
 const UPLOAD_URL = '/.netlify/functions/upload-image';
 
+// Check if running in development mode
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 export const uploadImage = async (file) => {
+  if (isDevelopment) {
+    // Development mode: return mock URL
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log('📁 [DEV] Image uploaded (mock):', file.name);
+        resolve(e.target.result); // Return data URL for preview
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   try {
     const reader = new FileReader();
     
@@ -43,6 +58,15 @@ export const uploadImage = async (file) => {
 };
 
 export const saveManga = async (mangaData) => {
+  if (isDevelopment) {
+    // Development mode: save to localStorage
+    console.log('💾 [DEV] Saving manga:', mangaData);
+    const mangas = JSON.parse(localStorage.getItem('dev_mangas') || '[]');
+    mangas.push(mangaData);
+    localStorage.setItem('dev_mangas', JSON.stringify(mangas));
+    return { success: true, message: 'Manga saved (dev mode)' };
+  }
+
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -64,6 +88,18 @@ export const saveManga = async (mangaData) => {
 };
 
 export const updateManga = async (slug, mangaData) => {
+  if (isDevelopment) {
+    // Development mode: update in localStorage
+    console.log('✏️ [DEV] Updating manga:', slug, mangaData);
+    const mangas = JSON.parse(localStorage.getItem('dev_mangas') || '[]');
+    const index = mangas.findIndex(m => m.slug === slug);
+    if (index !== -1) {
+      mangas[index] = mangaData;
+      localStorage.setItem('dev_mangas', JSON.stringify(mangas));
+    }
+    return { success: true, message: 'Manga updated (dev mode)' };
+  }
+
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -86,6 +122,15 @@ export const updateManga = async (slug, mangaData) => {
 };
 
 export const deleteManga = async (slug) => {
+  if (isDevelopment) {
+    // Development mode: delete from localStorage
+    console.log('🗑️ [DEV] Deleting manga:', slug);
+    const mangas = JSON.parse(localStorage.getItem('dev_mangas') || '[]');
+    const filtered = mangas.filter(m => m.slug !== slug);
+    localStorage.setItem('dev_mangas', JSON.stringify(filtered));
+    return { success: true, message: 'Manga deleted (dev mode)' };
+  }
+
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -107,6 +152,13 @@ export const deleteManga = async (slug) => {
 };
 
 export const getAllMangas = async () => {
+  if (isDevelopment) {
+    // Development mode: get from localStorage
+    const mangas = JSON.parse(localStorage.getItem('dev_mangas') || '[]');
+    console.log('📚 [DEV] Getting mangas:', mangas.length);
+    return mangas;
+  }
+
   try {
     const response = await fetch(API_URL, {
       method: 'POST',

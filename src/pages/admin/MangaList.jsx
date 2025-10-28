@@ -2,17 +2,43 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaList } from '../../data/mangaData'
-import { deleteManga } from '../../utils/mangaService'
+import { deleteManga, getAllMangas } from '../../utils/mangaService'
 
 const MangaList = () => {
   const [mangas, setMangas] = useState([])
   const [deleteModal, setDeleteModal] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load mangas from data
-    setMangas(mangaList)
+    loadMangas()
   }, [])
+
+  const loadMangas = async () => {
+    setLoading(true)
+    try {
+      // Try to get from API/localStorage first
+      const apiMangas = await getAllMangas()
+      
+      // Merge with static manga data
+      const allMangas = [...mangaList, ...apiMangas]
+      
+      // Remove duplicates by slug
+      const uniqueMangas = allMangas.reduce((acc, manga) => {
+        if (!acc.find(m => m.slug === manga.slug)) {
+          acc.push(manga)
+        }
+        return acc
+      }, [])
+      
+      setMangas(uniqueMangas)
+    } catch (error) {
+      console.error('Error loading mangas:', error)
+      setMangas(mangaList)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredMangas = mangas.filter(manga =>
     manga.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -28,6 +54,7 @@ const MangaList = () => {
       setMangas(mangas.filter(m => m.slug !== deleteModal))
       setDeleteModal(null)
       alert('Manga başarıyla silindi!')
+      await loadMangas() // Reload list
     } catch (error) {
       alert('Silme hatası: ' + error.message)
     }

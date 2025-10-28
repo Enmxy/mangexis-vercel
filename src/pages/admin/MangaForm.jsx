@@ -217,16 +217,27 @@ const MangaForm = () => {
     setUploadProgress('Kaydediliyor...')
 
     try {
+      // Convert chapters format for compatibility
+      const formattedData = {
+        ...formData,
+        chapters: formData.chapters.map(ch => ({
+          id: ch.chapter.toString(),
+          title: `Bölüm ${ch.chapter}`,
+          imageLinks: ch.images.filter(img => img.trim()),
+          fansubs: ch.fansubs || []
+        }))
+      }
+
       if (isEdit) {
-        await updateManga(slug, formData)
-        alert('Manga başarıyla güncellendi!')
+        await updateManga(slug, formattedData)
+        alert('✅ Manga başarıyla güncellendi!')
       } else {
-        await saveManga(formData)
-        alert('Manga başarıyla eklendi!')
+        await saveManga(formattedData)
+        alert('✅ Manga başarıyla eklendi! Manga listesinde görünecek.')
       }
       navigate('/admin/mangas')
     } catch (error) {
-      alert('Hata: ' + error.message)
+      alert('❌ Hata: ' + error.message)
     } finally {
       setSaving(false)
       setUploadProgress('')
