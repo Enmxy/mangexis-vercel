@@ -45,3 +45,41 @@ body {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
 }
+
+/* High-Quality Image Rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: bicubic;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Ultra Quality Enhancement */
+.ultra-quality {
+  filter: contrast(1.08) saturate(1.12) brightness(1.03);
+  -webkit-filter: contrast(1.08) saturate(1.12) brightness(1.03);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+  transform: translateZ(0) scale(1.001);
+  -webkit-transform: translateZ(0) scale(1.001);
+  will-change: transform;
+}
+
+/* HD Quality Enhancement */
+.hd-quality {
+  filter: contrast(1.05) saturate(1.08) brightness(1.01);
+  -webkit-filter: contrast(1.05) saturate(1.08) brightness(1.01);
+  image-rendering: crisp-edges;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Anti-aliasing for smooth edges */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}

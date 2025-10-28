@@ -15,7 +15,8 @@ const Reader = () => {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [zoomLevel, setZoomLevel] = useState(100)
-  const [imageQuality, setImageQuality] = useState('original') // original, compressed
+  const [imageQuality, setImageQuality] = useState('ultra') // standard, hd, ultra
+  const [enhanceMode, setEnhanceMode] = useState(true)
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
@@ -210,6 +211,41 @@ const Reader = () => {
     setZoomLevel(100)
   }
 
+  // Quality presets
+  const getQualitySettings = () => {
+    switch (imageQuality) {
+      case 'ultra':
+        return {
+          filter: enhanceMode 
+            ? 'contrast(1.05) saturate(1.1) brightness(1.02) sharpen(1.5)' 
+            : 'contrast(1.05) saturate(1.1)',
+          imageRendering: '-webkit-optimize-contrast',
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+          willChange: 'transform'
+        }
+      case 'hd':
+        return {
+          filter: 'contrast(1.03) saturate(1.05)',
+          imageRendering: 'crisp-edges',
+          backfaceVisibility: 'hidden'
+        }
+      case 'standard':
+      default:
+        return {
+          filter: 'none',
+          imageRendering: 'auto'
+        }
+    }
+  }
+
+  const toggleQuality = () => {
+    const qualities = ['standard', 'hd', 'ultra']
+    const currentIndex = qualities.indexOf(imageQuality)
+    const nextIndex = (currentIndex + 1) % qualities.length
+    setImageQuality(qualities[nextIndex])
+  }
+
   // Chapter change
   const handleChapterChange = (newChapterId) => {
     navigate(`/manga/${slug}/chapter/${newChapterId}`)
@@ -320,6 +356,17 @@ const Reader = () => {
                     </select>
                   )}
 
+                  {/* Image Quality Toggle */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={toggleQuality}
+                    className="px-3 py-2 bg-[#EDEDED] text-[#0A0A0A] hover:bg-white rounded transition-all text-xs font-bold"
+                    title="Görüntü Kalitesi"
+                  >
+                    {imageQuality === 'ultra' ? '🔥 ULTRA' : imageQuality === 'hd' ? '⚡ HD' : '📱 STD'}
+                  </motion.button>
+
                   {/* Zoom Controls */}
                   <div className="flex items-center gap-1 bg-[#EDEDED] rounded px-2 py-1">
                     <motion.button
@@ -417,16 +464,15 @@ const Reader = () => {
               src={imageUrl}
               alt={`Page ${index + 1}`}
               loading="lazy"
-              className="w-full h-auto block"
+              className={`w-full h-auto block ${
+                imageQuality === 'ultra' ? 'ultra-quality' : 
+                imageQuality === 'hd' ? 'hd-quality' : ''
+              }`}
               style={{
-                filter: 'blur(0px)',
-                transition: 'filter 0.3s ease-out',
-                imageRendering: imageQuality === 'original' ? 'high-quality' : 'auto',
+                ...getQualitySettings(),
+                transition: 'all 0.3s ease-out',
                 maxWidth: '100%',
                 height: 'auto'
-              }}
-              onLoad={(e) => {
-                e.target.style.filter = 'blur(0px)'
               }}
             />
           </motion.div>
