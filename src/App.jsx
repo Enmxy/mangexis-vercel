@@ -46,6 +46,7 @@ function App() {
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="mangas" element={<MangaList />} />
         <Route path="mangas/new" element={<MangaForm />} />

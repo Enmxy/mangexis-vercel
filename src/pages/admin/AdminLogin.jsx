@@ -31,6 +31,10 @@ const AdminLogin = () => {
   const handleLogin = () => {
     if (window.netlifyIdentity) {
       window.netlifyIdentity.open('login')
+    } else {
+      // Development mode - direkt dashboard'a yönlendir
+      console.warn('Netlify Identity not available. Using development mode.')
+      navigate('/admin/dashboard')
     }
   }
 

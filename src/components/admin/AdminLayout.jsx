@@ -21,6 +21,10 @@ const AdminLayout = () => {
         setUser(null)
         navigate('/admin/login')
       })
+    } else {
+      // Netlify Identity yüklenmemişse, development modunda devam et
+      console.warn('Netlify Identity not loaded. Running in development mode.')
+      setUser({ email: 'dev@admin.com' })
     }
   }, [navigate])
 

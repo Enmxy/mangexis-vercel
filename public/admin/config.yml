@@ -19,10 +19,16 @@ collections:
       - { label: "Cover URL", name: "cover", widget: "string" }
       - { label: "Description", name: "description", widget: "text" }
       - { label: "Status", name: "status", widget: "select", options: ["ongoing", "completed", "hiatus"] }
-      - { label: "Genres", name: "genres", widget: "list" }
+      - label: "Genres"
+        name: "genres"
+        widget: "list"
+        field: { label: "Genre", name: "genre", widget: "string" }
       - label: "Chapters"
         name: "chapters"
         widget: "list"
         fields:
           - { label: "Chapter Number", name: "chapter", widget: "number" }
-          - { label: "Images", name: "images", widget: "list" }
+          - label: "Images"
+            name: "images"
+            widget: "list"
+            field: { label: "Image URL", name: "image", widget: "string" }
