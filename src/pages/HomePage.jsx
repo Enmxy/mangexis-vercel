@@ -106,49 +106,13 @@ const HomePage = () => {
             </motion.div>
 
             {/* Loading Spinner */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="relative w-16 h-16 sm:w-20 sm:h-20"
-            >
-              {/* Outer Ring */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-2 border-white/20 border-t-white rounded-full"
-              />
-              
-              {/* Inner Ring */}
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-2 border-2 border-white/10 border-b-white/60 rounded-full"
-              />
-              
-              {/* Center Dot */}
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-0 m-auto w-2 h-2 bg-white rounded-full"
-              />
-            </motion.div>
-
-            {/* Loading Text */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{ delay: 0.5, duration: 1.5, repeat: Infinity }}
-              className="mt-8 text-tertiary text-xs sm:text-sm tracking-wider"
-            >
-              LOADING...
-            </motion.div>
+            <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="pt-20 min-h-screen">
-        {/* Slider Section */}
+        {/* Hero Slider */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -158,8 +122,44 @@ const HomePage = () => {
           <Slider slides={sliderData} />
         </motion.div>
 
+        {/* Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 py-4"
+        >
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{allMangas.length}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Toplam Manga</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                {allMangas.reduce((sum, m) => sum + (m.chapters?.length || 0), 0)}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400">Toplam Bölüm</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{availableGenres.length}</div>
+              <div className="text-xs sm:text-sm text-gray-400">Tür</div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {/* Section Title */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mb-6"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Tüm Mangalar</h2>
+            <div className="w-20 h-1 bg-white rounded-full"></div>
+          </motion.div>
+
           {/* Search & Filter */}
           <SearchFilter
             searchTerm={searchTerm}
@@ -175,17 +175,32 @@ const HomePage = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
           >
-            {filteredMangas.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                {filteredMangas.map((manga) => (
-                  <MangaCard key={manga.slug} manga={manga} />
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+              </div>
+            ) : filteredMangas.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+                {filteredMangas.map((manga, index) => (
+                  <motion.div
+                    key={manga.slug}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <MangaCard manga={manga} />
+                  </motion.div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-20">
-                <p className="text-tertiary text-base sm:text-lg">Manga bulunamadı</p>
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-gray-400 text-lg">Manga bulunamadı</p>
+                <p className="text-gray-600 text-sm mt-2">Farklı filtreler deneyin</p>
               </div>
             )}
           </motion.div>
