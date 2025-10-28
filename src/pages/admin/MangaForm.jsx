@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { mangaList } from '../../data/mangaData'
+import { saveManga, updateManga, uploadImage } from '../../utils/mangaService'
 
 const MangaForm = () => {
   const navigate = useNavigate()
@@ -15,13 +16,19 @@ const MangaForm = () => {
     description: '',
     status: 'ongoing',
     genres: [],
+    fansub: '',
     chapters: []
   })
+
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
+  const [saving, setSaving] = useState(false)
 
   const [newGenre, setNewGenre] = useState('')
   const [newChapter, setNewChapter] = useState({
     chapter: 1,
-    images: ['']
+    images: [''],
+    fansubs: [{ name: 'Default', images: [''] }]
   })
 
   const availableGenres = [
@@ -42,9 +49,11 @@ const MangaForm = () => {
           description: manga.description,
           status: manga.status,
           genres: manga.genres || [],
+          fansub: manga.fansub || '',
           chapters: manga.chapters?.map(ch => ({
             chapter: parseInt(ch.id),
-            images: ch.imageLinks || []
+            images: ch.imageLinks || [],
+            fansubs: ch.fansubs || [{ name: 'Default', images: ch.imageLinks || [] }]
           })) || []
         })
       }
@@ -130,9 +139,48 @@ const MangaForm = () => {
       })
       setNewChapter({
         chapter: newChapter.chapter + 1,
-        images: ['']
+        images: [''],
+        fansubs: [{ name: 'Default', images: [''] }]
       })
     }
+  }
+
+  const handleAddFansub = () => {
+    setNewChapter({
+      ...newChapter,
+      fansubs: [...newChapter.fansubs, { name: '', images: [''] }]
+    })
+  }
+
+  const handleRemoveFansub = (index) => {
+    setNewChapter({
+      ...newChapter,
+      fansubs: newChapter.fansubs.filter((_, i) => i !== index)
+    })
+  }
+
+  const handleFansubNameChange = (index, name) => {
+    const updatedFansubs = [...newChapter.fansubs]
+    updatedFansubs[index].name = name
+    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
+  }
+
+  const handleFansubImageChange = (fansubIndex, imageIndex, value) => {
+    const updatedFansubs = [...newChapter.fansubs]
+    updatedFansubs[fansubIndex].images[imageIndex] = value
+    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
+  }
+
+  const handleAddFansubImage = (fansubIndex) => {
+    const updatedFansubs = [...newChapter.fansubs]
+    updatedFansubs[fansubIndex].images.push('')
+    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
+  }
+
+  const handleRemoveFansubImage = (fansubIndex, imageIndex) => {
+    const updatedFansubs = [...newChapter.fansubs]
+    updatedFansubs[fansubIndex].images = updatedFansubs[fansubIndex].images.filter((_, i) => i !== imageIndex)
+    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
   }
 
   const handleRemoveChapter = (index) => {
@@ -142,18 +190,47 @@ const MangaForm = () => {
     })
   }
 
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploading(true)
+    setUploadProgress('Kapak yükleniyor...')
+
+    try {
+      const url = await uploadImage(file)
+      setFormData({ ...formData, cover: url })
+      setUploadProgress('Kapak yüklendi!')
+      setTimeout(() => setUploadProgress(''), 2000)
+    } catch (error) {
+      alert('Yükleme hatası: ' + error.message)
+      setUploadProgress('')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // In production, this would:
-    // 1. Create/update JSON file in src/data/mangas/{slug}.json
-    // 2. Commit to Git via Netlify/GitHub API
-    
-    console.log('Saving manga:', formData)
-    
-    // Simulate save
-    alert(isEdit ? 'Manga güncellendi!' : 'Manga eklendi!')
-    navigate('/admin/mangas')
+    setSaving(true)
+    setUploadProgress('Kaydediliyor...')
+
+    try {
+      if (isEdit) {
+        await updateManga(slug, formData)
+        alert('Manga başarıyla güncellendi!')
+      } else {
+        await saveManga(formData)
+        alert('Manga başarıyla eklendi!')
+      }
+      navigate('/admin/mangas')
+    } catch (error) {
+      alert('Hata: ' + error.message)
+    } finally {
+      setSaving(false)
+      setUploadProgress('')
+    }
   }
 
   return (
@@ -217,19 +294,34 @@ const MangaForm = () => {
               <p className="text-gray-500 text-xs mt-1">Otomatik oluşturuldu, düzenleyebilirsiniz</p>
             </div>
 
-            {/* Cover URL */}
+            {/* Cover Upload/URL */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Kapak URL *
+                Kapak Resmi *
               </label>
-              <input
-                type="url"
-                value={formData.cover}
-                onChange={(e) => setFormData({ ...formData, cover: e.target.value })}
-                required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
-                placeholder="https://..."
-              />
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="url"
+                  value={formData.cover}
+                  onChange={(e) => setFormData({ ...formData, cover: e.target.value })}
+                  className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                  placeholder="https://... veya dosya yükle"
+                />
+                <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center gap-2">
+                  <span>📁</span>
+                  <span className="hidden sm:inline">Yükle</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverUpload}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+              {uploadProgress && (
+                <p className="text-sm text-purple-400 mb-2">{uploadProgress}</p>
+              )}
               {formData.cover && (
                 <div className="mt-3">
                   <img
@@ -273,6 +365,21 @@ const MangaForm = () => {
                 <option value="completed">Tamamlandı</option>
                 <option value="hiatus">Ara Verildi</option>
               </select>
+            </div>
+
+            {/* Fansub */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Fansub/Çeviri Grubu
+              </label>
+              <input
+                type="text"
+                value={formData.fansub}
+                onChange={(e) => setFormData({ ...formData, fansub: e.target.value })}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                placeholder="Örn: MangeXis Fansub, Türk Anime TV"
+              />
+              <p className="text-gray-500 text-xs mt-1">Çeviriyi yapan grup/kişi (opsiyonel)</p>
             </div>
           </div>
         </motion.div>
@@ -437,15 +544,17 @@ const MangaForm = () => {
           <button
             type="button"
             onClick={() => navigate('/admin/mangas')}
-            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+            disabled={saving}
+            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             İptal
           </button>
           <button
             type="submit"
-            className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg shadow-lg shadow-purple-500/50 transition-all duration-200"
+            disabled={saving || uploading}
+            className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg shadow-lg shadow-purple-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isEdit ? '💾 Güncelle' : '✅ Kaydet'}
+            {saving ? '⏳ Kaydediliyor...' : (isEdit ? '💾 Güncelle' : '✅ Kaydet')}
           </button>
         </div>
       </form>

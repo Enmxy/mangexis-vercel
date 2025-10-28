@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/*"
@@ -10,3 +11,9 @@
 # Enable Netlify Identity
 [context.production.environment]
   NETLIFY_USE_YARN = "false"
+
+# Environment variables (set these in Netlify Dashboard)
+# GITHUB_TOKEN - GitHub Personal Access Token
+# REPO_OWNER - Your GitHub username
+# REPO_NAME - Repository name (mangexis)
+# IMGBB_API_KEY - ImgBB API key for image uploads

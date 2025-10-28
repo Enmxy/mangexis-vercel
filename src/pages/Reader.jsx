@@ -11,6 +11,7 @@ const Reader = () => {
 
   const [currentPage, setCurrentPage] = useState(0)
   const [showControls, setShowControls] = useState(true)
+  const [selectedFansub, setSelectedFansub] = useState(0)
 
   useEffect(() => {
     const timer = setTimeout(() => setShowControls(false), 3000)
@@ -117,6 +118,21 @@ const Reader = () => {
                     ))}
                   </select>
 
+                  {/* Fansub Selector */}
+                  {chapter.fansubs && chapter.fansubs.length > 1 && (
+                    <select
+                      value={selectedFansub}
+                      onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
+                      className="px-2 sm:px-4 py-1.5 sm:py-2 bg-black/50 border border-white/20 rounded-custom text-xs sm:text-sm font-medium cursor-pointer focus:outline-none focus:border-white/40 transition-all duration-200"
+                    >
+                      {chapter.fansubs.map((fansub, index) => (
+                        <option key={index} value={index}>
+                          {fansub.name || `Fansub ${index + 1}`}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
                   {nextChapter && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -157,7 +173,7 @@ const Reader = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
-          src={chapter.imageLinks[currentPage]}
+          src={chapter.fansubs && chapter.fansubs[selectedFansub]?.images[currentPage] || chapter.imageLinks[currentPage]}
           alt={`Page ${currentPage + 1}`}
           onClick={handleImageClick}
           className="max-w-full max-h-screen object-contain cursor-pointer"

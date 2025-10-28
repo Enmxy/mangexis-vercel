@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaList } from '../../data/mangaData'
+import { deleteManga } from '../../utils/mangaService'
 
 const MangaList = () => {
   const [mangas, setMangas] = useState([])
@@ -21,10 +22,15 @@ const MangaList = () => {
     setDeleteModal(slug)
   }
 
-  const confirmDelete = () => {
-    // In production, this would delete the JSON file via Git API
-    setMangas(mangas.filter(m => m.slug !== deleteModal))
-    setDeleteModal(null)
+  const confirmDelete = async () => {
+    try {
+      await deleteManga(deleteModal)
+      setMangas(mangas.filter(m => m.slug !== deleteModal))
+      setDeleteModal(null)
+      alert('Manga başarıyla silindi!')
+    } catch (error) {
+      alert('Silme hatası: ' + error.message)
+    }
   }
 
   const getStatusBadge = (status) => {
