@@ -34,9 +34,10 @@ export const mangaList = [
         id: '1',
         title: 'Bölüm 1: Romance Dawn',
         imageLinks: [
-          'https://i.ibb.co/placeholder1.jpg',
-          'https://i.ibb.co/placeholder2.jpg',
-          'https://i.ibb.co/placeholder3.jpg'
+          'https://i.ibb.co/whYQTRx6/02.jpg',
+          'https://i.ibb.co/LdyDPXrZ/03.jpg',
+          'https://i.ibb.co/TxMz5vfc/04.jpg',
+          'https://i.ibb.co/0RyP3D7q/04.jpg',
         ]
       },
       {

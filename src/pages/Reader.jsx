@@ -151,7 +151,7 @@ const Reader = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-white/10 backdrop-blur-xl"
+            className="fixed top-0 left-0 right-0 z-50 bg-black/95 border-b border-white/20"
           >
             <div className="max-w-7xl mx-auto px-4 py-3">
               <div className="flex items-center justify-between gap-4">
@@ -161,7 +161,7 @@ const Reader = () => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all"
+                      className="p-2 bg-white text-black hover:bg-gray-200 rounded transition-all"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -169,8 +169,8 @@ const Reader = () => {
                     </motion.button>
                   </Link>
                   <div className="hidden md:block">
-                    <h2 className="text-sm font-semibold text-white">{manga.title}</h2>
-                    <p className="text-xs text-gray-400">{chapter.title}</p>
+                    <h2 className="text-sm font-bold text-white">{manga.title}</h2>
+                    <p className="text-xs text-gray-500">{chapter.title}</p>
                   </div>
                 </div>
 
@@ -181,7 +181,7 @@ const Reader = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleChapterChange(prevChapter.id)}
-                      className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all"
+                      className="p-2 bg-white text-black hover:bg-gray-200 rounded transition-all"
                       title="Önceki Bölüm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,7 +193,7 @@ const Reader = () => {
                   <select
                     value={chapterId}
                     onChange={(e) => handleChapterChange(e.target.value)}
-                    className="px-3 py-2 bg-black/70 border border-white/20 rounded-lg text-sm font-medium cursor-pointer focus:outline-none focus:border-white/40 transition-all max-w-[150px]"
+                    className="px-3 py-2 bg-white text-black border-2 border-white rounded text-sm font-bold cursor-pointer focus:outline-none focus:border-gray-300 transition-all max-w-[150px]"
                   >
                     {manga.chapters.map((ch) => (
                       <option key={ch.id} value={ch.id}>{ch.title}</option>
@@ -205,7 +205,7 @@ const Reader = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleChapterChange(nextChapter.id)}
-                      className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all"
+                      className="p-2 bg-white text-black hover:bg-gray-200 rounded transition-all"
                       title="Sonraki Bölüm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +222,7 @@ const Reader = () => {
                     <select
                       value={selectedFansub}
                       onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
-                      className="px-3 py-2 bg-black/70 border border-white/20 rounded-lg text-xs font-medium cursor-pointer focus:outline-none focus:border-white/40 transition-all"
+                      className="px-3 py-2 bg-white text-black border-2 border-white rounded text-xs font-bold cursor-pointer focus:outline-none focus:border-gray-300 transition-all"
                     >
                       {chapter.fansubs.map((fansub, index) => (
                         <option key={index} value={index}>
@@ -237,7 +237,7 @@ const Reader = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={toggleFullscreen}
-                    className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all"
+                    className="p-2 bg-white text-black hover:bg-gray-200 rounded transition-all"
                     title={isFullscreen ? "Tam Ekrandan Çık (F)" : "Tam Ekran (F)"}
                   >
                     {isFullscreen ? (
@@ -255,16 +255,16 @@ const Reader = () => {
 
               {/* Progress Bar */}
               <div className="mt-3">
-                <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
+                <div className="flex items-center justify-between text-xs text-white font-mono mb-1.5">
                   <span>Sayfa {currentPage + 1} / {images.length}</span>
                   <span>{Math.round(((currentPage + 1) / images.length) * 100)}%</span>
                 </div>
-                <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                <div className="relative w-full h-1 bg-gray-800 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentPage + 1) / images.length) * 100}%` }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="absolute h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                    className="absolute h-full bg-white"
                   />
                 </div>
               </div>
@@ -316,8 +316,8 @@ const Reader = () => {
                 onClick={handlePrevPage}
               >
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-3 bg-white rounded-full shadow-lg">
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </div>
@@ -334,8 +334,8 @@ const Reader = () => {
                 onClick={handleNextPage}
               >
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-3 bg-white rounded-full shadow-lg">
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
@@ -356,8 +356,8 @@ const Reader = () => {
             transition={{ delay: 0.5 }}
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40"
           >
-            <div className="glass-effect px-6 py-3 rounded-full border border-white/10">
-              <p className="text-sm text-gray-300 flex items-center gap-2">
+            <div className="bg-white px-6 py-3 rounded-full shadow-lg">
+              <p className="text-sm text-black font-mono flex items-center gap-2">
                 <span className="hidden sm:inline">← Önceki | Ortaya Tıkla: Kontroller | Sonraki →</span>
                 <span className="sm:hidden">← | Tıkla | →</span>
               </p>
