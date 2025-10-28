@@ -15,11 +15,7 @@ const Reader = () => {
   const [selectedFansub, setSelectedFansub] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [zoomLevel, setZoomLevel] = useState(100)
-  const [imageQuality, setImageQuality] = useState('ultra') // standard, hd, ultra
-  const [upscaleEnabled, setUpscaleEnabled] = useState(true)
-  const [upscaledImages, setUpscaledImages] = useState({})
-  const [upscaling, setUpscaling] = useState(false)
+  const [zoomLevel, setZoomLevel] = useState(50)
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
@@ -58,51 +54,6 @@ const Reader = () => {
   }
 
   const images = getCurrentImages()
-
-  // Upscale images when quality changes
-  useEffect(() => {
-    if (!upscaleEnabled || imageQuality === 'standard' || !images.length) return
-
-    const upscaleImages = async () => {
-      setUpscaling(true)
-      const newUpscaled = {}
-
-      // Upscale first 3 images immediately (visible)
-      for (let i = 0; i < Math.min(3, images.length); i++) {
-        try {
-          const upscaled = await imageUpscaler.upscale(images[i], imageQuality)
-          newUpscaled[images[i]] = upscaled
-        } catch (error) {
-          console.error('Upscaling failed:', error)
-          newUpscaled[images[i]] = images[i]
-        }
-      }
-
-      setUpscaledImages(prev => ({ ...prev, ...newUpscaled }))
-
-      // Upscale remaining images in background
-      for (let i = 3; i < images.length; i++) {
-        try {
-          const upscaled = await imageUpscaler.upscale(images[i], imageQuality)
-          setUpscaledImages(prev => ({ ...prev, [images[i]]: upscaled }))
-        } catch (error) {
-          console.error('Upscaling failed:', error)
-          setUpscaledImages(prev => ({ ...prev, [images[i]]: images[i] }))
-        }
-      }
-
-      setUpscaling(false)
-    }
-
-    upscaleImages()
-
-    // Cleanup on unmount
-    return () => {
-      if (imageQuality !== 'standard') {
-        imageUpscaler.clearCache()
-      }
-    }
-  }, [images, imageQuality])
 
   // Save reading progress
   useEffect(() => {
@@ -259,54 +210,6 @@ const Reader = () => {
     setZoomLevel(100)
   }
 
-  // Quality presets
-  const getQualitySettings = () => {
-    switch (imageQuality) {
-      case 'ultra':
-        return {
-          filter: enhanceMode 
-            ? 'contrast(1.05) saturate(1.1) brightness(1.02) sharpen(1.5)' 
-            : 'contrast(1.05) saturate(1.1)',
-          imageRendering: '-webkit-optimize-contrast',
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          willChange: 'transform'
-        }
-      case 'hd':
-        return {
-          filter: 'contrast(1.03) saturate(1.05)',
-          imageRendering: 'crisp-edges',
-          backfaceVisibility: 'hidden'
-        }
-      case 'standard':
-      default:
-        return {
-          filter: 'none',
-          imageRendering: 'auto'
-        }
-    }
-  }
-
-  const toggleQuality = () => {
-    const qualities = ['standard', 'hd', 'ultra']
-    const currentIndex = qualities.indexOf(imageQuality)
-    const nextIndex = (currentIndex + 1) % qualities.length
-    setImageQuality(qualities[nextIndex])
-    setUpscaledImages({}) // Clear cache when changing quality
-  }
-
-  // Get image URL (upscaled or original)
-  const getImageUrl = (originalUrl) => {
-    if (!upscaleEnabled || imageQuality === 'standard') return originalUrl
-    return upscaledImages[originalUrl] || originalUrl
-  }
-
-  const toggleUpscale = () => {
-    setUpscaleEnabled(!upscaleEnabled)
-    if (!upscaleEnabled) {
-      setUpscaledImages({})
-    }
-  }
 
   // Chapter change
   const handleChapterChange = (newChapterId) => {
@@ -418,38 +321,6 @@ const Reader = () => {
                     </select>
                   )}
 
-                  {/* Upscale Toggle */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={toggleUpscale}
-                    className={`p-2 rounded transition-all ${
-                      upscaleEnabled 
-                        ? 'bg-[#EDEDED] text-[#0A0A0A] hover:bg-white' 
-                        : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                    }`}
-                    title={upscaleEnabled ? 'Upscaling Açık' : 'Upscaling Kapalı'}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                    </svg>
-                    {upscaling && upscaleEnabled && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    )}
-                  </motion.button>
-
-                  {/* Image Quality Toggle */}
-                  {upscaleEnabled && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={toggleQuality}
-                      className="px-3 py-2 bg-[#EDEDED] text-[#0A0A0A] hover:bg-white rounded transition-all text-xs font-bold"
-                      title="Kalite Modu"
-                    >
-                      {imageQuality === 'ultra' ? 'ULTRA' : imageQuality === 'hd' ? 'HD' : 'STD'}
-                    </motion.button>
-                  )}
 
                   {/* Zoom Controls */}
                   <div className="flex items-center gap-1 bg-[#EDEDED] rounded px-2 py-1">
@@ -545,15 +416,14 @@ const Reader = () => {
             className="w-full"
           >
             <img
-              src={getImageUrl(imageUrl)}
+              src={imageUrl}
               alt={`Page ${index + 1}`}
               loading="lazy"
               className="w-full h-auto block"
               style={{
                 transition: 'opacity 0.3s ease-out',
                 maxWidth: '100%',
-                height: 'auto',
-                imageRendering: imageQuality === 'ultra' ? '-webkit-optimize-contrast' : 'auto'
+                height: 'auto'
               }}
             />
           </motion.div>

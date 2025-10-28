@@ -112,52 +112,105 @@ const HomePage = () => {
       </AnimatePresence>
 
       <div className="pt-20 min-h-screen">
-        {/* Hero Slider */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8"
-        >
-          <Slider slides={sliderData} />
-        </motion.div>
+        {/* Hero Section with Gradient */}
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/5 to-transparent h-[600px] -z-10" />
+          
+          {/* Hero Slider */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="max-w-7xl mx-auto px-4 sm:px-6 py-8"
+          >
+            <Slider slides={sliderData} />
+          </motion.div>
 
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 py-4"
-        >
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{allMangas.length}</div>
-              <div className="text-xs sm:text-sm text-gray-400">Toplam Manga</div>
+          {/* Premium Stats Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="max-w-7xl mx-auto px-4 sm:px-6 py-6"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Total Manga */}
+              <motion.div 
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative group bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-6 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">{allMangas.length}</div>
+                  <div className="text-sm text-gray-400 font-medium">Toplam Manga</div>
+                </div>
+              </motion.div>
+
+              {/* Total Chapters */}
+              <motion.div 
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative group bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-6 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {allMangas.reduce((sum, m) => sum + (m.chapters?.length || 0), 0)}
+                  </div>
+                  <div className="text-sm text-gray-400 font-medium">Toplam Bölüm</div>
+                </div>
+              </motion.div>
+
+              {/* Total Genres */}
+              <motion.div 
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="relative group bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-6 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">{availableGenres.length}</div>
+                  <div className="text-sm text-gray-400 font-medium">Farklı Tür</div>
+                </div>
+              </motion.div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                {allMangas.reduce((sum, m) => sum + (m.chapters?.length || 0), 0)}
-              </div>
-              <div className="text-xs sm:text-sm text-gray-400">Toplam Bölüm</div>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{availableGenres.length}</div>
-              <div className="text-xs sm:text-sm text-gray-400">Tür</div>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          {/* Section Title */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          {/* Section Title with Description */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mb-6"
+            className="mb-8"
           >
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Tüm Mangalar</h2>
-            <div className="w-20 h-1 bg-white rounded-full"></div>
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Tüm Mangalar</h2>
+                <div className="w-24 h-1.5 bg-gradient-to-r from-white to-transparent rounded-full"></div>
+              </div>
+              <div className="hidden sm:block text-sm text-gray-400">
+                {filteredMangas.length} manga gösteriliyor
+              </div>
+            </div>
+            <p className="text-gray-400 text-sm sm:text-base max-w-2xl">
+              En popüler mangaları keşfedin, favorilerinizi bulun ve okumaya başlayın
+            </p>
           </motion.div>
 
           {/* Search & Filter */}
