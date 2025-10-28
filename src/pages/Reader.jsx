@@ -14,6 +14,8 @@ const Reader = () => {
   const [selectedFansub, setSelectedFansub] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [zoomLevel, setZoomLevel] = useState(100)
+  const [imageQuality, setImageQuality] = useState('original') // original, compressed
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
@@ -94,6 +96,73 @@ const Reader = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [slug, chapterId])
 
+  // Keyboard shortcuts for zoom
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === '+' || e.key === '=') {
+          e.preventDefault()
+          handleZoomIn()
+        } else if (e.key === '-') {
+          e.preventDefault()
+          handleZoomOut()
+        } else if (e.key === '0') {
+          e.preventDefault()
+          handleZoomReset()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [zoomLevel])
+
+  // Pinch to zoom for mobile
+  useEffect(() => {
+    let initialDistance = 0
+    let initialZoom = zoomLevel
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        const touch1 = e.touches[0]
+        const touch2 = e.touches[1]
+        initialDistance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        )
+        initialZoom = zoomLevel
+      }
+    }
+
+    const handleTouchMove = (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault()
+        const touch1 = e.touches[0]
+        const touch2 = e.touches[1]
+        const currentDistance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        )
+        const scale = currentDistance / initialDistance
+        const newZoom = Math.min(Math.max(initialZoom * scale, 50), 200)
+        setZoomLevel(Math.round(newZoom))
+      }
+    }
+
+    const container = scrollContainerRef.current
+    if (container) {
+      container.addEventListener('touchstart', handleTouchStart, { passive: false })
+      container.addEventListener('touchmove', handleTouchMove, { passive: false })
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('touchstart', handleTouchStart)
+        container.removeEventListener('touchmove', handleTouchMove)
+      }
+    }
+  }, [zoomLevel])
+
   // Tap controls
   const handleTap = (e) => {
     const clickX = e.clientX
@@ -126,6 +195,19 @@ const Reader = () => {
       document.exitFullscreen()
       setIsFullscreen(false)
     }
+  }
+
+  // Zoom controls
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 25, 200))
+  }
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 25, 50))
+  }
+
+  const handleZoomReset = () => {
+    setZoomLevel(100)
   }
 
   // Chapter change
@@ -238,6 +320,43 @@ const Reader = () => {
                     </select>
                   )}
 
+                  {/* Zoom Controls */}
+                  <div className="flex items-center gap-1 bg-[#EDEDED] rounded px-2 py-1">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleZoomOut}
+                      className="p-1 text-[#0A0A0A] hover:bg-white rounded transition-all"
+                      title="Zoom Out"
+                      disabled={zoomLevel <= 50}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleZoomReset}
+                      className="px-2 py-1 text-[#0A0A0A] hover:bg-white rounded transition-all text-xs font-bold"
+                      title="Reset Zoom"
+                    >
+                      {zoomLevel}%
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleZoomIn}
+                      className="p-1 text-[#0A0A0A] hover:bg-white rounded transition-all"
+                      title="Zoom In"
+                      disabled={zoomLevel >= 200}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </motion.button>
+                  </div>
+
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -277,8 +396,12 @@ const Reader = () => {
       {/* Vertical Scroll Images */}
       <div 
         ref={scrollContainerRef}
-        className="max-w-4xl mx-auto pt-20"
+        className="mx-auto pt-20"
         onClick={handleTap}
+        style={{
+          maxWidth: `${zoomLevel}%`,
+          transition: 'max-width 0.3s ease-out'
+        }}
       >
         {images.map((imageUrl, index) => (
           <motion.div
@@ -297,7 +420,10 @@ const Reader = () => {
               className="w-full h-auto block"
               style={{
                 filter: 'blur(0px)',
-                transition: 'filter 0.3s ease-out'
+                transition: 'filter 0.3s ease-out',
+                imageRendering: imageQuality === 'original' ? 'high-quality' : 'auto',
+                maxWidth: '100%',
+                height: 'auto'
               }}
               onLoad={(e) => {
                 e.target.style.filter = 'blur(0px)'
