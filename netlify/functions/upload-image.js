@@ -1,6 +1,3 @@
-const fetch = require('node-fetch');
-const FormData = require('form-data');
-
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -26,13 +23,19 @@ exports.handler = async (event, context) => {
   try {
     const { image, filename } = JSON.parse(event.body);
     
+    // Remove data:image/... prefix
+    const base64Image = image.split(',')[1];
+    
     // Upload to imgbb (free image hosting)
-    const formData = new FormData();
-    formData.append('image', image.split(',')[1]); // Remove data:image/... prefix
+    const formData = new URLSearchParams();
+    formData.append('image', base64Image);
     
     const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formData.toString()
     });
 
     const data = await response.json();

@@ -4,16 +4,49 @@ import Slider from '../components/Slider'
 import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
 import { sliderData, mangaList } from '../data/mangaData'
+import { getAllMangas } from '../utils/mangaService'
 
 const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [genreFilter, setGenreFilter] = useState('all')
+  const [allMangas, setAllMangas] = useState(mangaList)
   const [filteredMangas, setFilteredMangas] = useState(mangaList)
   const [showIntro, setShowIntro] = useState(true)
+  const [loading, setLoading] = useState(true)
+
+  // Load mangas from API/localStorage + static data
+  useEffect(() => {
+    loadAllMangas()
+  }, [])
+
+  const loadAllMangas = async () => {
+    setLoading(true)
+    try {
+      const apiMangas = await getAllMangas()
+      const combined = [...mangaList, ...apiMangas]
+      
+      // Remove duplicates by slug
+      const unique = combined.reduce((acc, manga) => {
+        if (!acc.find(m => m.slug === manga.slug)) {
+          acc.push(manga)
+        }
+        return acc
+      }, [])
+      
+      setAllMangas(unique)
+      setFilteredMangas(unique)
+    } catch (error) {
+      console.error('Error loading mangas:', error)
+      setAllMangas(mangaList)
+      setFilteredMangas(mangaList)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Extract all unique genres
-  const availableGenres = [...new Set(mangaList.flatMap(manga => manga.genres))].sort()
+  const availableGenres = [...new Set(allMangas.flatMap(manga => manga.genres))].sort()
 
   // Hide intro animation after 2.5 seconds
   useEffect(() => {
@@ -24,7 +57,7 @@ const HomePage = () => {
   }, [])
 
   useEffect(() => {
-    let filtered = mangaList
+    let filtered = allMangas
 
     // Filter by search term
     if (searchTerm) {
@@ -44,7 +77,7 @@ const HomePage = () => {
     }
 
     setFilteredMangas(filtered)
-  }, [searchTerm, statusFilter, genreFilter])
+  }, [searchTerm, statusFilter, genreFilter, allMangas])
 
   return (
     <>

@@ -1,10 +1,32 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
+import { getAllMangas } from '../utils/mangaService'
 
 const MangaDetail = () => {
   const { slug } = useParams()
-  const manga = mangaList.find(m => m.slug === slug)
+  const [manga, setManga] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadManga()
+  }, [slug])
+
+  const loadManga = async () => {
+    setLoading(true)
+    try {
+      const apiMangas = await getAllMangas()
+      const combined = [...mangaList, ...apiMangas]
+      const found = combined.find(m => m.slug === slug)
+      setManga(found)
+    } catch (error) {
+      console.error('Error loading manga:', error)
+      setManga(mangaList.find(m => m.slug === slug))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (!manga) {
     return (

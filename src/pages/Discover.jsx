@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import MangaCard from '../components/MangaCard'
 import { mangaList } from '../data/mangaData'
+import { getAllMangas } from '../utils/mangaService'
 
 const Discover = () => {
   // Filter States
@@ -9,19 +10,46 @@ const Discover = () => {
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [selectedGenres, setSelectedGenres] = useState([])
   const [sortBy, setSortBy] = useState('title-asc')
+  const [allMangas, setAllMangas] = useState(mangaList)
+  const [loading, setLoading] = useState(true)
+
+  // Load mangas from API/localStorage + static data
+  useEffect(() => {
+    loadAllMangas()
+  }, [])
+
+  const loadAllMangas = async () => {
+    setLoading(true)
+    try {
+      const apiMangas = await getAllMangas()
+      const combined = [...mangaList, ...apiMangas]
+      const unique = combined.reduce((acc, manga) => {
+        if (!acc.find(m => m.slug === manga.slug)) {
+          acc.push(manga)
+        }
+        return acc
+      }, [])
+      setAllMangas(unique)
+    } catch (error) {
+      console.error('Error loading mangas:', error)
+      setAllMangas(mangaList)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Get all unique genres from manga data
   const allGenres = useMemo(() => {
     const genres = new Set()
-    mangaList.forEach(manga => {
+    allMangas.forEach(manga => {
       manga.genres.forEach(genre => genres.add(genre))
     })
     return Array.from(genres).sort()
-  }, [])
+  }, [allMangas])
 
   // Filter manga with 100% accuracy
   const filteredMangas = useMemo(() => {
-    let result = [...mangaList]
+    let result = [...allMangas]
 
     // 1. Search filter - case insensitive, matches title
     if (searchTerm.trim()) {
@@ -62,7 +90,7 @@ const Discover = () => {
     })
 
     return result
-  }, [searchTerm, selectedStatus, selectedGenres, sortBy])
+  }, [searchTerm, selectedStatus, selectedGenres, sortBy, allMangas])
 
   // Toggle genre selection
   const toggleGenre = (genre) => {
