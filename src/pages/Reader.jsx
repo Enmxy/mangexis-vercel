@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
+import Comments from '../components/Comments'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -198,6 +199,16 @@ const Reader = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Comments Section - After last page */}
+      {currentPage === chapter.imageLinks.length - 1 && (
+        <div className="max-w-4xl mx-auto px-4 py-12 bg-black">
+          <Comments 
+            identifier={`chapter-${manga.slug}-${chapterId}`}
+            title={`${manga.title} - ${chapter.title}`}
+          />
+        </div>
+      )}
     </div>
   )
 }

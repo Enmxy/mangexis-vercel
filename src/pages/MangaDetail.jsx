@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
+import Comments from '../components/Comments'
 
 const MangaDetail = () => {
   const { slug } = useParams()
@@ -127,6 +128,19 @@ const MangaDetail = () => {
               </Link>
             ))}
           </div>
+        </motion.div>
+
+        {/* Comments Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-12"
+        >
+          <Comments 
+            identifier={`manga-${manga.slug}`}
+            title={manga.title}
+          />
         </motion.div>
       </div>
     </div>
