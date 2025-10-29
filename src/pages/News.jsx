@@ -50,9 +50,9 @@ const News = () => {
           className="text-center mb-12"
         >
           <h1 className="text-5xl font-black text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Manga Haberleri
+            Haberler & Duyurular
           </h1>
-          <p className="text-gray-400 text-lg">Manga dünyasından en son haberler ve duyurular</p>
+          <p className="text-gray-400 text-lg">Manga dünyasından en son haberler, duyurular ve güncellemeler</p>
         </motion.div>
 
         {/* Tag Filter */}

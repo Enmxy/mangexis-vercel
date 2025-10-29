@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getAllNews } from '../utils/newsService'
+import Poll from '../components/Poll'
 
 const NewsDetail = () => {
   const { slug } = useParams()
@@ -133,6 +134,13 @@ const NewsDetail = () => {
                 {news.content}
               </div>
             </div>
+
+            {/* Poll */}
+            {news.poll && (
+              <div className="mt-8">
+                <Poll poll={news.poll} newsSlug={news.slug} />
+              </div>
+            )}
           </div>
         </motion.article>
 

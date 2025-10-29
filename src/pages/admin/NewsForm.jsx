@@ -16,13 +16,17 @@ const NewsForm = () => {
     content: '',
     image: '',
     date: new Date().toISOString().split('T')[0],
-    tags: []
+    tags: [],
+    poll: null
   })
 
   const [newTag, setNewTag] = useState('')
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
+  const [showPollForm, setShowPollForm] = useState(false)
+  const [pollQuestion, setPollQuestion] = useState('')
+  const [pollOptions, setPollOptions] = useState(['', ''])
 
   useEffect(() => {
     if (isEdit) {
@@ -81,6 +85,48 @@ const NewsForm = () => {
       ...formData,
       tags: formData.tags.filter(t => t !== tag)
     })
+  }
+
+  const handleAddPollOption = () => {
+    setPollOptions([...pollOptions, ''])
+  }
+
+  const handleRemovePollOption = (index) => {
+    if (pollOptions.length > 2) {
+      setPollOptions(pollOptions.filter((_, i) => i !== index))
+    }
+  }
+
+  const handlePollOptionChange = (index, value) => {
+    const updated = [...pollOptions]
+    updated[index] = value
+    setPollOptions(updated)
+  }
+
+  const handleSavePoll = () => {
+    const validOptions = pollOptions.filter(opt => opt.trim())
+    if (!pollQuestion.trim() || validOptions.length < 2) {
+      alert('⚠️ Anket sorusu ve en az 2 seçenek gerekli!')
+      return
+    }
+
+    setFormData({
+      ...formData,
+      poll: {
+        id: Date.now().toString(),
+        question: pollQuestion,
+        options: validOptions
+      }
+    })
+    setShowPollForm(false)
+    alert('✅ Anket eklendi!')
+  }
+
+  const handleRemovePoll = () => {
+    setFormData({ ...formData, poll: null })
+    setPollQuestion('')
+    setPollOptions(['', ''])
+    setShowPollForm(false)
   }
 
   const handleImageUpload = async (e) => {
@@ -277,11 +323,120 @@ const NewsForm = () => {
           />
         </motion.div>
 
-        {/* Tags */}
+        {/* Poll */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="bg-gray-800 rounded-xl p-6 border border-gray-700"
+        >
+          <h2 className="text-lg font-semibold text-white mb-4">Anket (Opsiyonel)</h2>
+          
+          {formData.poll ? (
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="text-green-400 font-medium mb-2">✅ Anket eklendi</p>
+                  <p className="text-white font-medium">{formData.poll.question}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemovePoll}
+                  className="text-red-400 hover:text-red-300 px-3 py-1"
+                >
+                  ✖
+                </button>
+              </div>
+              <div className="space-y-1">
+                {formData.poll.options.map((opt, i) => (
+                  <p key={i} className="text-gray-300 text-sm">• {opt}</p>
+                ))}
+              </div>
+            </div>
+          ) : showPollForm ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Anket Sorusu
+                </label>
+                <input
+                  type="text"
+                  value={pollQuestion}
+                  onChange={(e) => setPollQuestion(e.target.value)}
+                  placeholder="Örn: En sevdiğiniz manga türü hangisi?"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Seçenekler (En az 2)
+                </label>
+                <div className="space-y-2">
+                  {pollOptions.map((option, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={option}
+                        onChange={(e) => handlePollOptionChange(index, e.target.value)}
+                        placeholder={`Seçenek ${index + 1}`}
+                        className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                      />
+                      {pollOptions.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePollOption(index)}
+                          className="text-red-400 hover:text-red-300 px-3"
+                        >
+                          ✖
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddPollOption}
+                  className="mt-2 text-purple-400 hover:text-purple-300 text-sm"
+                >
+                  + Seçenek Ekle
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleSavePoll}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Anketi Kaydet
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPollForm(false)}
+                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  İptal
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowPollForm(true)}
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <span className="text-xl">📋</span>
+              <span>Anket Ekle</span>
+            </button>
+          )}
+        </motion.div>
+
+        {/* Tags */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
           className="bg-gray-800 rounded-xl p-6 border border-gray-700"
         >
           <h2 className="text-lg font-semibold text-white mb-4">Etiketler</h2>
