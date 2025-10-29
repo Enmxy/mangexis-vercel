@@ -8,6 +8,9 @@ const AdminLogin = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
+  const [remainingAttempts, setRemainingAttempts] = useState(null)
+  const [lockedUntil, setLockedUntil] = useState(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -24,6 +27,7 @@ const AdminLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
+    setWarning('')
     setLoading(true)
 
     try {
@@ -31,11 +35,31 @@ const AdminLogin = () => {
       
       if (result.success) {
         authApi.setToken(result.token)
+        // Clear all warnings on success
+        setRemainingAttempts(null)
+        setLockedUntil(null)
         navigate('/admin/dashboard')
       } else {
+        // Handle different error types
         setError(result.error || 'Giriş başarısız')
+        
+        // Show remaining attempts warning
+        if (result.remainingAttempts !== undefined) {
+          setRemainingAttempts(result.remainingAttempts)
+        }
+        
+        // Show lockout warning
+        if (result.warning) {
+          setWarning(result.warning)
+        }
+        
+        // Handle lockout
+        if (result.lockedUntil) {
+          setLockedUntil(result.lockedUntil)
+        }
       }
     } catch (err) {
+      console.error('Login error:', err)
       setError('Bağlantı hatası. Lütfen tekrar deneyin.')
     } finally {
       setLoading(false)
@@ -101,30 +125,74 @@ const AdminLogin = () => {
               />
             </div>
 
-            {error && (
+            {/* Lockout Warning */}
+            {lockedUntil && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-500/20 border-2 border-red-500 rounded-lg p-4 text-red-300"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🔒</span>
+                  <span className="font-bold">Hesap Kilitlendi</span>
+                </div>
+                <p className="text-sm">Çok fazla başarısız deneme. 30 dakika sonra tekrar deneyin.</p>
+              </motion.div>
+            )}
+
+            {/* Warning */}
+            {warning && !lockedUntil && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-yellow-500/20 border border-yellow-500 rounded-lg p-3 text-yellow-300 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{warning}</span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Error */}
+            {error && !lockedUntil && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-red-500/10 border border-red-500 rounded-lg p-3 text-red-400 text-sm"
               >
-                {error}
+                <div className="flex items-center justify-between">
+                  <span>{error}</span>
+                  {remainingAttempts !== null && remainingAttempts > 0 && (
+                    <span className="text-xs bg-red-600/30 px-2 py-1 rounded">
+                      {remainingAttempts} deneme kaldı
+                    </span>
+                  )}
+                </div>
               </motion.div>
             )}
 
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={!lockedUntil ? { scale: 1.02 } : {}}
+              whileTap={!lockedUntil ? { scale: 0.98 } : {}}
               type="submit"
-              disabled={loading}
+              disabled={loading || lockedUntil}
               className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-lg shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+              {lockedUntil ? '🔒 Hesap Kilitli' : loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
             </motion.button>
           </form>
 
-          <p className="text-gray-400 text-xs text-center mt-6">
-            JWT token ile güvenli giriş
-          </p>
+          <div className="mt-6 space-y-2">
+            <p className="text-gray-400 text-xs text-center">
+              🔐 JWT token ile güvenli giriş
+            </p>
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+              <span>🛡️ Rate limiting</span>
+              <span>⏱️ Auto lockout</span>
+              <span>📊 Security logging</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Footer */}

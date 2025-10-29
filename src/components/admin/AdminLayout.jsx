@@ -9,6 +9,7 @@ const AdminLayout = () => {
   const [user, setUser] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [sessionRemaining, setSessionRemaining] = useState(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -24,8 +25,12 @@ const AdminLayout = () => {
         
         if (result.success) {
           setUser(result.user)
+          if (result.sessionRemaining) {
+            setSessionRemaining(result.sessionRemaining)
+          }
         } else {
           authApi.removeToken()
+          alert('⚖️ Oturumunuz sona erdi. Lütfen tekrar giriş yapın.')
           navigate('/admin/login')
         }
       } catch (error) {
@@ -38,6 +43,35 @@ const AdminLayout = () => {
     }
 
     checkAuth()
+
+    // Session timeout monitoring - check every minute
+    const sessionCheck = setInterval(async () => {
+      const token = authApi.getToken()
+      if (!token) {
+        clearInterval(sessionCheck)
+        return
+      }
+
+      try {
+        const result = await authApi.verify(token)
+        if (!result.success) {
+          clearInterval(sessionCheck)
+          authApi.removeToken()
+          alert('🕒 Oturumunuz sona erdi. Güvenlik nedeniyle otomatik olarak çıkış yapıldı.')
+          navigate('/admin/login')
+        } else if (result.sessionRemaining) {
+          setSessionRemaining(result.sessionRemaining)
+          // Warn when 10 minutes remaining
+          if (result.sessionRemaining < 10 * 60 * 1000 && result.sessionRemaining > 9 * 60 * 1000) {
+            alert('⚠️ Oturumunuz 10 dakika içinde sona erecek. Yapılan değişiklikleri kaydedin.')
+          }
+        }
+      } catch (error) {
+        console.error('Session check failed:', error)
+      }
+    }, 60000) // Check every minute
+
+    return () => clearInterval(sessionCheck)
   }, [navigate])
 
   const handleLogout = () => {

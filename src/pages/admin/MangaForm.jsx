@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { mangaList } from '../../data/mangaData'
-import { saveManga, updateManga, uploadImage } from '../../utils/mangaService'
+import { saveManga, updateManga, uploadImage, getAllMangas } from '../../utils/mangaService'
 
 const MangaForm = () => {
   const navigate = useNavigate()
