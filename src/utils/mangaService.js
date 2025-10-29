@@ -1,4 +1,5 @@
 // Manga CRUD operations with Netlify Functions
+import { authApi } from './adminApi'
 
 const API_URL = '/.netlify/functions/manga-operations';
 const UPLOAD_URL = '/.netlify/functions/upload-image';
@@ -68,10 +69,12 @@ export const saveManga = async (mangaData) => {
   }
 
   try {
+    const token = authApi.getToken();
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         operation: 'CREATE_MANGA',
@@ -101,10 +104,12 @@ export const updateManga = async (slug, mangaData) => {
   }
 
   try {
+    const token = authApi.getToken();
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         operation: 'UPDATE_MANGA',
@@ -132,10 +137,12 @@ export const deleteManga = async (slug) => {
   }
 
   try {
+    const token = authApi.getToken();
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         operation: 'DELETE_MANGA',
@@ -160,10 +167,12 @@ export const getAllMangas = async () => {
   }
 
   try {
+    const token = authApi.getToken();
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         operation: 'GET_ALL_MANGAS'

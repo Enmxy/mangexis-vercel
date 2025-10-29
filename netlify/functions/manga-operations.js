@@ -1,5 +1,7 @@
 // Simplified backend without external dependencies for Netlify
+const jwt = require('jsonwebtoken')
 const BRANCH = 'main';
+const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-super-secret-key-change-in-production';
 
 // Helper to get GitHub API headers
 const getGitHubHeaders = () => ({
@@ -26,13 +28,24 @@ exports.handler = async (event, context) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Check authentication (Netlify Identity)
-  const user = context.clientContext?.user;
-  if (!user) {
+  // Check JWT authentication
+  const token = event.headers.authorization?.replace('Bearer ', '');
+  
+  if (!token) {
     return {
       statusCode: 401,
       headers,
-      body: JSON.stringify({ error: 'Unauthorized - Please login' })
+      body: JSON.stringify({ error: 'Unauthorized - No token provided' })
+    };
+  }
+
+  try {
+    jwt.verify(token, JWT_SECRET);
+  } catch (error) {
+    return {
+      statusCode: 401,
+      headers,
+      body: JSON.stringify({ error: 'Unauthorized - Invalid token' })
     };
   }
 
