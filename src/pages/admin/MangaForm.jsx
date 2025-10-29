@@ -40,8 +40,21 @@ const MangaForm = () => {
 
   useEffect(() => {
     if (isEdit) {
-      const manga = mangaList.find(m => m.slug === slug)
+      loadMangaForEdit()
+    }
+  }, [isEdit, slug])
+
+  const loadMangaForEdit = async () => {
+    try {
+      // Try to load from API first
+      const apiMangas = await getAllMangas()
+      const allMangas = [...mangaList, ...apiMangas]
+      const manga = allMangas.find(m => m.slug === slug)
+      
       if (manga) {
+        console.log('Loading manga for edit:', manga)
+        console.log('Existing chapters:', manga.chapters)
+        
         setFormData({
           title: manga.title,
           slug: manga.slug,
@@ -56,9 +69,22 @@ const MangaForm = () => {
             fansubs: ch.fansubs || [{ name: 'Default', images: ch.imageLinks || [] }]
           })) || []
         })
+        
+        // Set next chapter number
+        if (manga.chapters && manga.chapters.length > 0) {
+          const maxChapter = Math.max(...manga.chapters.map(ch => parseInt(ch.id)))
+          setNewChapter({
+            chapter: maxChapter + 1,
+            images: [''],
+            fansubs: [{ name: 'Default', images: [''] }]
+          })
+        }
       }
+    } catch (error) {
+      console.error('Error loading manga for edit:', error)
+      alert('❌ Manga yüklenemedi: ' + error.message)
     }
-  }, [isEdit, slug])
+  }
 
   const generateSlug = (title) => {
     return title
