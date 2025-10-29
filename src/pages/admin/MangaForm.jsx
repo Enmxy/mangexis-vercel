@@ -132,31 +132,48 @@ const MangaForm = () => {
   }
 
   const handleAddChapter = () => {
-    console.log('Adding chapter:', newChapter)
-    console.log('Current images:', newChapter.images)
-    
-    const hasImages = newChapter.images.some(img => img.trim())
-    console.log('Has valid images?', hasImages)
-    
-    if (hasImages) {
-      const updatedChapters = [...formData.chapters, { ...newChapter }]
-      console.log('Updated chapters:', updatedChapters)
-      
-      setFormData({
-        ...formData,
-        chapters: updatedChapters
-      })
-      
-      setNewChapter({
-        chapter: newChapter.chapter + 1,
-        images: [''],
-        fansubs: [{ name: 'Default', images: [''] }]
-      })
-      
-      alert(`Bölüm ${newChapter.chapter} eklendi! Toplam ${updatedChapters.length} bölüm.`)
-    } else {
-      alert('Lütfen en az 1 sayfa URLsi girin!')
+    // Validate chapter number
+    if (!newChapter.chapter || newChapter.chapter < 1) {
+      alert('⚠️ Lütfen geçerli bir bölüm numarası girin!')
+      return
     }
+
+    // Validate images
+    const validImages = newChapter.images.filter(img => img && img.trim())
+    if (validImages.length === 0) {
+      alert('⚠️ Lütfen en az 1 sayfa URL\'si girin!')
+      return
+    }
+
+    // Check if chapter already exists
+    const chapterExists = formData.chapters.some(ch => ch.chapter === newChapter.chapter)
+    if (chapterExists) {
+      alert(`⚠️ Bölüm ${newChapter.chapter} zaten ekli! Farklı bir numara seçin.`)
+      return
+    }
+
+    // Add chapter with validated images
+    const chapterToAdd = {
+      chapter: newChapter.chapter,
+      images: validImages,
+      fansubs: newChapter.fansubs || []
+    }
+
+    const updatedChapters = [...formData.chapters, chapterToAdd]
+    
+    setFormData({
+      ...formData,
+      chapters: updatedChapters
+    })
+    
+    // Reset form for next chapter
+    setNewChapter({
+      chapter: newChapter.chapter + 1,
+      images: [''],
+      fansubs: [{ name: 'Default', images: [''] }]
+    })
+    
+    alert(`✅ Bölüm ${chapterToAdd.chapter} eklendi! (${validImages.length} sayfa)\n\nToplam: ${updatedChapters.length} bölüm`)
   }
 
   const handleAddFansub = () => {
@@ -227,6 +244,17 @@ const MangaForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
+    // Validation
+    if (!formData.title || !formData.slug || !formData.cover) {
+      alert('⚠️ Lütfen tüm zorunlu alanları doldurun (Başlık, Slug, Kapak)')
+      return
+    }
+
+    if (formData.chapters.length === 0) {
+      const confirm = window.confirm('⚠️ Hiç bölüm eklenmedi. Bölümsüz devam etmek istiyor musunuz?')
+      if (!confirm) return
+    }
+    
     setSaving(true)
     setUploadProgress('Kaydediliyor...')
 
@@ -234,24 +262,32 @@ const MangaForm = () => {
       // Convert chapters format for compatibility
       const formattedData = {
         ...formData,
-        chapters: formData.chapters.map(ch => ({
-          id: ch.chapter.toString(),
-          title: `Bölüm ${ch.chapter}`,
-          imageLinks: ch.images.filter(img => img.trim()),
-          fansubs: ch.fansubs || []
-        }))
+        chapters: formData.chapters
+          .sort((a, b) => a.chapter - b.chapter) // Sort by chapter number
+          .map(ch => ({
+            id: ch.chapter.toString(),
+            title: `Bölüm ${ch.chapter}`,
+            imageLinks: ch.images.filter(img => img && img.trim()),
+            fansubs: ch.fansubs || []
+          }))
       }
 
+      console.log('Saving manga with data:', formattedData)
+      console.log('Chapters to save:', formattedData.chapters)
+
       if (isEdit) {
-        await updateManga(slug, formattedData)
-        alert('✅ Manga başarıyla güncellendi!')
+        const result = await updateManga(slug, formattedData)
+        console.log('Update result:', result)
+        alert(`✅ Manga başarıyla güncellendi!\n\nBölüm sayısı: ${formattedData.chapters.length}`)
       } else {
-        await saveManga(formattedData)
-        alert('✅ Manga başarıyla eklendi! Manga listesinde görünecek.')
+        const result = await saveManga(formattedData)
+        console.log('Save result:', result)
+        alert(`✅ Manga başarıyla eklendi!\n\nBaşlık: ${formattedData.title}\nBölüm: ${formattedData.chapters.length}\n\nManga listesinde görünecek.`)
       }
       navigate('/admin/mangas')
     } catch (error) {
-      alert('❌ Hata: ' + error.message)
+      console.error('Save error:', error)
+      alert(`❌ Kaydetme hatası:\n\n${error.message}\n\nKonsolu kontrol edin.`)
     } finally {
       setSaving(false)
       setUploadProgress('')
@@ -482,26 +518,47 @@ const MangaForm = () => {
           <h2 className="text-lg font-semibold text-white mb-4">Bölümler</h2>
           
           {/* Existing Chapters */}
-          {formData.chapters.length > 0 && (
-            <div className="space-y-3 mb-6">
-              {formData.chapters.map((chapter, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-700 rounded-lg p-4 flex items-center justify-between"
-                >
-                  <div>
-                    <p className="text-white font-medium">Bölüm {chapter.chapter}</p>
-                    <p className="text-gray-400 text-sm">{chapter.images.length} sayfa</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveChapter(index)}
-                    className="text-red-400 hover:text-red-300 transition-colors"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              ))}
+          {formData.chapters.length > 0 ? (
+            <div className="mb-6">
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
+                <p className="text-green-400 font-medium text-sm">
+                  ✅ {formData.chapters.length} bölüm eklendi
+                </p>
+              </div>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {formData.chapters
+                  .sort((a, b) => a.chapter - b.chapter)
+                  .map((chapter, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-700 rounded-lg p-3 flex items-center justify-between hover:bg-gray-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
+                          {chapter.chapter}
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">Bölüm {chapter.chapter}</p>
+                          <p className="text-gray-400 text-xs">{chapter.images?.length || 0} sayfa</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveChapter(index)}
+                        className="text-red-400 hover:text-red-300 transition-colors px-3 py-2 hover:bg-red-500/10 rounded"
+                        title="Sil"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+              <p className="text-yellow-400 text-sm">
+                ⚠️ Henüz bölüm eklenmedi. Aşağıdaki formdan bölüm ekleyin.
+              </p>
             </div>
           )}
 
