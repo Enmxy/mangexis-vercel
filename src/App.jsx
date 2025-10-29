@@ -11,6 +11,8 @@ import Disclaimer from './pages/Disclaimer'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import Favorites from './pages/Favorites'
+import News from './pages/News'
+import NewsDetail from './pages/NewsDetail'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -18,6 +20,8 @@ import AdminLayout from './components/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import MangaList from './pages/admin/MangaList'
 import MangaForm from './pages/admin/MangaForm'
+import NewsList from './pages/admin/NewsList'
+import NewsForm from './pages/admin/NewsForm'
 
 function App() {
   return (
@@ -85,6 +89,22 @@ function App() {
         </div>
       } />
       <Route path="/manga/:slug/chapter/:chapterId" element={<Reader />} />
+      <Route path="/news" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <News />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
+      <Route path="/news/:slug" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <NewsDetail />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
@@ -94,6 +114,9 @@ function App() {
         <Route path="mangas" element={<MangaList />} />
         <Route path="mangas/new" element={<MangaForm />} />
         <Route path="mangas/edit/:slug" element={<MangaForm />} />
+        <Route path="news" element={<NewsList />} />
+        <Route path="news/new" element={<NewsForm />} />
+        <Route path="news/edit/:slug" element={<NewsForm />} />
       </Route>
     </Routes>
   )

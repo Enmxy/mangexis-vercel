@@ -48,6 +48,7 @@ const AdminLayout = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
     { name: 'Mangalar', path: '/admin/mangas', icon: '📚' },
+    { name: 'Haberler', path: '/admin/news', icon: '📰' },
     { name: 'Manga Ekle', path: '/admin/mangas/new', icon: '➕' }
   ]
 
