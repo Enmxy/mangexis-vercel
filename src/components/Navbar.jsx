@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '../context/AuthContext'
 
 const Navbar = () => {
   const location = useLocation()
-  const { user, isAuthenticated, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   const navItems = [
     { name: 'Anasayfa', path: '/' },
@@ -54,93 +51,6 @@ const Navbar = () => {
                 </motion.div>
               </Link>
             ))}
-          </div>
-
-          {/* User Menu */}
-          <div className="hidden md:flex items-center gap-4">
-            {isAuthenticated && user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-white text-sm font-medium">{user.username}</span>
-                  <svg className={`w-4 h-4 text-white transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                <AnimatePresence>
-                  {userMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50"
-                    >
-                      <Link
-                        to="/profile"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block px-4 py-3 text-white hover:bg-white/10 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>👤</span>
-                          <span>Profilim</span>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/history"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block px-4 py-3 text-white hover:bg-white/10 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>📚</span>
-                          <span>Okuma Geçmişi</span>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/favorites"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block px-4 py-3 text-white hover:bg-white/10 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>❤️</span>
-                          <span>Favorilerim</span>
-                        </div>
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout()
-                          setUserMenuOpen(false)
-                        }}
-                        className="w-full text-left px-4 py-3 text-red-400 hover:bg-red-500/10 transition-colors border-t border-gray-700"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>🚺</span>
-                          <span>Çıkış Yap</span>
-                        </div>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link to="/login">
-                  <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Giriş Yap
-                  </button>
-                </Link>
-                <Link to="/signup">
-                  <button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Kayıt Ol
-                  </button>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Mobile Menu Button */}

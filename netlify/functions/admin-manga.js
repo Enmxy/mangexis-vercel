@@ -50,25 +50,51 @@ const updateMangaData = async (content, sha, message) => {
   }
 }
 
-exports.handler = async (event, context) => {
+// Helper: Validate manga data
+const validateManga = (manga) => {
+  const errors = []
+  
+  if (!manga.title || manga.title.trim().length < 2) {
+    errors.push('Başlık en az 2 karakter olmalı')
+  }
+  
+  if (!manga.slug || manga.slug.trim().length < 2) {
+    errors.push('Slug en az 2 karakter olmalı')
+  }
+  
+  if (!manga.cover || !manga.cover.startsWith('http')) {
+    errors.push('Geçerli bir kapak resmi URL\'si gerekli')
+  }
+  
+  if (!manga.description || manga.description.trim().length < 10) {
+    errors.push('Açıklama en az 10 karakter olmalı')
+  }
+  
+  if (!manga.status || !['ongoing', 'completed', 'hiatus'].includes(manga.status)) {
+    errors.push('Geçerli bir durum seçin (ongoing, completed, hiatus)')
+  }
+  
+  if (!manga.genres || !Array.isArray(manga.genres) || manga.genres.length === 0) {
+    errors.push('En az 1 tür seçilmeli')
+  }
+  
+  return errors
+}
+
+exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   }
 
+  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' }
   }
 
-  // Verify authentication
-  const token = event.headers.authorization?.replace('Bearer ', '')
-  const user = verifyToken(token)
+  const path = event.path.replace('/.netlify/functions/admin-manga', '')
 
-  if (!user) {
-    return {
-      statusCode: 401,
-      headers,
       body: JSON.stringify({ error: 'Unauthorized' })
     }
   }
