@@ -1,15 +1,23 @@
 {
   "title": "Spy X Family",
   "slug": "spy-x-family",
-  "cover": "",
-  "description": "mmm",
+  "cover": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUM0SkM5pd4gxqeMtzwkyD8tl-yKd-7FyqCw&s",
+  "description": "Westalis isimli ülke adına çalışan ve kod adı \"Alacakaranlık\" olan bir casus, komşu ülke Ostania ile aradaki sürtüşmeyi durdurmak ve barışı sağlamak adına bir görev almıştır. Aldığı bu görevde Alacakaranlık, Ostanialı bir politikacı olan Donovan Desmond'a yakınlaşmak mecburiyetindedir ve bu görevi başarabilmek için sahte bir aile kurmak zorundadır.",
   "status": "ongoing",
   "genres": [
     "Aksiyon",
+    "Macera",
     "Shounen",
+    "Fantastik",
     "Drama",
-    "Doğaüstü"
+    "Gerilim",
+    "Doğaüstü",
+    "Komedi",
+    "Romantizm",
+    "Okul",
+    "Süper Güç",
+    "Karanlık Fantazi"
   ],
-  "fansub": "",
+  "fansub": "Mangexis",
   "chapters": []
 }
