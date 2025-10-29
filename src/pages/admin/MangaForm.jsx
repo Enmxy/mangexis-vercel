@@ -132,16 +132,30 @@ const MangaForm = () => {
   }
 
   const handleAddChapter = () => {
-    if (newChapter.images.some(img => img.trim())) {
+    console.log('Adding chapter:', newChapter)
+    console.log('Current images:', newChapter.images)
+    
+    const hasImages = newChapter.images.some(img => img.trim())
+    console.log('Has valid images?', hasImages)
+    
+    if (hasImages) {
+      const updatedChapters = [...formData.chapters, { ...newChapter }]
+      console.log('Updated chapters:', updatedChapters)
+      
       setFormData({
         ...formData,
-        chapters: [...formData.chapters, { ...newChapter }]
+        chapters: updatedChapters
       })
+      
       setNewChapter({
         chapter: newChapter.chapter + 1,
         images: [''],
         fansubs: [{ name: 'Default', images: [''] }]
       })
+      
+      alert(`Bölüm ${newChapter.chapter} eklendi! Toplam ${updatedChapters.length} bölüm.`)
+    } else {
+      alert('Lütfen en az 1 sayfa URLsi girin!')
     }
   }
 
