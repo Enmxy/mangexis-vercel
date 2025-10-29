@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import MobileBottomNav from './components/MobileBottomNav'
 import HomePage from './pages/HomePage'
 import MangaDetail from './pages/MangaDetail'
 import Reader from './pages/Reader'
@@ -27,6 +28,7 @@ function App() {
           <Navbar />
           <HomePage />
           <Footer />
+          <MobileBottomNav />
         </div>
       } />
       <Route path="/discover" element={
@@ -34,6 +36,7 @@ function App() {
           <Navbar />
           <Discover />
           <Footer />
+          <MobileBottomNav />
         </div>
       } />
       <Route path="/favorites" element={
@@ -41,6 +44,7 @@ function App() {
           <Navbar />
           <Favorites />
           <Footer />
+          <MobileBottomNav />
         </div>
       } />
       <Route path="/about" element={
@@ -48,6 +52,7 @@ function App() {
           <Navbar />
           <About />
           <Footer />
+          <MobileBottomNav />
         </div>
       } />
       <Route path="/disclaimer" element={
@@ -76,6 +81,7 @@ function App() {
           <Navbar />
           <MangaDetail />
           <Footer />
+          <MobileBottomNav />
         </div>
       } />
       <Route path="/manga/:slug/chapter/:chapterId" element={<Reader />} />

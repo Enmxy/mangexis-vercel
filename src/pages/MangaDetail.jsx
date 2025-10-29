@@ -47,6 +47,26 @@ const MangaDetail = () => {
     }
   }
 
+  const handleShare = async () => {
+    const shareData = {
+      title: manga.title,
+      text: `${manga.title} - MangeXis'te okuyun!`,
+      url: window.location.href
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(window.location.href)
+        alert('Link kopyalandı!')
+      }
+    } catch (error) {
+      console.error('Share failed:', error)
+    }
+  }
+
   const loadManga = async () => {
     setLoading(true)
     try {
@@ -240,6 +260,7 @@ const MangaDetail = () => {
                   {isFavorite ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
                 </motion.button>
                 <motion.button
+                  onClick={handleShare}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-6 py-4 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all flex items-center gap-2"
