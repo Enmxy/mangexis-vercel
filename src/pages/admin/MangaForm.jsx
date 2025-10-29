@@ -28,7 +28,11 @@ const MangaForm = () => {
   const [newChapter, setNewChapter] = useState({
     chapter: 1,
     images: [''],
-    fansubs: [{ name: 'Default', images: [''] }]
+    fansubs: []
+  })
+  const [currentFansub, setCurrentFansub] = useState({
+    name: '',
+    images: ['']
   })
 
   const availableGenres = [
@@ -157,6 +161,63 @@ const MangaForm = () => {
     })
   }
 
+  const handleFansubImageChange = (index, value) => {
+    const updatedImages = [...currentFansub.images]
+    updatedImages[index] = value
+    setCurrentFansub({
+      ...currentFansub,
+      images: updatedImages
+    })
+  }
+
+  const handleAddFansubImageField = () => {
+    setCurrentFansub({
+      ...currentFansub,
+      images: [...currentFansub.images, '']
+    })
+  }
+
+  const handleRemoveFansubImageField = (index) => {
+    setCurrentFansub({
+      ...currentFansub,
+      images: currentFansub.images.filter((_, i) => i !== index)
+    })
+  }
+
+  const handleAddFansub = () => {
+    if (!currentFansub.name.trim()) {
+      alert('⚠️ Fansub adı girin!')
+      return
+    }
+
+    const validImages = currentFansub.images.filter(img => img && img.trim())
+    if (validImages.length === 0) {
+      alert('⚠️ En az 1 sayfa URL\'si girin!')
+      return
+    }
+
+    const fansubExists = newChapter.fansubs.some(f => f.name === currentFansub.name)
+    if (fansubExists) {
+      alert(`⚠️ "${currentFansub.name}" fansub zaten ekli!`)
+      return
+    }
+
+    setNewChapter({
+      ...newChapter,
+      fansubs: [...newChapter.fansubs, { name: currentFansub.name, images: validImages }]
+    })
+
+    setCurrentFansub({ name: '', images: [''] })
+    alert(`✅ "${currentFansub.name}" fansub eklendi! (${validImages.length} sayfa)`)
+  }
+
+  const handleRemoveFansub = (index) => {
+    setNewChapter({
+      ...newChapter,
+      fansubs: newChapter.fansubs.filter((_, i) => i !== index)
+    })
+  }
+
   const handleAddChapter = () => {
     // Validate chapter number
     if (!newChapter.chapter || newChapter.chapter < 1) {
@@ -178,6 +239,12 @@ const MangaForm = () => {
       return
     }
 
+    // Check if we have fansubs or default images
+    if (validImages.length === 0 && newChapter.fansubs.length === 0) {
+      alert('⚠️ En az 1 fansub veya varsayılan sayfalar ekleyin!')
+      return
+    }
+
     // Add chapter with validated images
     const chapterToAdd = {
       chapter: newChapter.chapter,
@@ -196,48 +263,15 @@ const MangaForm = () => {
     setNewChapter({
       chapter: newChapter.chapter + 1,
       images: [''],
-      fansubs: [{ name: 'Default', images: [''] }]
+      fansubs: []
     })
+    setCurrentFansub({ name: '', images: [''] })
     
-    alert(`✅ Bölüm ${chapterToAdd.chapter} eklendi! (${validImages.length} sayfa)\n\nToplam: ${updatedChapters.length} bölüm`)
-  }
-
-  const handleAddFansub = () => {
-    setNewChapter({
-      ...newChapter,
-      fansubs: [...newChapter.fansubs, { name: '', images: [''] }]
-    })
-  }
-
-  const handleRemoveFansub = (index) => {
-    setNewChapter({
-      ...newChapter,
-      fansubs: newChapter.fansubs.filter((_, i) => i !== index)
-    })
-  }
-
-  const handleFansubNameChange = (index, name) => {
-    const updatedFansubs = [...newChapter.fansubs]
-    updatedFansubs[index].name = name
-    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
-  }
-
-  const handleFansubImageChange = (fansubIndex, imageIndex, value) => {
-    const updatedFansubs = [...newChapter.fansubs]
-    updatedFansubs[fansubIndex].images[imageIndex] = value
-    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
-  }
-
-  const handleAddFansubImage = (fansubIndex) => {
-    const updatedFansubs = [...newChapter.fansubs]
-    updatedFansubs[fansubIndex].images.push('')
-    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
-  }
-
-  const handleRemoveFansubImage = (fansubIndex, imageIndex) => {
-    const updatedFansubs = [...newChapter.fansubs]
-    updatedFansubs[fansubIndex].images = updatedFansubs[fansubIndex].images.filter((_, i) => i !== imageIndex)
-    setNewChapter({ ...newChapter, fansubs: updatedFansubs })
+    const fansubInfo = newChapter.fansubs.length > 0 
+      ? `\n${newChapter.fansubs.length} fansub ekli`
+      : ''
+    
+    alert(`✅ Bölüm ${chapterToAdd.chapter} eklendi!\n${validImages.length} varsayılan sayfa${fansubInfo}\n\nToplam: ${updatedChapters.length} bölüm`)
   }
 
   const handleRemoveChapter = (index) => {
@@ -635,6 +669,87 @@ const MangaForm = () => {
               >
                 + Sayfa Ekle
               </button>
+            </div>
+
+            {/* Fansub Management */}
+            <div className="border-t border-gray-600 pt-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <span>🎬</span>
+                <span>Fansub Ekle (Opsiyonel)</span>
+              </h3>
+              
+              {/* Existing Fansubs */}
+              {newChapter.fansubs.length > 0 && (
+                <div className="mb-4 space-y-2">
+                  {newChapter.fansubs.map((fansub, index) => (
+                    <div key={index} className="bg-gray-600/50 rounded-lg p-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-medium">{fansub.name}</p>
+                        <p className="text-gray-400 text-xs">{fansub.images.length} sayfa</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFansub(index)}
+                        className="text-red-400 hover:text-red-300 px-2"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Fansub Form */}
+              <div className="bg-gray-600/30 rounded-lg p-3 space-y-3">
+                <input
+                  type="text"
+                  value={currentFansub.name}
+                  onChange={(e) => setCurrentFansub({ ...currentFansub, name: e.target.value })}
+                  placeholder="Fansub adı (örn: TurkAnime, MangaTR)"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                />
+                
+                <div>
+                  <label className="block text-sm text-gray-300 mb-2">Fansub Sayfaları</label>
+                  <div className="space-y-2">
+                    {currentFansub.images.map((image, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="url"
+                          value={image}
+                          onChange={(e) => handleFansubImageChange(index, e.target.value)}
+                          placeholder={`Sayfa ${index + 1} URL`}
+                          className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors text-sm"
+                        />
+                        {currentFansub.images.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFansubImageField(index)}
+                            className="text-red-400 hover:text-red-300 px-2"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddFansubImageField}
+                    className="mt-2 text-purple-400 hover:text-purple-300 text-xs"
+                  >
+                    + Sayfa Ekle
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddFansub}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                >
+                  🎬 Fansub Ekle
+                </button>
+              </div>
             </div>
 
             <button

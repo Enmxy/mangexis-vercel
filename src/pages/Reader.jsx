@@ -5,6 +5,7 @@ import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import Comments from '../components/Comments'
 import imageUpscaler from '../utils/imageUpscaler'
+import { addToHistory } from '../utils/readingHistory'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -60,7 +61,7 @@ const Reader = () => {
 
   const images = getCurrentImages()
 
-  // Save reading progress
+  // Save reading progress and history
   useEffect(() => {
     if (manga && chapter) {
       const key = `reading-progress-${manga.slug}`
@@ -68,8 +69,11 @@ const Reader = () => {
         chapterId: chapter.id,
         timestamp: Date.now()
       }))
+      
+      // Add to reading history
+      addToHistory(manga, chapter.id, currentPage, images.length)
     }
-  }, [manga, chapter])
+  }, [manga, chapter, currentPage, images.length])
 
   // Restore scroll position
   useEffect(() => {

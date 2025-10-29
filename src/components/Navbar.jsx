@@ -9,6 +9,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Anasayfa', path: '/' },
     { name: 'Keşfet', path: '/discover' },
+    { name: 'Okuma Geçmişi', path: '/history' },
     { name: 'Haberler & Duyurular', path: '/news' },
     { name: 'Hakkımızda', path: '/about' }
   ]

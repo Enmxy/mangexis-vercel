@@ -6,6 +6,7 @@ import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
 import { sliderData, mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
+import { getReadingHistory } from '../utils/readingHistory'
 
 const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -15,13 +16,29 @@ const HomePage = () => {
   const [filteredMangas, setFilteredMangas] = useState(mangaList)
   const [showIntro, setShowIntro] = useState(true)
   const [loading, setLoading] = useState(true)
-  const [continueReading, setContinueReading] = useState(null)
+  const [continueReading, setContinueReading] = useState([])
+  const [recentlyUpdated, setRecentlyUpdated] = useState([])
 
   // Load mangas from API/localStorage + static data
   useEffect(() => {
     loadAllMangas()
-    loadContinueReading()
   }, [])
+
+  useEffect(() => {
+    if (allMangas.length > 0) {
+      loadContinueReading()
+      // Get recently updated mangas (sort by latest chapter)
+      const sorted = [...allMangas]
+        .filter(m => m.chapters && m.chapters.length > 0)
+        .sort((a, b) => {
+          const aLatest = Math.max(...a.chapters.map(ch => parseInt(ch.id) || 0))
+          const bLatest = Math.max(...b.chapters.map(ch => parseInt(ch.id) || 0))
+          return bLatest - aLatest
+        })
+        .slice(0, 8)
+      setRecentlyUpdated(sorted)
+    }
+  }, [allMangas])
 
   const loadAllMangas = async () => {
     setLoading(true)
@@ -50,23 +67,16 @@ const HomePage = () => {
 
   const loadContinueReading = () => {
     try {
-      const allProgress = Object.keys(localStorage)
-        .filter(key => key.startsWith('reading-progress-'))
-        .map(key => {
-          const data = JSON.parse(localStorage.getItem(key))
-          const slug = key.replace('reading-progress-', '')
-          return { ...data, slug, key }
-        })
-        .sort((a, b) => b.timestamp - a.timestamp)
-
-      if (allProgress.length > 0) {
-        const latest = allProgress[0]
-        const manga = mangaList.find(m => m.slug === latest.slug)
+      const history = getReadingHistory()
+      const recent = history.slice(0, 3).map(item => {
+        const manga = allMangas.find(m => m.slug === item.slug)
         if (manga) {
-          const chapter = manga.chapters.find(c => c.id === latest.chapterId)
-          setContinueReading({ manga, chapter })
+          return { ...item, manga }
         }
-      }
+        return null
+      }).filter(Boolean)
+      
+      setContinueReading(recent)
     } catch (error) {
       console.error('Error loading continue reading:', error)
     }
@@ -154,7 +164,7 @@ const HomePage = () => {
           </motion.div>
 
           {/* Continue Reading Section */}
-          {continueReading && (
+          {continueReading.length > 0 && (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -162,35 +172,53 @@ const HomePage = () => {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-white/20 rounded-2xl p-6"
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <h2 className="text-xl font-bold text-white">Okumaya Devam Et</h2>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                  <img 
-                    src={continueReading.manga.cover} 
-                    alt={continueReading.manga.title}
-                    className="w-20 h-28 object-cover rounded-lg border border-white/10"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-white mb-1">{continueReading.manga.title}</h3>
-                    <p className="text-gray-400 text-sm mb-3">{continueReading.chapter?.title || 'Bölüm'}</p>
-                    <Link to={`/manga/${continueReading.manga.slug}/chapter/${continueReading.chapter?.id}`}>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-all flex items-center gap-2 text-sm"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Devam Et
-                      </motion.button>
-                    </Link>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h2 className="text-xl font-bold text-white">Okumaya Devam Et</h2>
                   </div>
+                  <Link to="/history" className="text-purple-400 hover:text-purple-300 text-sm font-medium">
+                    Tümünü Gör →
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {continueReading.map((item, index) => (
+                    <motion.div
+                      key={item.slug + item.chapterId}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-all group"
+                    >
+                      <div className="flex gap-3">
+                        <img 
+                          src={item.cover} 
+                          alt={item.title}
+                          className="w-16 h-20 object-cover rounded-lg border border-white/10"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-medium mb-1 truncate group-hover:text-purple-400 transition-colors">{item.title}</h3>
+                          <p className="text-gray-400 text-xs mb-2">{item.chapterTitle}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                              <div 
+                                className="h-full bg-purple-500 rounded-full transition-all"
+                                style={{ width: `${item.progress}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-400">{item.progress}%</span>
+                          </div>
+                          <Link to={`/manga/${item.slug}/chapter/${item.chapterId}`}>
+                            <button className="mt-2 text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded transition-colors">
+                              Devam Et
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
             </div>
@@ -259,6 +287,60 @@ const HomePage = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Recently Updated Section */}
+        {recentlyUpdated.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <h2 className="text-2xl font-bold text-white">Son Güncellemeler</h2>
+                </div>
+                <Link to="/discover" className="text-green-400 hover:text-green-300 text-sm font-medium">
+                  Tümünü Keşfet →
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                {recentlyUpdated.map((manga, index) => (
+                  <motion.div
+                    key={manga.slug}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Link to={`/manga/${manga.slug}`}>
+                      <div className="group relative overflow-hidden rounded-xl">
+                        <img
+                          src={manga.cover}
+                          alt={manga.title}
+                          className="w-full aspect-[2/3] object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/150x200?text=No+Image' }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute bottom-0 left-0 right-0 p-2 translate-y-full group-hover:translate-y-0 transition-transform">
+                          <p className="text-white text-xs font-medium truncate">{manga.title}</p>
+                          <p className="text-green-400 text-xs">Bölüm {Math.max(...manga.chapters.map(ch => parseInt(ch.id) || 0))}</p>
+                        </div>
+                        <div className="absolute top-2 right-2">
+                          <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                            YENİ
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

@@ -13,6 +13,7 @@ import Terms from './pages/Terms'
 import Favorites from './pages/Favorites'
 import News from './pages/News'
 import NewsDetail from './pages/NewsDetail'
+import ReadingHistory from './pages/ReadingHistory'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -47,6 +48,14 @@ function App() {
         <div className="min-h-screen bg-black">
           <Navbar />
           <Favorites />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
+      <Route path="/history" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <ReadingHistory />
           <Footer />
           <MobileBottomNav />
         </div>
