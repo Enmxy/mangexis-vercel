@@ -14,15 +14,16 @@ const Comments = ({ identifier, title }) => {
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'Enmxy/Mangexis')
     script.setAttribute('data-repo-id', 'R_kgDOPo9WYg')
-    script.setAttribute('data-category', 'Announcements')
-    script.setAttribute('data-category-id', 'DIC_kwDOPo9WYs4CxK8j')
-    script.setAttribute('data-mapping', 'pathname')
+    script.setAttribute('data-category', 'General')
+    script.setAttribute('data-category-id', 'DIC_kwDOPo9WYs4CxK65')
+    script.setAttribute('data-mapping', 'title')
     script.setAttribute('data-strict', '0')
     script.setAttribute('data-reactions-enabled', '1')
     script.setAttribute('data-emit-metadata', '0')
-    script.setAttribute('data-input-position', 'bottom')
+    script.setAttribute('data-input-position', 'top')
     script.setAttribute('data-theme', 'dark')
     script.setAttribute('data-lang', 'tr')
+    script.setAttribute('data-loading', 'lazy')
     script.crossOrigin = 'anonymous'
     script.async = true
 
