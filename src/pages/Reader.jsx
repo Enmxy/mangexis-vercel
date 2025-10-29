@@ -19,6 +19,8 @@ const Reader = () => {
     // Mobile: 100%, Desktop: 50%
     return window.innerWidth < 768 ? 100 : 50
   })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageInput, setPageInput] = useState('1')
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
@@ -82,7 +84,7 @@ const Reader = () => {
     }
   }, [chapter, images.length])
 
-  // Track scroll progress
+  // Track scroll progress and current page
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
@@ -90,9 +92,29 @@ const Reader = () => {
       const progress = (scrollTop / docHeight) * 100
       setScrollProgress(progress)
 
+      // Calculate current page based on scroll position
+      const viewportCenter = scrollTop + window.innerHeight / 2
+      let foundPage = 1
+      imageRefs.current.forEach((ref, index) => {
+        if (ref) {
+          const rect = ref.getBoundingClientRect()
+          const elementTop = scrollTop + rect.top
+          if (viewportCenter >= elementTop) {
+            foundPage = index + 1
+          }
+        }
+      })
+      setCurrentPage(foundPage)
+      setPageInput(foundPage.toString())
+
       // Save scroll position
       const key = `scroll-position-${slug}-${chapterId}`
       localStorage.setItem(key, scrollTop.toString())
+
+      // Auto-hide bar
+      clearTimeout(window.barTimer)
+      setShowBar(true)
+      window.barTimer = setTimeout(() => setShowBar(false), 2000)
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -202,17 +224,39 @@ const Reader = () => {
 
   // Zoom controls
   const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 25, 200))
+    if (zoomLevel < 200) setZoomLevel(prev => Math.min(200, prev + 10))
   }
 
   const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 25, 50))
+    if (zoomLevel > 50) setZoomLevel(prev => Math.max(50, prev - 10))
   }
 
   const handleZoomReset = () => {
-    setZoomLevel(100)
+    setZoomLevel(50)
   }
 
+  const jumpToPage = (pageNumber) => {
+    const targetPage = Math.max(1, Math.min(pageNumber, images.length))
+    const targetRef = imageRefs.current[targetPage - 1]
+    if (targetRef) {
+      const rect = targetRef.getBoundingClientRect()
+      const scrollTop = window.scrollY + rect.top - 100
+      window.scrollTo({ top: scrollTop, behavior: 'smooth' })
+    }
+  }
+
+  const handlePageInput = (e) => {
+    const value = e.target.value
+    setPageInput(value)
+    const pageNum = parseInt(value)
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= images.length) {
+      jumpToPage(pageNum)
+    }
+  }
+
+  const handlePageInputBlur = () => {
+    setPageInput(currentPage.toString())
+  }
 
   // Chapter change
   const handleChapterChange = (newChapterId) => {
@@ -308,8 +352,68 @@ const Reader = () => {
                   )}
                 </div>
 
-                {/* Right: Settings */}
+                {/* Right: Page Navigation & Settings */}
                 <div className="flex items-center gap-2">
+                  {/* Page Jump Controls */}
+                  <div className="flex items-center gap-1 bg-[#EDEDED] rounded px-2 py-1">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => jumpToPage(1)}
+                      className="p-1 text-[#0A0A0A] hover:bg-white rounded transition-all"
+                      title="İlk Sayfa"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                      </svg>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => jumpToPage(currentPage - 1)}
+                      className="p-1 text-[#0A0A0A] hover:bg-white rounded transition-all"
+                      title="Önceki Sayfa"
+                      disabled={currentPage <= 1}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </motion.button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={images.length}
+                      value={pageInput}
+                      onChange={handlePageInput}
+                      onBlur={handlePageInputBlur}
+                      className="w-12 px-1 py-1 text-center text-xs font-bold bg-white text-[#0A0A0A] rounded border-none focus:outline-none focus:ring-1 focus:ring-[#0A0A0A]"
+                    />
+                    <span className="text-xs text-[#0A0A0A] font-medium">/ {images.length}</span>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => jumpToPage(currentPage + 1)}
+                      className="p-1 text-[#0A0A0A] hover:bg-white rounded transition-all"
+                      title="Sonraki Sayfa"
+                      disabled={currentPage >= images.length}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => jumpToPage(images.length)}
+                      className="p-1 text-[#0A0A0A] hover:bg-white rounded transition-all"
+                      title="Son Sayfa"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                      </svg>
+                    </motion.button>
+                  </div>
+
                   {chapter.fansubs && chapter.fansubs.length > 1 && (
                     <select
                       value={selectedFansub}

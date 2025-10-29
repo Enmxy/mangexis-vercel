@@ -14,7 +14,7 @@ export const sliderData = [
   },
   {
     id: 3,
-    image: 'https://i.ibb.co/9wKQXqL/demon-slayer-slider.jpg',
+    image: 'https://artfiles.alphacoders.com/160/160580.jpeg',
     title: 'Demon Slayer',
     link: '/manga/demon-slayer'
   }
