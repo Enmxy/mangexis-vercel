@@ -2,13 +2,13 @@
 export const sliderData = [
   {
     id: 1,
-    image: 'https://m.media-amazon.com/images/I/91NxYvUNf6L._AC_UF894,1000_QL80_.jpg',
+    image: 'https://static0.srcdn.com/wordpress/wp-content/uploads/2020/09/One-Piece-Manga-Cover.jpg',
     title: 'One Piece',
     link: '/manga/one-piece'
   },
   {
     id: 2,
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4daBShScio0A2c45ACpuXGA_5jHF68oFY4A&s',
+    image: 'https://static0.cbrimages.com/wordpress/wp-content/uploads/2020/11/Attack-on-Titan-Manga-Reportedly-Set-for-Full-Color-Reprint-feature-image.jpg',
     title: 'Attack on Titan',
     link: '/manga/attack-on-titan'
   },

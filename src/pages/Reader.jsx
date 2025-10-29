@@ -299,8 +299,117 @@ const Reader = () => {
             transition={{ duration: 0.15, ease: "easeOut" }}
             className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/95 border-b border-[#EDEDED]/10 backdrop-blur-sm"
           >
-            <div className="max-w-5xl mx-auto px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
+            <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2 sm:py-3">
+              {/* Mobile Layout */}
+              <div className="md:hidden flex flex-col gap-2">
+                {/* Top Row: Back + Page Navigation */}
+                <div className="flex items-center justify-between gap-2">
+                  <Link to={`/manga/${slug}`}>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      className="p-1.5 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all"
+                      title="Geri"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                    </motion.button>
+                  </Link>
+
+                  {/* Page Jump - Mobile */}
+                  <div className="flex items-center gap-0.5 bg-[#EDEDED] rounded px-1.5 py-1">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => jumpToPage(currentPage - 1)}
+                      className="p-0.5 text-[#0A0A0A] rounded transition-all"
+                      disabled={currentPage <= 1}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </motion.button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={images.length}
+                      value={pageInput}
+                      onChange={handlePageInput}
+                      onBlur={handlePageInputBlur}
+                      className="w-8 px-0.5 py-0.5 text-center text-xs font-bold bg-white text-[#0A0A0A] rounded border-none focus:outline-none"
+                    />
+                    <span className="text-xs text-[#0A0A0A] font-medium">/{images.length}</span>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => jumpToPage(currentPage + 1)}
+                      className="p-0.5 text-[#0A0A0A] rounded transition-all"
+                      disabled={currentPage >= images.length}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </motion.button>
+                  </div>
+
+                  {/* Zoom - Mobile */}
+                  <div className="flex items-center gap-0.5 bg-[#EDEDED] rounded px-1 py-1">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleZoomOut}
+                      className="p-0.5 text-[#0A0A0A] rounded transition-all"
+                      disabled={zoomLevel <= 50}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </motion.button>
+                    <span className="text-xs text-[#0A0A0A] font-bold min-w-[28px] text-center">{zoomLevel}%</span>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleZoomIn}
+                      className="p-0.5 text-[#0A0A0A] rounded transition-all"
+                      disabled={zoomLevel >= 200}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </motion.button>
+                  </div>
+                </div>
+
+                {/* Bottom Row: Chapter Navigation */}
+                <div className="flex items-center gap-2 justify-center">
+                  {prevChapter && (
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleChapterChange(prevChapter.id)}
+                      className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all text-xs font-bold"
+                    >
+                      ←
+                    </motion.button>
+                  )}
+                  <select
+                    value={chapterId}
+                    onChange={(e) => handleChapterChange(e.target.value)}
+                    className="flex-1 px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
+                  >
+                    {manga.chapters.map((ch) => (
+                      <option key={ch.id} value={ch.id}>{ch.title}</option>
+                    ))}
+                  </select>
+                  {nextChapter && (
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleChapterChange(nextChapter.id)}
+                      className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all text-xs font-bold"
+                    >
+                      →
+                    </motion.button>
+                  )}
+                </div>
+              </div>
+
+              {/* Desktop Layout */}
+              <div className="hidden md:flex items-center justify-between gap-3">
                 {/* Left: Back */}
                 <Link to={`/manga/${slug}`}>
                   <motion.button
@@ -352,8 +461,8 @@ const Reader = () => {
                   )}
                 </div>
 
-                {/* Right: Page Navigation & Settings */}
-                <div className="flex items-center gap-2">
+                {/* Right: Page Navigation & Settings - Desktop */}
+                <div className="hidden md:flex items-center gap-2">
                   {/* Page Jump Controls */}
                   <div className="flex items-center gap-1 bg-[#EDEDED] rounded px-2 py-1">
                     <motion.button
