@@ -19,5 +19,21 @@
     "Okul"
   ],
   "fansub": "Cinnet Fansub",
-  "chapters": []
+  "chapters": [
+    {
+      "id": "1",
+      "title": "Bölüm 1",
+      "imageLinks": [
+        "https://cdn.sinnloschen.de/spyfamily/1/1-cm2i3brbw0000vekkacvb0m23.jpeg"
+      ],
+      "fansubs": [
+        {
+          "name": "Default",
+          "images": [
+            ""
+          ]
+        }
+      ]
+    }
+  ]
 }
