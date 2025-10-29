@@ -39,10 +39,16 @@ const MangaDetail = () => {
 
   return (
     <div className="pt-20 min-h-screen">
-      {/* Hero Section with Background */}
-      <div className="relative">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent h-96 -z-10" />
+      {/* Hero Section with Blurred Background */}
+      <div className="relative overflow-hidden">
+        {/* Blurred Background Image */}
+        <div className="absolute inset-0 -z-20">
+          <div 
+            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-20 scale-110"
+            style={{ backgroundImage: `url(${manga.cover})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-black" />
+        </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <motion.div
@@ -146,39 +152,129 @@ const MangaDetail = () => {
                 </p>
               </motion.div>
 
+              {/* Stats Grid */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="grid grid-cols-3 gap-3 mb-8"
+              >
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">{manga.chapters.length}</div>
+                  <div className="text-xs text-gray-400">Bölüm</div>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">4.8</div>
+                  <div className="text-xs text-gray-400">Puan</div>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">12K</div>
+                  <div className="text-xs text-gray-400">Okur</div>
+                </div>
+              </motion.div>
+
               {/* Action Buttons */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="flex flex-wrap gap-3"
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="flex flex-wrap gap-3 mb-6"
               >
                 {manga.chapters.length > 0 && (
                   <Link to={`/manga/${manga.slug}/chapter/${manga.chapters[0].id}`}>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-all flex items-center gap-2"
+                      className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition-all flex items-center gap-2 shadow-lg"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      İlk Bölümü Oku
+                      Okumaya Başla
                     </motion.button>
                   </Link>
                 )}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-lg font-bold hover:bg-white/20 transition-all flex items-center gap-2"
+                  className="px-6 py-4 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
-                  Listeye Ekle
+                  Favorilere Ekle
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-4 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  Paylaş
                 </motion.button>
               </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Info Cards Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {/* Reading Progress */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="bg-white/5 border border-white/10 rounded-2xl p-6"
+          >
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              Okuma İlerlemeniz
+            </h3>
+            <div className="mb-3">
+              <div className="flex justify-between text-sm text-gray-400 mb-2">
+                <span>Bölüm 1 / {manga.chapters.length}</span>
+                <span>0%</span>
+              </div>
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0"></div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400">Okumaya başlayın ve ilerlemenizi takip edin!</p>
+          </motion.div>
+
+          {/* Author Info */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="bg-white/5 border border-white/10 rounded-2xl p-6"
+          >
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Manga Bilgileri
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Yayın Durumu:</span>
+                <span className="text-white font-medium">{manga.status === 'ongoing' ? 'Devam Ediyor' : 'Tamamlandı'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Toplam Bölüm:</span>
+                <span className="text-white font-medium">{manga.chapters.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Türler:</span>
+                <span className="text-white font-medium">{manga.genres.length} tür</span>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -189,16 +285,20 @@ const MangaDetail = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
         >
           {/* Section Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-3xl font-bold text-white mb-2">Bölümler</h2>
-              <div className="w-20 h-1 bg-white rounded-full"></div>
+              <div className="w-20 h-1.5 bg-gradient-to-r from-white to-transparent rounded-full"></div>
             </div>
-            <div className="text-sm text-gray-400">
-              {manga.chapters.length} bölüm mevcut
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-400">{manga.chapters.length} bölüm</span>
+              <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white">
+                <option>En Yeni</option>
+                <option>En Eski</option>
+              </select>
             </div>
           </div>
 

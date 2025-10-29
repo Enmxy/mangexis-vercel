@@ -164,7 +164,7 @@ const About = () => {
           <p className="text-lg sm:text-xl lg:text-2xl font-light text-tertiary italic px-4">
             "Ben kaliteliyim, ama bağırmıyorum."
           </p>
-          <p className="text-xs sm:text-sm text-tertiary mt-4">— MangeXis</p>
+          <p className="text-xs sm:text-sm text-tertiary mt-4">— EnmPoy, MangeXis Kurucusu</p>
         </motion.div>
       </div>
     </div>
