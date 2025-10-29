@@ -377,33 +377,49 @@ const Reader = () => {
                 </div>
 
                 {/* Bottom Row: Chapter Navigation */}
-                <div className="flex items-center gap-2 justify-center">
-                  {prevChapter && (
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleChapterChange(prevChapter.id)}
-                      className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all text-xs font-bold"
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 justify-center">
+                    {prevChapter && (
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleChapterChange(prevChapter.id)}
+                        className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all text-xs font-bold"
+                      >
+                        ←
+                      </motion.button>
+                    )}
+                    <select
+                      value={chapterId}
+                      onChange={(e) => handleChapterChange(e.target.value)}
+                      className="flex-1 px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
                     >
-                      ←
-                    </motion.button>
-                  )}
-                  <select
-                    value={chapterId}
-                    onChange={(e) => handleChapterChange(e.target.value)}
-                    className="flex-1 px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
-                  >
-                    {manga.chapters.map((ch) => (
-                      <option key={ch.id} value={ch.id}>{ch.title}</option>
-                    ))}
-                  </select>
-                  {nextChapter && (
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleChapterChange(nextChapter.id)}
-                      className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all text-xs font-bold"
+                      {manga.chapters.map((ch) => (
+                        <option key={ch.id} value={ch.id}>{ch.title}</option>
+                      ))}
+                    </select>
+                    {nextChapter && (
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleChapterChange(nextChapter.id)}
+                        className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded transition-all text-xs font-bold"
+                      >
+                        →
+                      </motion.button>
+                    )}
+                  </div>
+                  {/* Fansub Selector - Mobile */}
+                  {chapter.fansubs && chapter.fansubs.length > 1 && (
+                    <select
+                      value={selectedFansub}
+                      onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
+                      className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
                     >
-                      →
-                    </motion.button>
+                      {chapter.fansubs.map((fansub, index) => (
+                        <option key={index} value={index}>
+                          {fansub.name || `Fansub ${index + 1}`}
+                        </option>
+                      ))}
+                    </select>
                   )}
                 </div>
               </div>

@@ -33,6 +33,7 @@ export const mangaList = [
       {
         id: '1',
         title: 'Bölüm 1: Romance Dawn',
+        // Default images (fallback)
         imageLinks: [
           'https://i.ibb.co/whYQTRx6/02.jpg',
           'https://i.ibb.co/LdyDPXrZ/03.jpg',
@@ -58,6 +59,48 @@ export const mangaList = [
           'https://i.ibb.co/XkYB5YMM/22.jpg',
           'https://i.ibb.co/PvgHyB7m/23.jpg',
           'https://i.ibb.co/0VtvW2zq/24.jpg',
+        ],
+        // Multiple fansubs support
+        fansubs: [
+          {
+            name: 'MangeXis Fansub',
+            images: [
+              'https://i.ibb.co/whYQTRx6/02.jpg',
+              'https://i.ibb.co/LdyDPXrZ/03.jpg',
+              'https://i.ibb.co/TxMz5vfc/04.jpg',
+              'https://i.ibb.co/0RyP3D7q/04.jpg',
+              'https://i.ibb.co/Q3X7MS8t/05.jpg',
+              'https://i.ibb.co/5X3HzJWb/06.jpg',
+              'https://i.ibb.co/39Z2xRtF/07.jpg',
+              'https://i.ibb.co/Dqs79gn/08.jpg',
+              'https://i.ibb.co/d9DYN17/09.jpg',
+              'https://i.ibb.co/cXD6YKm1/10.jpg',
+              'https://i.ibb.co/Nd990xLd/11.jpg',
+              'https://i.ibb.co/9HnmgdCk/12.jpg',
+              'https://i.ibb.co/MDrLX3tD/13.jpg',
+              'https://i.ibb.co/zVdxw4QV/14.jpg',
+              'https://i.ibb.co/MyLPzLZY/15.jpg',
+              'https://i.ibb.co/kg10B03b/16.jpg',
+              'https://i.ibb.co/fd5yWzyM/17.jpg',
+              'https://i.ibb.co/Kxn1yNpq/18.jpg',
+              'https://i.ibb.co/TDbJnX6h/19.jpg',
+              'https://i.ibb.co/Wr2Pr3C/20.jpg',
+              'https://i.ibb.co/fGdw38sR/21.jpg',
+              'https://i.ibb.co/XkYB5YMM/22.jpg',
+              'https://i.ibb.co/PvgHyB7m/23.jpg',
+              'https://i.ibb.co/0VtvW2zq/24.jpg',
+            ]
+          },
+          {
+            name: 'Alternative Fansub',
+            images: [
+              'https://i.ibb.co/whYQTRx6/02.jpg',
+              'https://i.ibb.co/LdyDPXrZ/03.jpg',
+              'https://i.ibb.co/TxMz5vfc/04.jpg',
+              'https://i.ibb.co/0RyP3D7q/04.jpg',
+              'https://i.ibb.co/Q3X7MS8t/05.jpg',
+            ]
+          }
         ]
       },
       {
@@ -66,6 +109,15 @@ export const mangaList = [
         imageLinks: [
           'https://i.ibb.co/placeholder4.jpg',
           'https://i.ibb.co/placeholder5.jpg'
+        ],
+        fansubs: [
+          {
+            name: 'MangeXis Fansub',
+            images: [
+              'https://i.ibb.co/placeholder4.jpg',
+              'https://i.ibb.co/placeholder5.jpg'
+            ]
+          }
         ]
       }
     ]
