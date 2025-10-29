@@ -34,6 +34,21 @@
           ]
         }
       ]
+    },
+    {
+      "id": "2",
+      "title": "Bölüm 2",
+      "imageLinks": [
+        "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgvE051Q8kkasQwB3UwS2HHMb48lAGINlg-WbsQzJ8q-nrU4fY1eIUCMDaPCpgaoGpoWwI5NKsdA1kw-DnbgQyGYUM2itvbYoUccKctbcG2vF8UuV_VXbbelcj3tgAuEI5kaFEgYo-Q8dROfe-uFuroehuhdm0X5kYFmAcZrTFkBsZ2fxhjYHaKuf9xeoc/s1600/10001.jpg"
+      ],
+      "fansubs": [
+        {
+          "name": "Default",
+          "images": [
+            ""
+          ]
+        }
+      ]
     }
   ]
 }
