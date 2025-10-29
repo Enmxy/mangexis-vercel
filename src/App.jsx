@@ -14,6 +14,9 @@ import Favorites from './pages/Favorites'
 import News from './pages/News'
 import NewsDetail from './pages/NewsDetail'
 import ReadingHistory from './pages/ReadingHistory'
+import Login from './pages/Login'
+import SignUp from './pages/SignUp'
+import Profile from './pages/Profile'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -56,6 +59,24 @@ function App() {
         <div className="min-h-screen bg-black">
           <Navbar />
           <ReadingHistory />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
+      <Route path="/login" element={
+        <div className="min-h-screen bg-black">
+          <Login />
+        </div>
+      } />
+      <Route path="/signup" element={
+        <div className="min-h-screen bg-black">
+          <SignUp />
+        </div>
+      } />
+      <Route path="/profile" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <Profile />
           <Footer />
           <MobileBottomNav />
         </div>
