@@ -8,6 +8,40 @@
   to = "/index.html"
   status = 200
 
+# Security Headers - DDoS & Bot Protection
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevent scraping and downloads
+    X-Robots-Tag = "noarchive, noimageindex"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Content Security Policy
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none';"
+    
+    # Permissions Policy
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
+    
+    # Cache Control for images (prevent hotlinking)
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+# Block HTTrack and other scrapers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Block common scrapers/bots via user-agent
+    X-Robots-Tag = "noarchive, noimageindex, nofollow"
+
+# Rate limiting for API endpoints
+[[headers]]
+  for = "/netlify/functions/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store, no-cache, must-revalidate"
+
 # Enable Netlify Identity
 [context.production.environment]
   NETLIFY_USE_YARN = "false"

@@ -15,7 +15,10 @@ const Reader = () => {
   const [selectedFansub, setSelectedFansub] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [zoomLevel, setZoomLevel] = useState(50)
+  const [zoomLevel, setZoomLevel] = useState(() => {
+    // Mobile: 100%, Desktop: 50%
+    return window.innerWidth < 768 ? 100 : 50
+  })
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
@@ -419,11 +422,18 @@ const Reader = () => {
               src={imageUrl}
               alt={`Page ${index + 1}`}
               loading="lazy"
-              className="w-full h-auto block"
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              className="w-full h-auto block select-none pointer-events-none"
               style={{
                 transition: 'opacity 0.3s ease-out',
                 maxWidth: '100%',
-                height: 'auto'
+                height: 'auto',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none'
               }}
             />
           </motion.div>

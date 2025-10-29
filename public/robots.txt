@@ -1,15 +1,66 @@
-User-agent: *
-Allow: /
-Sitemap: https://mangexis.netlify.app/sitemap.xml
-
-# Google
+# Allow search engines
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
 
-# Bing
 User-agent: Bingbot
 Allow: /
-
-# Disallow admin pages
-User-agent: *
 Disallow: /admin/
+
+# Block HTTrack and website copiers
+User-agent: HTTrack
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: WebZIP
+Disallow: /
+
+User-agent: WebReaper
+Disallow: /
+
+User-agent: WebStripper
+Disallow: /
+
+User-agent: WebSauger
+Disallow: /
+
+User-agent: Teleport
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: Wget
+Disallow: /
+
+User-agent: larbin
+Disallow: /
+
+User-agent: Xenu
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# General rules
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /netlify/
+Crawl-delay: 10
+
+Sitemap: https://mangexis.netlify.app/sitemap.xml
