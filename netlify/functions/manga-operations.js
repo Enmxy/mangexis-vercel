@@ -28,29 +28,64 @@ exports.handler = async (event, context) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Check JWT authentication
-  const token = event.headers.authorization?.replace('Bearer ', '');
-  
-  if (!token) {
-    return {
-      statusCode: 401,
-      headers,
-      body: JSON.stringify({ error: 'Unauthorized - No token provided' })
-    };
-  }
-
-  try {
-    jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    return {
-      statusCode: 401,
-      headers,
-      body: JSON.stringify({ error: 'Unauthorized - Invalid token' })
-    };
-  }
-
   try {
     const { operation, manga, slug } = JSON.parse(event.body || '{}');
+    
+    // Public operation - no auth required
+    if (operation === 'GET_ALL_MANGAS') {
+      const { owner, repo } = getRepoInfo();
+      const githubHeaders = getGitHubHeaders();
+      
+      const response = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/contents/src/data/mangas?ref=${BRANCH}`,
+        { headers: githubHeaders }
+      );
+
+      if (!response.ok) {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ mangas: [] })
+        };
+      }
+
+      const files = await response.json();
+      const jsonFiles = files.filter(file => file.name.endsWith('.json'));
+
+      const mangas = await Promise.all(
+        jsonFiles.map(async (file) => {
+          const fileResponse = await fetch(file.download_url);
+          return await fileResponse.json();
+        })
+      );
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ mangas })
+      };
+    }
+
+    // Protected operations - require authentication
+    const token = event.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ error: 'Unauthorized - No token provided' })
+      };
+    }
+
+    try {
+      jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ error: 'Unauthorized - Invalid token' })
+      };
+    }
     const { owner, repo } = getRepoInfo();
     const githubHeaders = getGitHubHeaders();
 
@@ -166,36 +201,6 @@ exports.handler = async (event, context) => {
         };
       }
 
-      case 'GET_ALL_MANGAS': {
-        const response = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/contents/src/data/mangas?ref=${BRANCH}`,
-          { headers: githubHeaders }
-        );
-
-        if (!response.ok) {
-          return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ mangas: [] })
-          };
-        }
-
-        const files = await response.json();
-        const jsonFiles = files.filter(file => file.name.endsWith('.json'));
-
-        const mangas = await Promise.all(
-          jsonFiles.map(async (file) => {
-            const fileResponse = await fetch(file.download_url);
-            return await fileResponse.json();
-          })
-        );
-
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ mangas })
-        };
-      }
 
       default:
         return {

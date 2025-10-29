@@ -167,12 +167,11 @@ export const getAllMangas = async () => {
   }
 
   try {
-    const token = authApi.getToken();
+    // Public endpoint - no token required
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         operation: 'GET_ALL_MANGAS'
