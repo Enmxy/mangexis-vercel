@@ -9,10 +9,43 @@ const MangaDetail = () => {
   const { slug } = useParams()
   const [manga, setManga] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isFavorite, setIsFavorite] = useState(false)
 
   useEffect(() => {
     loadManga()
   }, [slug])
+
+  useEffect(() => {
+    if (manga) {
+      checkFavorite()
+    }
+  }, [manga])
+
+  const checkFavorite = () => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    setIsFavorite(favorites.some(fav => fav.slug === manga.slug))
+  }
+
+  const toggleFavorite = () => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    
+    if (isFavorite) {
+      const updated = favorites.filter(fav => fav.slug !== manga.slug)
+      localStorage.setItem('favorites', JSON.stringify(updated))
+      setIsFavorite(false)
+    } else {
+      favorites.push({
+        slug: manga.slug,
+        title: manga.title,
+        cover: manga.cover,
+        genres: manga.genres,
+        status: manga.status,
+        chapters: manga.chapters
+      })
+      localStorage.setItem('favorites', JSON.stringify(favorites))
+      setIsFavorite(true)
+    }
+  }
 
   const loadManga = async () => {
     setLoading(true)
@@ -157,7 +190,7 @@ const MangaDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="grid grid-cols-3 gap-3 mb-8"
+                className="grid grid-cols-2 gap-3 mb-8"
               >
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
                   <div className="text-2xl font-bold text-white mb-1">{manga.chapters.length}</div>
@@ -166,10 +199,6 @@ const MangaDetail = () => {
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
                   <div className="text-2xl font-bold text-white mb-1">4.8</div>
                   <div className="text-xs text-gray-400">Puan</div>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-white mb-1">12K</div>
-                  <div className="text-xs text-gray-400">Okur</div>
                 </div>
               </motion.div>
 
@@ -196,14 +225,19 @@ const MangaDetail = () => {
                   </Link>
                 )}
                 <motion.button
+                  onClick={toggleFavorite}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-4 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all flex items-center gap-2"
+                  className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2 ${
+                    isFavorite 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
+                  }`}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
-                  Favorilere Ekle
+                  {isFavorite ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}

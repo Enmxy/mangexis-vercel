@@ -9,6 +9,7 @@ import About from './pages/About'
 import Disclaimer from './pages/Disclaimer'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
+import Favorites from './pages/Favorites'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -32,6 +33,13 @@ function App() {
         <div className="min-h-screen bg-black">
           <Navbar />
           <Discover />
+          <Footer />
+        </div>
+      } />
+      <Route path="/favorites" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <Favorites />
           <Footer />
         </div>
       } />

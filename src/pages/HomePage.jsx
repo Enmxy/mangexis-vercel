@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Slider from '../components/Slider'
 import SearchFilter from '../components/SearchFilter'
@@ -14,10 +15,12 @@ const HomePage = () => {
   const [filteredMangas, setFilteredMangas] = useState(mangaList)
   const [showIntro, setShowIntro] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [continueReading, setContinueReading] = useState(null)
 
   // Load mangas from API/localStorage + static data
   useEffect(() => {
     loadAllMangas()
+    loadContinueReading()
   }, [])
 
   const loadAllMangas = async () => {
@@ -42,6 +45,30 @@ const HomePage = () => {
       setFilteredMangas(mangaList)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadContinueReading = () => {
+    try {
+      const allProgress = Object.keys(localStorage)
+        .filter(key => key.startsWith('reading-progress-'))
+        .map(key => {
+          const data = JSON.parse(localStorage.getItem(key))
+          const slug = key.replace('reading-progress-', '')
+          return { ...data, slug, key }
+        })
+        .sort((a, b) => b.timestamp - a.timestamp)
+
+      if (allProgress.length > 0) {
+        const latest = allProgress[0]
+        const manga = mangaList.find(m => m.slug === latest.slug)
+        if (manga) {
+          const chapter = manga.chapters.find(c => c.id === latest.chapterId)
+          setContinueReading({ manga, chapter })
+        }
+      }
+    } catch (error) {
+      console.error('Error loading continue reading:', error)
     }
   }
 
@@ -112,6 +139,49 @@ const HomePage = () => {
       </AnimatePresence>
 
       <div className="pt-20 min-h-screen">
+        {/* Continue Reading Section */}
+        {continueReading && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-white/20 rounded-2xl p-6 mb-6"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 className="text-xl font-bold text-white">Okumaya Devam Et</h2>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <img 
+                  src={continueReading.manga.cover} 
+                  alt={continueReading.manga.title}
+                  className="w-20 h-28 object-cover rounded-lg border border-white/10"
+                />
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-white mb-1">{continueReading.manga.title}</h3>
+                  <p className="text-gray-400 text-sm mb-3">{continueReading.chapter?.title || 'Bölüm'}</p>
+                  <Link to={`/manga/${continueReading.manga.slug}/chapter/${continueReading.chapter?.id}`}>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-4 py-2 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-all flex items-center gap-2 text-sm"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Devam Et
+                    </motion.button>
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
         {/* Hero Section with Gradient */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/5 to-transparent h-[600px] -z-10" />
