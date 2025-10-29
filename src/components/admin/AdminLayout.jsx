@@ -1,37 +1,48 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { authApi } from '../../utils/adminApi'
 
 const AdminLayout = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (window.netlifyIdentity) {
-      const currentUser = window.netlifyIdentity.currentUser()
-      setUser(currentUser)
+    const checkAuth = async () => {
+      const token = authApi.getToken()
       
-      if (!currentUser) {
+      if (!token) {
         navigate('/admin/login')
+        return
       }
 
-      window.netlifyIdentity.on('logout', () => {
-        setUser(null)
+      try {
+        const result = await authApi.verify(token)
+        
+        if (result.success) {
+          setUser(result.user)
+        } else {
+          authApi.removeToken()
+          navigate('/admin/login')
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        authApi.removeToken()
         navigate('/admin/login')
-      })
-    } else {
-      // Netlify Identity yüklenmemişse, development modunda devam et
-      console.warn('Netlify Identity not loaded. Running in development mode.')
-      setUser({ email: 'dev@admin.com' })
+      } finally {
+        setLoading(false)
+      }
     }
+
+    checkAuth()
   }, [navigate])
 
   const handleLogout = () => {
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.logout()
-    }
+    authApi.removeToken()
+    navigate('/admin/login')
   }
 
   const menuItems = [
@@ -39,6 +50,14 @@ const AdminLayout = () => {
     { name: 'Mangalar', path: '/admin/mangas', icon: '📚' },
     { name: 'Manga Ekle', path: '/admin/mangas/new', icon: '➕' }
   ]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">Yükleniyor...</div>
+      </div>
+    )
+  }
 
   if (!user) return null
 
@@ -85,13 +104,13 @@ const AdminLayout = () => {
               <div className="p-4 border-t border-gray-700">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {user?.email?.[0]?.toUpperCase() || 'A'}
+                    {user?.username?.[0]?.toUpperCase() || 'A'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium truncate">
-                      {user?.email || 'Admin'}
+                      {user?.username || 'Admin'}
                     </p>
-                    <p className="text-gray-400 text-xs">Yönetici</p>
+                    <p className="text-gray-400 text-xs">{user?.role || 'Yönetici'}</p>
                   </div>
                 </div>
                 <motion.button
