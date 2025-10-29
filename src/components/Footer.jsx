@@ -74,9 +74,14 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              © 2025 MangeXis. Tüm hakları saklıdır.
-            </p>
+            <div className="text-center md:text-left">
+              <p className="text-gray-400 text-sm mb-2">
+                © 2025 MangeXis. Tüm hakları saklıdır.
+              </p>
+              <p className="text-gray-500 text-xs">
+                Telif hakları için: <a href="mailto:mangexis-destek@proton.me" className="text-purple-400 hover:text-purple-300 transition-colors">mangexis-destek@proton.me</a>
+              </p>
+            </div>
             <p className="text-gray-500 text-xs">
               Made with ❤️ for manga lovers
             </p>

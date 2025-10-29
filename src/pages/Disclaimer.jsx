@@ -40,7 +40,7 @@ const Disclaimer = () => {
                 Eğer telif hakkınıza ait bir içerik bulunduğunu düşünüyorsanız, lütfen bizimle iletişime geçin. İlgili içerik derhal kaldırılacaktır.
               </p>
               <div className="bg-white/5 border-l-4 border-white p-4 rounded">
-                <p className="text-white font-medium">İletişim: contact@mangexis.com</p>
+                <p className="text-white font-medium">Telif Hakları İçin İletişim: <a href="mailto:mangexis-destek@proton.me" className="text-purple-400 hover:text-purple-300 transition-colors">mangexis-destek@proton.me</a></p>
               </div>
             </section>
 

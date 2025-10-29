@@ -144,10 +144,10 @@ const Terms = () => {
             <section className="bg-white/5 border border-white/10 rounded-xl p-6">
               <h2 className="text-2xl font-bold text-white mb-4">8. İletişim</h2>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Kullanım şartları hakkında sorularınız için:
+                Kullanım şartları ve telif hakları hakkında sorularınız için:
               </p>
               <div className="bg-white/5 border-l-4 border-white p-4 rounded">
-                <p className="text-white font-medium">E-posta: legal@mangexis.com</p>
+                <p className="text-white font-medium">E-posta: <a href="mailto:mangexis-destek@proton.me" className="text-purple-400 hover:text-purple-300 transition-colors">mangexis-destek@proton.me</a></p>
               </div>
             </section>
           </div>
