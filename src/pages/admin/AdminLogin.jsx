@@ -1,40 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { authApi } from '../../utils/adminApi'
 
 const AdminLogin = () => {
   const navigate = useNavigate()
-  const [user, setUser] = useState(null)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Initialize Netlify Identity
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on('init', user => {
-        setUser(user)
-        if (user) {
-          navigate('/admin/dashboard')
-        }
-      })
-
-      window.netlifyIdentity.on('login', user => {
-        setUser(user)
+    // Check if already authenticated
+    const checkAuth = async () => {
+      const isAuth = await authApi.isAuthenticated()
+      if (isAuth) {
         navigate('/admin/dashboard')
-        window.netlifyIdentity.close()
-      })
-
-      window.netlifyIdentity.on('logout', () => {
-        setUser(null)
-      })
+      }
     }
+    checkAuth()
   }, [navigate])
 
-  const handleLogin = () => {
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.open('login')
-    } else {
-      // Development mode - direkt dashboard'a yönlendir
-      console.warn('Netlify Identity not available. Using development mode.')
-      navigate('/admin/dashboard')
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const result = await authApi.login(username, password)
+      
+      if (result.success) {
+        authApi.setToken(result.token)
+        navigate('/admin/dashboard')
+      } else {
+        setError(result.error || 'Giriş başarısız')
+      }
+    } catch (err) {
+      setError('Bağlantı hatası. Lütfen tekrar deneyin.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -68,17 +72,58 @@ const AdminLogin = () => {
             Giriş Yap
           </h2>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogin}
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-lg shadow-purple-500/50"
-          >
-            Netlify Identity ile Giriş
-          </motion.button>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">
+                Kullanıcı Adı
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                placeholder="admin"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">
+                Şifre
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-500/10 border border-red-500 rounded-lg p-3 text-red-400 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-lg shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+            </motion.button>
+          </form>
 
           <p className="text-gray-400 text-xs text-center mt-6">
-            Güvenli giriş için Netlify Identity kullanılmaktadır
+            JWT token ile güvenli giriş
           </p>
         </motion.div>
 
