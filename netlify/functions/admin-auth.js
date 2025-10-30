@@ -1,8 +1,20 @@
 const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-super-secret-key-change-in-production'
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin'
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'mangexis2024'
+
+// User accounts with roles
+const USERS = [
+  {
+    username: process.env.ADMIN_USERNAME || 'admin',
+    password: process.env.ADMIN_PASSWORD || 'mangexis2024',
+    role: 'admin'
+  },
+  {
+    username: 'fansub',
+    password: 'FansubMangexis2025',
+    role: 'fansub'
+  }
+]
 
 // Security Configuration
 const MAX_LOGIN_ATTEMPTS = 5 // Max failed attempts before lockout
@@ -160,15 +172,17 @@ exports.handler = async (event, context) => {
         }
       }
 
-      // Validate credentials
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // Validate credentials against all users
+      const user = USERS.find(u => u.username === username && u.password === password)
+      
+      if (user) {
         clearFailedAttempts(clientIP)
         
         const now = Date.now()
         const token = jwt.sign(
           { 
-            username, 
-            role: 'admin',
+            username: user.username, 
+            role: user.role,
             iat: now,
             sessionStart: now
           },
@@ -176,7 +190,7 @@ exports.handler = async (event, context) => {
           { expiresIn: '2h' } // Shorter session for security
         )
 
-        logSecurityEvent('LOGIN_SUCCESS', clientIP, { username })
+        logSecurityEvent('LOGIN_SUCCESS', clientIP, { username: user.username, role: user.role })
 
         return {
           statusCode: 200,
@@ -184,7 +198,7 @@ exports.handler = async (event, context) => {
           body: JSON.stringify({
             success: true,
             token,
-            user: { username, role: 'admin' },
+            user: { username: user.username, role: user.role },
             sessionTimeout: SESSION_TIMEOUT
           })
         }

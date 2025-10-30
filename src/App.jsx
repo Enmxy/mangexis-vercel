@@ -25,6 +25,7 @@ import NewsList from './pages/admin/NewsList'
 import NewsForm from './pages/admin/NewsForm'
 import SliderList from './pages/admin/SliderList'
 import SliderForm from './pages/admin/SliderForm'
+import ChapterAdd from './pages/admin/ChapterAdd'
 
 function App() {
   return (
@@ -131,6 +132,7 @@ function App() {
         <Route path="sliders" element={<SliderList />} />
         <Route path="sliders/new" element={<SliderForm />} />
         <Route path="sliders/edit/:id" element={<SliderForm />} />
+        <Route path="chapter-add" element={<ChapterAdd />} />
       </Route>
     </Routes>
   )

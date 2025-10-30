@@ -79,7 +79,24 @@ const AdminLayout = () => {
     navigate('/admin/login')
   }
 
-  const menuItems = [
+  const getMenuItems = () => {
+    // Fansub role: only chapter add page
+    if (user?.role === 'fansub') {
+      return [
+        { 
+          name: 'Bölüm Ekle', 
+          path: '/admin/chapter-add', 
+          icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          )
+        }
+      ]
+    }
+    
+    // Admin role: all menu items
+    return [
     { 
       name: 'Dashboard', 
       path: '/admin/dashboard', 
@@ -117,6 +134,9 @@ const AdminLayout = () => {
       )
     }
   ]
+  }
+  
+  const menuItems = getMenuItems()
 
   if (loading) {
     return (
