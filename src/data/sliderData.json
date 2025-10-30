@@ -8,5 +8,15 @@
     "link": "https://mangexis.netlify.app/manga/one-piece",
     "buttonText": "Oku",
     "createdAt": 1761832366451
+  },
+  {
+    "id": 2,
+    "title": "JoJo's Bizarre Adventure",
+    "description": "JoJo's Bizare Adventure, çeşitli üyeleri sahip oldukları eşsiz güçleri kullanarak doğaüstü düşmanları almayı hedeflediklerini keşfeden bir aile olan Joestar ailesinin hikâyesini anlatmaktadır. Seri, her biri Joestar ailesinin bir üyesinin öyküsünün ardından kaçınılmaz olarak \"JoJo\" unvanını kısaltması gereken bir isme sahip 9 ayrı kısma bölünmüştür. Serinin ilk altı kısmı tek bir devamlılıkta, 7, 8 ve 9. kısımlar ise alternatif bir devamlılıkta geçmektedir.",
+    "image": "https://e1.pxfuel.com/desktop-wallpaper/981/818/desktop-wallpaper-jojo-s-bizarre-adventure-1920x1080-jojos-bizarre-adventure.jpg",
+    "type": "manga",
+    "link": "https://mangexis.netlify.app/manga/jojo-s-bizarre-adventure",
+    "buttonText": "Oku",
+    "createdAt": 1761839925601
   }
 ]
