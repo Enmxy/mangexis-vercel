@@ -3,25 +3,39 @@ const bcrypt = require('bcryptjs')
 
 // CRITICAL SECURITY: All credentials MUST be in environment variables
 // Never hardcode passwords or secrets in code!
-const JWT_SECRET = process.env.JWT_SECRET
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required!')
+const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-fallback-secret-CHANGE-IN-PRODUCTION'
+
+// Warn if using fallback secret
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️  WARNING: Using fallback JWT_SECRET. Set JWT_SECRET in environment variables for production!')
 }
 
 // User accounts with roles - passwords are bcrypt hashed
-// IMPORTANT: Store hashed passwords in environment variables
+// IMPORTANT: Store hashed passwords in environment variables for production
+
+// Fallback hashed passwords for development (ONLY if env vars not set)
+// Admin: MangeXis@2025!SuperSecureAdmin#Pass
+const FALLBACK_ADMIN_HASH = '$2a$12$dwsG4a3jbW9MVEmAgny2EO4agfGVK.El4bmHCqtOJij/Ca4yJl8RS'
+// Fansub: FansubMangeXis$2025!SecureChapter#Upload  
+const FALLBACK_FANSUB_HASH = '$2a$12$AZ97mXt1txn62dI7kTmWveSSRpOBv7PEHTd0hAIrf/sQH696vh5jK'
+
 const USERS = [
   {
     username: process.env.ADMIN_USERNAME || 'admin',
-    passwordHash: process.env.ADMIN_PASSWORD_HASH, // bcrypt hash
+    passwordHash: process.env.ADMIN_PASSWORD_HASH || FALLBACK_ADMIN_HASH,
     role: 'admin'
   },
   {
     username: process.env.FANSUB_USERNAME || 'fansub',
-    passwordHash: process.env.FANSUB_PASSWORD_HASH, // bcrypt hash
+    passwordHash: process.env.FANSUB_PASSWORD_HASH || FALLBACK_FANSUB_HASH,
     role: 'fansub'
   }
-].filter(user => user.passwordHash) // Only include users with passwords set
+]
+
+// Warn if using fallback credentials
+if (!process.env.ADMIN_PASSWORD_HASH || !process.env.FANSUB_PASSWORD_HASH) {
+  console.warn('⚠️  WARNING: Using fallback password hashes. Set environment variables for production!')
+}
 
 // Security Configuration
 const MAX_LOGIN_ATTEMPTS = 5 // Max failed attempts before lockout
