@@ -14,10 +14,12 @@ import Favorites from './pages/Favorites'
 import News from './pages/News'
 import NewsDetail from './pages/NewsDetail'
 import ReadingHistory from './pages/ReadingHistory'
+import CustomPage from './pages/CustomPage'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminLayout from './components/admin/AdminLayout'
+import FansubLayout from './components/admin/FansubLayout'
 import Dashboard from './pages/admin/Dashboard'
 import MangaList from './pages/admin/MangaList'
 import MangaForm from './pages/admin/MangaForm'
@@ -26,6 +28,8 @@ import NewsForm from './pages/admin/NewsForm'
 import SliderList from './pages/admin/SliderList'
 import SliderForm from './pages/admin/SliderForm'
 import ChapterAdd from './pages/admin/ChapterAdd'
+import PagesList from './pages/admin/PagesList'
+import PageBuilder from './pages/admin/PageBuilder'
 
 function App() {
   return (
@@ -117,9 +121,25 @@ function App() {
           <MobileBottomNav />
         </div>
       } />
+      <Route path="/pages/:slug" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <CustomPage />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
+      
+      {/* Fansub Routes - Separate Layout */}
+      <Route path="/fansub" element={<FansubLayout />}>
+        <Route index element={<ChapterAdd />} />
+        <Route path="chapter-add" element={<ChapterAdd />} />
+      </Route>
+      
+      {/* Admin Routes - Full Access */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
@@ -132,7 +152,9 @@ function App() {
         <Route path="sliders" element={<SliderList />} />
         <Route path="sliders/new" element={<SliderForm />} />
         <Route path="sliders/edit/:id" element={<SliderForm />} />
-        <Route path="chapter-add" element={<ChapterAdd />} />
+        <Route path="pages" element={<PagesList />} />
+        <Route path="pages/new" element={<PageBuilder />} />
+        <Route path="pages/edit/:slug" element={<PageBuilder />} />
       </Route>
     </Routes>
   )

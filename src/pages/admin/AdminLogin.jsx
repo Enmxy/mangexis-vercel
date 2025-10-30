@@ -16,9 +16,21 @@ const AdminLogin = () => {
   useEffect(() => {
     // Check if already authenticated
     const checkAuth = async () => {
-      const isAuth = await authApi.isAuthenticated()
-      if (isAuth) {
-        navigate('/admin/dashboard')
+      const token = authApi.getToken()
+      if (token) {
+        try {
+          const result = await authApi.verify(token)
+          if (result.success) {
+            // Redirect based on role
+            if (result.user?.role === 'fansub') {
+              navigate('/fansub')
+            } else {
+              navigate('/admin/dashboard')
+            }
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error)
+        }
       }
     }
     checkAuth()
@@ -38,7 +50,13 @@ const AdminLogin = () => {
         // Clear all warnings on success
         setRemainingAttempts(null)
         setLockedUntil(null)
-        navigate('/admin/dashboard')
+        
+        // Redirect based on role
+        if (result.user?.role === 'fansub') {
+          navigate('/fansub')
+        } else {
+          navigate('/admin/dashboard')
+        }
       } else {
         // Handle different error types
         setError(result.error || 'Giriş başarısız')
