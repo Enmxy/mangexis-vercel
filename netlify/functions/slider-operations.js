@@ -5,8 +5,8 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN
 })
 
-const REPO_OWNER = process.env.REPO_OWNER || 'Enmxy'
-const REPO_NAME = process.env.REPO_NAME || 'Mangexis'
+const REPO_OWNER = 'Enmxy'
+const REPO_NAME = 'Mangexis'
 const FILE_PATH = 'src/data/sliderData.json'
 
 const headers = {
