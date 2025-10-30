@@ -81,9 +81,9 @@ const AdminLayout = () => {
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
+    { name: 'Slider Yönetimi', path: '/admin/sliders', icon: '🎬' },
     { name: 'Mangalar', path: '/admin/mangas', icon: '📚' },
-    { name: 'Haberler & Duyurular', path: '/admin/news', icon: '📰' },
-    { name: 'Manga Ekle', path: '/admin/mangas/new', icon: '➕' }
+    { name: 'Haberler & Duyurular', path: '/admin/news', icon: '📰' }
   ]
 
   if (loading) {

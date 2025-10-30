@@ -23,6 +23,8 @@ import MangaList from './pages/admin/MangaList'
 import MangaForm from './pages/admin/MangaForm'
 import NewsList from './pages/admin/NewsList'
 import NewsForm from './pages/admin/NewsForm'
+import SliderList from './pages/admin/SliderList'
+import SliderForm from './pages/admin/SliderForm'
 
 function App() {
   return (
@@ -124,8 +126,11 @@ function App() {
         <Route path="mangas/new" element={<MangaForm />} />
         <Route path="mangas/edit/:slug" element={<MangaForm />} />
         <Route path="news" element={<NewsList />} />
-        <Route path="news/new" element={<NewsForm />} />
-        <Route path="news/edit/:slug" element={<NewsForm />} />
+        <Route path="/admin/news/new" element={<AdminLayout><NewsForm /></AdminLayout>} />
+        <Route path="/admin/news/edit/:id" element={<AdminLayout><NewsForm /></AdminLayout>} />
+        <Route path="/admin/sliders" element={<AdminLayout><SliderList /></AdminLayout>} />
+        <Route path="/admin/sliders/new" element={<AdminLayout><SliderForm /></AdminLayout>} />
+        <Route path="/admin/sliders/edit/:id" element={<AdminLayout><SliderForm /></AdminLayout>} />
       </Route>
     </Routes>
   )

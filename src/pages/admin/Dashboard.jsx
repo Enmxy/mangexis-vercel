@@ -128,6 +128,29 @@ const Dashboard = () => {
       <div>
         <h2 className="text-2xl font-bold text-white mb-4">Hızlı İşlemler</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link to="/admin/sliders/new">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              whileHover={{ scale: 1.03, x: 10 }}
+              whileTap={{ scale: 0.98 }}
+              className="group bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-8 shadow-xl hover:shadow-2xl hover:shadow-blue-500/50 transition-all cursor-pointer border border-blue-400/30"
+            >
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center text-4xl group-hover:scale-110 transition-transform backdrop-blur-sm">
+                  🎬
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-white font-black text-2xl mb-2">Slider Ekle</h3>
+                  <p className="text-blue-100 text-sm">Ana sayfada gösterilecek slider oluşturun</p>
+                </div>
+                <div className="text-white/50 group-hover:text-white group-hover:translate-x-2 transition-all text-2xl">
+                  →
+                </div>
+              </div>
+            </motion.div>
+          </Link>
+
           <Link to="/admin/mangas/new">
             <motion.div
               initial={{ opacity: 0, x: -20 }}

@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Slider from '../components/Slider'
 import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
-import { sliderData, mangaList } from '../data/mangaData'
+import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
+import { getAllSliders } from '../utils/sliderService'
 import { getReadingHistory } from '../utils/readingHistory'
 
 const HomePage = () => {
@@ -18,11 +19,23 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true)
   const [continueReading, setContinueReading] = useState([])
   const [recentlyUpdated, setRecentlyUpdated] = useState([])
+  const [sliders, setSliders] = useState([])
 
-  // Load mangas from API/localStorage + static data
+  // Load sliders and mangas from API
   useEffect(() => {
+    loadSliders()
     loadAllMangas()
   }, [])
+
+  const loadSliders = async () => {
+    try {
+      const data = await getAllSliders()
+      setSliders(data)
+    } catch (error) {
+      console.error('Error loading sliders:', error)
+      setSliders([])
+    }
+  }
 
   useEffect(() => {
     if (allMangas.length > 0) {
@@ -155,12 +168,20 @@ const HomePage = () => {
           
           {/* Hero Slider */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="max-w-7xl mx-auto px-4 sm:px-6 py-8"
           >
-            <Slider slides={sliderData} />
+            {sliders.length > 0 ? (
+              <Slider slides={sliders} />
+            ) : (
+              <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-12 text-center border border-gray-700">
+                <div className="text-6xl mb-4">🎬</div>
+                <h3 className="text-white text-xl font-bold mb-2">Henüz Slider Eklenmemiş</h3>
+                <p className="text-gray-400">Admin panelden slider ekleyerek başlayın</p>
+              </div>
+            )}
           </motion.div>
 
           {/* Continue Reading Section */}
