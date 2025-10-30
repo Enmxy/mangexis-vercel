@@ -30,6 +30,7 @@ import SliderForm from './pages/admin/SliderForm'
 import ChapterAdd from './pages/admin/ChapterAdd'
 import PagesList from './pages/admin/PagesList'
 import PageBuilder from './pages/admin/PageBuilder'
+import FansubMangaForm from './pages/admin/FansubMangaForm'
 
 function App() {
   return (
@@ -133,10 +134,12 @@ function App() {
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
       
-      {/* Fansub Routes - Separate Layout */}
+      {/* Fansub Routes - Chapter & Manga Management */}
       <Route path="/fansub" element={<FansubLayout />}>
         <Route index element={<ChapterAdd />} />
         <Route path="chapter-add" element={<ChapterAdd />} />
+        <Route path="manga/new" element={<FansubMangaForm />} />
+        <Route path="manga/edit/:slug" element={<FansubMangaForm />} />
       </Route>
       
       {/* Admin Routes - Full Access */}

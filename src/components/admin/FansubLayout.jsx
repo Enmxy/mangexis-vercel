@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Outlet } from 'react-router-dom'
+import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { authApi } from '../../utils/adminApi'
 
@@ -106,8 +106,34 @@ const FansubLayout = () => {
         </div>
       </header>
 
+      {/* Navigation */}
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          <Link
+            to="/fansub"
+            className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              useLocation().pathname === '/fansub' || useLocation().pathname === '/fansub/chapter-add'
+                ? 'bg-white text-purple-900'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            }`}
+          >
+            📖 Bölüm Ekle
+          </Link>
+          <Link
+            to="/fansub/manga/new"
+            className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              useLocation().pathname === '/fansub/manga/new'
+                ? 'bg-white text-purple-900'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            }`}
+          >
+            ➕ Manga Ekle
+          </Link>
+        </div>
+      </nav>
+
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
