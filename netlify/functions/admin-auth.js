@@ -1,20 +1,27 @@
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
-const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-super-secret-key-change-in-production'
+// CRITICAL SECURITY: All credentials MUST be in environment variables
+// Never hardcode passwords or secrets in code!
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required!')
+}
 
-// User accounts with roles
+// User accounts with roles - passwords are bcrypt hashed
+// IMPORTANT: Store hashed passwords in environment variables
 const USERS = [
   {
     username: process.env.ADMIN_USERNAME || 'admin',
-    password: process.env.ADMIN_PASSWORD || 'mangexis2024',
+    passwordHash: process.env.ADMIN_PASSWORD_HASH, // bcrypt hash
     role: 'admin'
   },
   {
-    username: 'fansub',
-    password: 'FansubMangexis2025',
+    username: process.env.FANSUB_USERNAME || 'fansub',
+    passwordHash: process.env.FANSUB_PASSWORD_HASH, // bcrypt hash
     role: 'fansub'
   }
-]
+].filter(user => user.passwordHash) // Only include users with passwords set
 
 // Security Configuration
 const MAX_LOGIN_ATTEMPTS = 5 // Max failed attempts before lockout
@@ -172,10 +179,16 @@ exports.handler = async (event, context) => {
         }
       }
 
-      // Validate credentials against all users
-      const user = USERS.find(u => u.username === username && u.password === password)
+      // Find user by username first
+      const user = USERS.find(u => u.username === username)
       
-      if (user) {
+      // Validate password with bcrypt
+      let isValidPassword = false
+      if (user && user.passwordHash) {
+        isValidPassword = await bcrypt.compare(password, user.passwordHash)
+      }
+      
+      if (user && isValidPassword) {
         clearFailedAttempts(clientIP)
         
         const now = Date.now()
