@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "One Piece ",
+    "description": "Çocukken, Monkey D. Luffy, Korsanlar \"Kızıl Saçlı\" Shanks'ın Masallarını dinleyerek bir korsan olmaktan ilham aldı. Ancak Luffy yanlışlıkla sakız-hac şeytan meyvesini yediğinde ve kauçuk gibi germe gücünü kazandığında hayatı değişti ... bir daha asla yüzemeyecek pahasına! Yıllar sonra, hala Korsanların Kralı olmaya söz veren Luffy, macerasına yol açıyor ... efsanevi \"Tek Parça\" nı arayışında bir kayıkta yalnız bir adam, dünyanın en büyük hazinesi olduğu söylendi ...",
+    "image": "https://dw9to29mmj727.cloudfront.net/promo/2016/5265-SeriesHeaders_OP_2000x800_wm.jpg",
+    "type": "manga",
+    "link": "https://mangexis.netlify.app/manga/one-piece",
+    "buttonText": "Oku",
+    "createdAt": 1761832366451
+  }
+]
