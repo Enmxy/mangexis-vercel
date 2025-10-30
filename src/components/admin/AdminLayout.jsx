@@ -80,10 +80,42 @@ const AdminLayout = () => {
   }
 
   const menuItems = [
-    { name: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
-    { name: 'Slider Yönetimi', path: '/admin/sliders', icon: '🎬' },
-    { name: 'Mangalar', path: '/admin/mangas', icon: '📚' },
-    { name: 'Haberler & Duyurular', path: '/admin/news', icon: '📰' }
+    { 
+      name: 'Dashboard', 
+      path: '/admin/dashboard', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Slider Yönetimi', 
+      path: '/admin/sliders', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Mangalar', 
+      path: '/admin/mangas', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Haberler & Duyurular', 
+      path: '/admin/news', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+        </svg>
+      )
+    }
   ]
 
   if (loading) {
@@ -106,13 +138,13 @@ const AdminLayout = () => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ duration: 0.3 }}
-            className="fixed lg:relative w-64 h-screen bg-gray-800 border-r border-gray-700 z-50"
+            className="fixed lg:relative w-64 h-screen bg-black border-r border-gray-800 z-50"
           >
             <div className="flex flex-col h-full">
               {/* Logo */}
-              <div className="p-6 border-b border-gray-700">
-                <h1 className="text-2xl font-bold font-mono text-white">MangeXis</h1>
-                <p className="text-purple-400 text-xs tracking-wider mt-1">ADMIN</p>
+              <div className="p-6 border-b border-gray-800">
+                <h1 className="text-2xl font-bold text-white">MangeXis</h1>
+                <p className="text-gray-500 text-xs tracking-widest mt-1 font-semibold">ADMIN PANEL</p>
               </div>
 
               {/* Menu */}
@@ -120,40 +152,43 @@ const AdminLayout = () => {
                 {menuItems.map((item) => (
                   <Link key={item.path} to={item.path}>
                     <motion.div
-                      whileHover={{ scale: 1.03, x: 5 }}
+                      whileHover={{ scale: 1.02, x: 3 }}
                       whileTap={{ scale: 0.98 }}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                         location.pathname === item.path
-                          ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/50'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                          ? 'bg-white text-black font-semibold'
+                          : 'text-gray-400 hover:bg-gray-900 hover:text-white'
                       }`}
                     >
-                      <span className="text-xl">{item.icon}</span>
-                      <span className="font-medium">{item.name}</span>
+                      <span className="flex-shrink-0">{item.icon}</span>
+                      <span className="text-sm">{item.name}</span>
                     </motion.div>
                   </Link>
                 ))}
               </nav>
 
               {/* User Info */}
-              <div className="p-4 border-t border-gray-700">
+              <div className="p-4 border-t border-gray-800">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-black font-bold">
                     {user?.username?.[0]?.toUpperCase() || 'A'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">
+                    <p className="text-white text-sm font-semibold truncate">
                       {user?.username || 'Admin'}
                     </p>
-                    <p className="text-gray-400 text-xs">{user?.role || 'Yönetici'}</p>
+                    <p className="text-gray-500 text-xs">{user?.role || 'Yönetici'}</p>
                   </div>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleLogout}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-200"
+                  className="w-full bg-gray-900 hover:bg-gray-800 border border-gray-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
                 >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
                   Çıkış Yap
                 </motion.button>
               </div>
@@ -165,13 +200,13 @@ const AdminLayout = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top Navbar */}
-        <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+        <header className="bg-black border-b border-gray-800 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden text-white p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                className="lg:hidden text-white p-2 hover:bg-gray-900 rounded-lg transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

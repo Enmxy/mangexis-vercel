@@ -126,11 +126,11 @@ function App() {
         <Route path="mangas/new" element={<MangaForm />} />
         <Route path="mangas/edit/:slug" element={<MangaForm />} />
         <Route path="news" element={<NewsList />} />
-        <Route path="/admin/news/new" element={<AdminLayout><NewsForm /></AdminLayout>} />
-        <Route path="/admin/news/edit/:id" element={<AdminLayout><NewsForm /></AdminLayout>} />
-        <Route path="/admin/sliders" element={<AdminLayout><SliderList /></AdminLayout>} />
-        <Route path="/admin/sliders/new" element={<AdminLayout><SliderForm /></AdminLayout>} />
-        <Route path="/admin/sliders/edit/:id" element={<AdminLayout><SliderForm /></AdminLayout>} />
+        <Route path="news/new" element={<NewsForm />} />
+        <Route path="news/edit/:id" element={<NewsForm />} />
+        <Route path="sliders" element={<SliderList />} />
+        <Route path="sliders/new" element={<SliderForm />} />
+        <Route path="sliders/edit/:id" element={<SliderForm />} />
       </Route>
     </Routes>
   )
