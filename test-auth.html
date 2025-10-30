@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - MangeXis</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #333;
+            color: #fff;
+        }
+        button {
+            background: #8b5cf6;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #7c3aed;
+        }
+        .result {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { border-color: #10b981; }
+        .error { border-color: #ef4444; }
+        h1 { color: #8b5cf6; }
+        h2 { color: #a78bfa; }
+    </style>
+</head>
+<body>
+    <h1>🔐 MangeXis Auth Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Admin Login</h2>
+        <input type="text" id="adminUser" placeholder="Username" value="admin">
+        <input type="password" id="adminPass" placeholder="Password" value="134790Emre2012/8">
+        <button onclick="testAdminLogin()">Test Admin</button>
+        <div id="adminResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Fansub Login</h2>
+        <input type="text" id="fansubUser" placeholder="Username" value="fansub">
+        <input type="password" id="fansubPass" placeholder="Password" value="Mangexis/Fansub2025OP">
+        <button onclick="testFansubLogin()">Test Fansub</button>
+        <div id="fansubResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Token Verify</h2>
+        <button onclick="testVerify()">Verify Current Token</button>
+        <div id="verifyResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Manga API</h2>
+        <button onclick="testMangaAPI()">Get All Mangas</button>
+        <div id="mangaResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8888/.netlify/functions'
+            : '/.netlify/functions';
+
+        async function testAdminLogin() {
+            const result = document.getElementById('adminResult');
+            result.textContent = 'Testing...';
+            result.className = 'result';
+
+            try {
+                const response = await fetch(`${API_BASE}/admin-auth`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: document.getElementById('adminUser').value,
+                        password: document.getElementById('adminPass').value
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('admin_token', data.token);
+                    result.className = 'result success';
+                    result.textContent = '✅ SUCCESS!\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ FAILED\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ ERROR\n\n' + error.message;
+            }
+        }
+
+        async function testFansubLogin() {
+            const result = document.getElementById('fansubResult');
+            result.textContent = 'Testing...';
+            result.className = 'result';
+
+            try {
+                const response = await fetch(`${API_BASE}/admin-auth`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: document.getElementById('fansubUser').value,
+                        password: document.getElementById('fansubPass').value
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('admin_token', data.token);
+                    result.className = 'result success';
+                    result.textContent = '✅ SUCCESS!\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ FAILED\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ ERROR\n\n' + error.message;
+            }
+        }
+
+        async function testVerify() {
+            const result = document.getElementById('verifyResult');
+            result.textContent = 'Testing...';
+            result.className = 'result';
+
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                result.className = 'result error';
+                result.textContent = '❌ No token found. Login first!';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin-auth`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ action: 'verify' })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.textContent = '✅ TOKEN VALID\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ TOKEN INVALID\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ ERROR\n\n' + error.message;
+            }
+        }
+
+        async function testMangaAPI() {
+            const result = document.getElementById('mangaResult');
+            result.textContent = 'Testing...';
+            result.className = 'result';
+
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                result.className = 'result error';
+                result.textContent = '❌ No token found. Login first!';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin-manga`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.mangas) {
+                    result.className = 'result success';
+                    result.textContent = `✅ SUCCESS! Found ${data.mangas.length} mangas\n\n` + JSON.stringify(data, null, 2);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ FAILED\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ ERROR\n\n' + error.message;
+            }
+        }
+
+        // Show current environment
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('API Base:', API_BASE);
+            console.log('Environment:', window.location.hostname === 'localhost' ? 'LOCAL' : 'PRODUCTION');
+        });
+    </script>
+</body>
+</html>
