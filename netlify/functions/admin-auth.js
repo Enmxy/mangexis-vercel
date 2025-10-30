@@ -14,10 +14,10 @@ if (!process.env.JWT_SECRET) {
 // IMPORTANT: Store hashed passwords in environment variables for production
 
 // Fallback hashed passwords for development (ONLY if env vars not set)
-// Admin: MangeXis@2025!SuperSecureAdmin#Pass
-const FALLBACK_ADMIN_HASH = '$2a$12$dwsG4a3jbW9MVEmAgny2EO4agfGVK.El4bmHCqtOJij/Ca4yJl8RS'
-// Fansub: FansubMangeXis$2025!SecureChapter#Upload  
-const FALLBACK_FANSUB_HASH = '$2a$12$AZ97mXt1txn62dI7kTmWveSSRpOBv7PEHTd0hAIrf/sQH696vh5jK'
+// Admin: 134790Emre2012/8
+const FALLBACK_ADMIN_HASH = '$2a$12$AEBfqB557jswA/1v70Y2I.bqdRaRvEolU4.ZdOcItffHXG.b.0Uwu'
+// Fansub: Mangexis/Fansub2025OP
+const FALLBACK_FANSUB_HASH = '$2a$12$4xZ9TjhysyZhqNP2Fn4jNeFoUh2Mzu.XCA5KRbN5wQ1BpNoGvXm4C'
 
 const USERS = [
   {
