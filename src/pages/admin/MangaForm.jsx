@@ -366,12 +366,16 @@ const MangaForm = () => {
             {isEdit ? 'Manga bilgilerini güncelleyin' : 'Yeni manga bilgilerini girin'}
           </p>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => navigate('/admin/mangas')}
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
         >
-          ✕ Kapat
-        </button>
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </motion.button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -429,7 +433,9 @@ const MangaForm = () => {
                   placeholder="https://... veya dosya yükle"
                 />
                 <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center gap-2">
-                  <span>📁</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
                   <span className="hidden sm:inline">Yükle</span>
                   <input
                     type="file"
@@ -529,74 +535,33 @@ const MangaForm = () => {
                   onClick={() => handleRemoveGenre(genre)}
                   className="hover:text-red-300 transition-colors"
                 >
-                  ✕
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </motion.span>
             ))}
           </div>
 
-          {/* Available Genres */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {availableGenres.filter(g => !formData.genres.includes(g)).map((genre) => (
-              <button
-                key={genre}
-                type="button"
-                onClick={() => handleAddGenre(genre)}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
-              >
-                + {genre}
-              </button>
-            ))}
-          </div>
-
-          {/* Custom Genre */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newGenre}
-              onChange={(e) => setNewGenre(e.target.value)}
-              placeholder="Özel tür ekle..."
-              className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
-            />
-            <button
-              type="button"
-              onClick={handleAddCustomGenre}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              Ekle
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Chapters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-gray-800 rounded-xl p-6 border border-gray-700"
-        >
+{{ ... }}
           <h2 className="text-lg font-semibold text-white mb-4">Bölümler</h2>
           
           {/* Existing Chapters */}
           {formData.chapters.length > 0 ? (
             <div className="mb-6">
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
-                <p className="text-green-400 font-medium text-sm">
-                  ✅ {formData.chapters.length} bölüm eklendi
+                <p className="text-green-400 font-medium text-sm flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {formData.chapters.length} bölüm eklendi
                 </p>
               </div>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {formData.chapters
                   .sort((a, b) => a.chapter - b.chapter)
                   .map((chapter, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-700 rounded-lg p-3 flex items-center justify-between hover:bg-gray-600 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                          {chapter.chapter}
-                        </div>
+{{ ... }}
                         <div>
                           <p className="text-white font-medium">Bölüm {chapter.chapter}</p>
                           <p className="text-gray-400 text-xs">{chapter.images?.length || 0} sayfa</p>
@@ -608,7 +573,9 @@ const MangaForm = () => {
                         className="text-red-400 hover:text-red-300 transition-colors px-3 py-2 hover:bg-red-500/10 rounded"
                         title="Sil"
                       >
-                        🗑️
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </div>
                   ))}
@@ -616,35 +583,18 @@ const MangaForm = () => {
             </div>
           ) : (
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
-              <p className="text-yellow-400 text-sm">
-                ⚠️ Henüz bölüm eklenmedi. Aşağıdaki formdan bölüm ekleyin.
+              <p className="text-yellow-400 text-sm flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Henüz bölüm eklenmedi. Aşağıdaki formdan bölüm ekleyin.
               </p>
             </div>
           )}
 
           {/* Add New Chapter */}
           <div className="bg-gray-700/50 rounded-lg p-4 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Bölüm Numarası
-              </label>
-              <input
-                type="number"
-                value={newChapter.chapter}
-                onChange={(e) => setNewChapter({ ...newChapter, chapter: parseInt(e.target.value) })}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Sayfa Linkleri
-              </label>
-              <div className="space-y-2">
-                {newChapter.images.map((image, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      type="url"
+{{ ... }}
                       value={image}
                       onChange={(e) => handleImageChange(index, e.target.value)}
                       placeholder={`Sayfa ${index + 1} URL`}
@@ -656,25 +606,25 @@ const MangaForm = () => {
                         onClick={() => handleRemoveImageField(index)}
                         className="text-red-400 hover:text-red-300 px-3 transition-colors"
                       >
-                        ✕
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                       </button>
                     )}
                   </div>
                 ))}
               </div>
               <button
-                type="button"
-                onClick={handleAddImageField}
-                className="mt-2 text-purple-400 hover:text-purple-300 text-sm transition-colors"
-              >
-                + Sayfa Ekle
+{{ ... }}
               </button>
             </div>
 
             {/* Fansub Management */}
             <div className="border-t border-gray-600 pt-4">
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <span>🎬</span>
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                </svg>
                 <span>Fansub Ekle (Opsiyonel)</span>
               </h3>
               
@@ -692,30 +642,15 @@ const MangaForm = () => {
                         onClick={() => handleRemoveFansub(index)}
                         className="text-red-400 hover:text-red-300 px-2"
                       >
-                        ✕
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                       </button>
                     </div>
                   ))}
                 </div>
               )}
-
-              {/* Add Fansub Form */}
-              <div className="bg-gray-600/30 rounded-lg p-3 space-y-3">
-                <input
-                  type="text"
-                  value={currentFansub.name}
-                  onChange={(e) => setCurrentFansub({ ...currentFansub, name: e.target.value })}
-                  placeholder="Fansub adı (örn: TurkAnime, MangaTR)"
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
-                />
-                
-                <div>
-                  <label className="block text-sm text-gray-300 mb-2">Fansub Sayfaları</label>
-                  <div className="space-y-2">
-                    {currentFansub.images.map((image, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="url"
+{{ ... }}
                           value={image}
                           onChange={(e) => handleFansubImageChange(index, e.target.value)}
                           placeholder={`Sayfa ${index + 1} URL`}
@@ -727,7 +662,9 @@ const MangaForm = () => {
                             onClick={() => handleRemoveFansubImageField(index)}
                             className="text-red-400 hover:text-red-300 px-2"
                           >
-                            ✕
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                           </button>
                         )}
                       </div>
@@ -745,28 +682,18 @@ const MangaForm = () => {
                 <button
                   type="button"
                   onClick={handleAddFansub}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"
                 >
-                  🎬 Fansub Ekle
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Fansub Ekle
                 </button>
               </div>
             </div>
 
             <button
-              type="button"
-              onClick={handleAddChapter}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-            >
-              Bölüm Ekle
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Submit */}
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/mangas')}
+{{ ... }}
             disabled={saving}
             className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -775,14 +702,34 @@ const MangaForm = () => {
           <button
             type="submit"
             disabled={saving || uploading}
-            className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg shadow-lg shadow-purple-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg shadow-lg shadow-purple-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {saving ? '⏳ Kaydediliyor...' : (isEdit ? '💾 Güncelle' : '✅ Kaydet')}
+            {saving ? (
+              <>
+                <svg className="animate-spin w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Kaydediliyor...
+              </>
+            ) : isEdit ? (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Güncelle
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Kaydet
+              </>
+            )}
           </button>
         </div>
       </form>
     </div>
   )
-}
 
 export default MangaForm
