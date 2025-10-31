@@ -13,9 +13,8 @@ const Giscus = ({ term, category = 'General' }) => {
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'Enmxy/mangexis-vercel')
     script.setAttribute('data-repo-id', 'R_kgDOQM0tVA')
-    // Category dinamik olarak kullanılabilir ama şimdilik General
     script.setAttribute('data-category', 'General')
-    script.setAttribute('data-category-id', 'DIC_kwDOQM0tVM4Cloqd')
+    script.setAttribute('data-category-id', 'DIC_kwDOQM0tVM4CxTlt')
     script.setAttribute('data-mapping', term ? 'specific' : 'pathname')
     if (term) {
       script.setAttribute('data-term', term)
