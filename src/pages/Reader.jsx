@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
+import { startAutoRefresh, stopAutoRefresh } from '../utils/autoRefresh'
 import Giscus from '../components/Giscus'
 import imageUpscaler from '../utils/imageUpscaler'
 import { addToHistory } from '../utils/readingHistory'
@@ -28,6 +29,15 @@ const Reader = () => {
   // Load manga data
   useEffect(() => {
     loadManga()
+    
+    // Auto refresh every 5 seconds
+    startAutoRefresh(async () => {
+      await loadManga()
+    }, 5)
+    
+    return () => {
+      stopAutoRefresh()
+    }
   }, [slug])
 
   const loadManga = async () => {
