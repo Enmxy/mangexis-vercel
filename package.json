@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "vercel-build": "vite build"
+    "vercel-build": "vite build",
+    "generate-hash": "node scripts/generate-password-hash.cjs"
   },
   "dependencies": {
     "react": "^18.2.0",
