@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken'
+import { Octokit } from '@octokit/rest'
 const BRANCH = 'main'
 const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-super-secret-key-change-in-production'
 

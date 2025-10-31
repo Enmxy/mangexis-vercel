@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 // CRITICAL SECURITY: All credentials MUST be in environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-fallback-secret-CHANGE-IN-PRODUCTION'
