@@ -1,84 +1,76 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { authApi } from '../../utils/adminApi'
 
 const AdminLogin = () => {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [warning, setWarning] = useState('')
-  const [remainingAttempts, setRemainingAttempts] = useState(null)
-  const [lockedUntil, setLockedUntil] = useState(null)
   const [loading, setLoading] = useState(false)
 
+  // Check if already logged in
   useEffect(() => {
-    // Check if already authenticated
-    const checkAuth = async () => {
-      const token = authApi.getToken()
-      if (token) {
-        try {
-          const result = await authApi.verify(token)
-          if (result.success) {
+    const token = localStorage.getItem('admin_token')
+    if (token) {
+      // Verify token
+      fetch('/api/admin-auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'verify' })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
             // Redirect based on role
-            if (result.user?.role === 'fansub') {
+            if (data.user?.role === 'fansub') {
               navigate('/fansub')
             } else {
               navigate('/admin/dashboard')
             }
           }
-        } catch (error) {
-          console.error('Auth check failed:', error)
-        }
-      }
+        })
+        .catch(() => {
+          localStorage.removeItem('admin_token')
+        })
     }
-    checkAuth()
   }, [navigate])
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
-    setWarning('')
     setLoading(true)
 
     try {
-      const result = await authApi.login(username, password)
+      const response = await fetch('/api/admin-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', username, password })
+      })
+      
+      const result = await response.json()
+
       
       if (result.success) {
-        authApi.setToken(result.token)
-        // Clear all warnings on success
-        setRemainingAttempts(null)
-        setLockedUntil(null)
+        // Save token
+        localStorage.setItem('admin_token', result.token)
+        localStorage.setItem('admin_role', result.user.role)
         
         // Redirect based on role
-        if (result.user?.role === 'fansub') {
+        if (result.user.role === 'fansub') {
           navigate('/fansub')
         } else {
           navigate('/admin/dashboard')
         }
       } else {
-        // Handle different error types
-        setError(result.error || 'Giriş başarısız')
-        
-        // Show remaining attempts warning
-        if (result.remainingAttempts !== undefined) {
-          setRemainingAttempts(result.remainingAttempts)
-        }
-        
-        // Show lockout warning
-        if (result.warning) {
-          setWarning(result.warning)
-        }
-        
-        // Handle lockout
-        if (result.lockedUntil) {
-          setLockedUntil(result.lockedUntil)
-        }
+        setError(result.error || 'Kullanıcı adı veya şifre hatalı')
       }
     } catch (err) {
       console.error('Login error:', err)
-      setError('Bağlantı hatası. Lütfen tekrar deneyin.')
+      setError('API bağlantı hatası. Vercel environment variables kontrol edin.')
     } finally {
       setLoading(false)
     }
@@ -143,73 +135,35 @@ const AdminLogin = () => {
               />
             </div>
 
-            {/* Lockout Warning */}
-            {lockedUntil && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/20 border-2 border-red-500 rounded-lg p-4 text-red-300"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">🔒</span>
-                  <span className="font-bold">Hesap Kilitlendi</span>
-                </div>
-                <p className="text-sm">Çok fazla başarısız deneme. 30 dakika sonra tekrar deneyin.</p>
-              </motion.div>
-            )}
-
-            {/* Warning */}
-            {warning && !lockedUntil && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-yellow-500/20 border border-yellow-500 rounded-lg p-3 text-yellow-300 text-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <span>⚠️</span>
-                  <span>{warning}</span>
-                </div>
-              </motion.div>
-            )}
-
             {/* Error */}
-            {error && !lockedUntil && (
+            {error && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-red-500/10 border border-red-500 rounded-lg p-3 text-red-400 text-sm"
               >
-                <div className="flex items-center justify-between">
-                  <span>{error}</span>
-                  {remainingAttempts !== null && remainingAttempts > 0 && (
-                    <span className="text-xs bg-red-600/30 px-2 py-1 rounded">
-                      {remainingAttempts} deneme kaldı
-                    </span>
-                  )}
-                </div>
+                {error}
               </motion.div>
             )}
 
             <motion.button
-              whileHover={!lockedUntil ? { scale: 1.02 } : {}}
-              whileTap={!lockedUntil ? { scale: 0.98 } : {}}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              disabled={loading || lockedUntil}
+              disabled={loading}
               className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-lg shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {lockedUntil ? '🔒 Hesap Kilitli' : loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+              {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
             </motion.button>
           </form>
 
-          <div className="mt-6 space-y-2">
-            <p className="text-gray-400 text-xs text-center">
-              🔐 JWT token ile güvenli giriş
+          <div className="mt-6 text-center">
+            <p className="text-gray-400 text-xs">
+              🔐 Vercel Serverless Functions + JWT Auth
             </p>
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-              <span>🛡️ Rate limiting</span>
-              <span>⏱️ Auto lockout</span>
-              <span>📊 Security logging</span>
-            </div>
+            <p className="text-gray-500 text-xs mt-1">
+              Admin: admin | Fansub: fansub
+            </p>
           </div>
         </motion.div>
 
