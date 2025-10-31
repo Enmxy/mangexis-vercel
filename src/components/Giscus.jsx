@@ -12,9 +12,10 @@ const Giscus = ({ term, category = 'General' }) => {
     const script = document.createElement('script')
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'Enmxy/mangexis-vercel')
-    script.setAttribute('data-repo-id', 'YOUR_REPO_ID') // GitHub repo ID
-    script.setAttribute('data-category', category)
-    script.setAttribute('data-category-id', 'YOUR_CATEGORY_ID') // Category ID
+    script.setAttribute('data-repo-id', 'R_kgDOQM0tVA')
+    // Category dinamik olarak kullanılabilir ama şimdilik General
+    script.setAttribute('data-category', 'General')
+    script.setAttribute('data-category-id', 'DIC_kwDOQM0tVM4Cloqd')
     script.setAttribute('data-mapping', term ? 'specific' : 'pathname')
     if (term) {
       script.setAttribute('data-term', term)

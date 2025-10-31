@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
-import Comments from '../components/Comments'
+import Giscus from '../components/Giscus'
 import imageUpscaler from '../utils/imageUpscaler'
 import { addToHistory } from '../utils/readingHistory'
 
@@ -705,9 +705,9 @@ const Reader = () => {
             </div>
 
             {/* Comments Section */}
-            <Comments 
-              identifier={`chapter-${manga.slug}-${chapterId}`}
-              title={`${manga.title} - ${chapter.title}`}
+            <Giscus 
+              term={`${manga.title} - Bölüm ${chapter.id}`}
+              category="Bölümler"
             />
           </div>
         </div>
