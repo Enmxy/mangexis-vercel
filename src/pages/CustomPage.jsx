@@ -14,7 +14,7 @@ const CustomPage = () => {
   const loadPage = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/.netlify/functions/custom-pages')
+      const response = await fetch('/api/custom-pages')
       const data = await response.json()
       if (data.success) {
         const foundPage = data.pages.find(p => p.slug === slug)

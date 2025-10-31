@@ -134,7 +134,7 @@ const ChapterAdd = () => {
       }
 
       // Call API to add chapter
-      const response = await fetch(`/.netlify/functions/manga-operations?action=addChapter&slug=${formData.mangaSlug}`, {
+      const response = await fetch(`/api/manga-operations?action=addChapter&slug=${formData.mangaSlug}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

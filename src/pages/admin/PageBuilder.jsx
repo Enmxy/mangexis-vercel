@@ -25,7 +25,7 @@ const PageBuilder = () => {
 
   const loadPages = async () => {
     try {
-      const response = await fetch('/.netlify/functions/custom-pages')
+      const response = await fetch('/api/custom-pages')
       const data = await response.json()
       if (data.success) {
         setPages(data.pages || [])

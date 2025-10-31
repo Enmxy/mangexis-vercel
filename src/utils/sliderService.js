@@ -1,6 +1,6 @@
 // Slider Service - API calls for slider management
 
-const API_BASE = '/.netlify/functions/slider-operations'
+const API_BASE = '/api/slider-operations'
 
 export const getAllSliders = async () => {
   try {

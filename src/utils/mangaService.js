@@ -1,8 +1,8 @@
 // Manga CRUD operations with Netlify Functions
 import { authApi } from './adminApi'
 
-const API_URL = '/.netlify/functions/manga-operations';
-const UPLOAD_URL = '/.netlify/functions/upload-image';
+const API_URL = '/api/manga-operations';
+const UPLOAD_URL = '/api/upload-image';
 
 // Check if running in development mode
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';

@@ -1,7 +1,7 @@
 // News CRUD operations with Netlify Functions
 import { authApi } from './adminApi'
 
-const API_URL = '/.netlify/functions/news-operations';
+const API_URL = '/api/news-operations';
 
 // Check if running in development mode
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';

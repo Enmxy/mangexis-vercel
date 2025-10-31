@@ -14,7 +14,7 @@ const PagesList = () => {
   const loadPages = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/.netlify/functions/custom-pages')
+      const response = await fetch('/api/custom-pages')
       const data = await response.json()
       if (data.success) {
         setPages(data.pages || [])
@@ -28,7 +28,7 @@ const PagesList = () => {
 
   const deletePage = async (slug) => {
     try {
-      const response = await fetch(`/.netlify/functions/custom-pages?slug=${slug}`, {
+      const response = await fetch(`/api/custom-pages?slug=${slug}`, {
         method: 'DELETE'
       })
       const result = await response.json()

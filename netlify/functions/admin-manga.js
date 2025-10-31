@@ -3,8 +3,8 @@ const { Octokit } = require('@octokit/rest')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-super-secret-key-change-in-production'
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-const REPO_OWNER = 'Enmxy'
-const REPO_NAME = 'Mangexis'
+const REPO_OWNER = process.env.REPO_OWNER || 'Enmxy'
+const REPO_NAME = process.env.REPO_NAME || 'Mangexis'
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN })
 
