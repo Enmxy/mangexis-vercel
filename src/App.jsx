@@ -1,7 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileBottomNav from './components/MobileBottomNav'
+import InstallPWA from './components/InstallPWA'
 import HomePage from './pages/HomePage'
 import MangaDetail from './pages/MangaDetail'
 import Reader from './pages/Reader'
@@ -34,7 +36,9 @@ import FansubMangaForm from './pages/admin/FansubMangaForm'
 
 function App() {
   return (
-    <Routes>
+    <ThemeProvider>
+      <InstallPWA />
+      <Routes>
       {/* Public Routes */}
       <Route path="/" element={
         <div className="min-h-screen bg-black">
@@ -159,7 +163,8 @@ function App() {
         <Route path="pages/new" element={<PageBuilder />} />
         <Route path="pages/edit/:slug" element={<PageBuilder />} />
       </Route>
-    </Routes>
+      </Routes>
+    </ThemeProvider>
   )
 }
 

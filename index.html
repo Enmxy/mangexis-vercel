@@ -5,6 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#9333ea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MangeXis" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    
     <!-- SEO Meta Tags -->
     <title>MangeXis - Türkiye'nin En İyi Manga Okuma Platformu | Ücretsiz Manga Oku</title>
     <meta name="description" content="MangeXis ile binlerce mangayı ücretsiz okuyun. One Piece, Naruto, Attack on Titan ve daha fazlası. Türkçe manga okuma platformu. Yüksek kalite, hızlı yükleme." />
@@ -36,20 +44,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- PWA Service Worker -->
     <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", user => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/dashboard";
-            });
-          }
-        });
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(reg => console.log('Service Worker: Registered'))
+            .catch(err => console.log('Service Worker: Error', err))
+        })
       }
     </script>
   </body>
