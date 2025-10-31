@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Slider from '../components/Slider'
 import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
+import FeatureSection from '../components/FeatureSection'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import { getAllSliders } from '../utils/sliderService'
@@ -175,32 +176,40 @@ const HomePage = () => {
 
   return (
     <>
-      {/* Loading Animation */}
+      {/* Intro Animation - Minimal */}
       <AnimatePresence>
         {showIntro && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center"
+            transition={{ duration: 0.8 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black"
           >
-            {/* Logo */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-center mb-8"
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center gap-8"
             >
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold font-mono text-white mb-2">
-                MangeXis
-              </h1>
-              <p className="text-tertiary text-xs sm:text-sm tracking-widest">
-                PREMIUM MANGA PLATFORM
-              </p>
+              {/* Logo */}
+              <motion.div
+                initial={{ y: -20 }}
+                animate={{ y: 0 }}
+                transition={{ type: "spring", stiffness: 200 }}
+                className="relative"
+              >
+                <div className="text-8xl font-black text-white font-mono tracking-tighter">
+                  MX
+                </div>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="h-1 bg-white mt-2"
+                />
+              </motion.div>
             </motion.div>
-
-            {/* Loading Spinner */}
-            <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
           </motion.div>
         )}
       </AnimatePresence>

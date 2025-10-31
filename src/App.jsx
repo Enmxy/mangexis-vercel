@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom'
-import { ThemeProvider } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileBottomNav from './components/MobileBottomNav'
@@ -36,7 +35,7 @@ import FansubMangaForm from './pages/admin/FansubMangaForm'
 
 function App() {
   return (
-    <ThemeProvider>
+    <>
       <InstallPWA />
       <Routes>
       {/* Public Routes */}
@@ -164,7 +163,7 @@ function App() {
         <Route path="pages/edit/:slug" element={<PageBuilder />} />
       </Route>
       </Routes>
-    </ThemeProvider>
+    </>
   )
 }
 
