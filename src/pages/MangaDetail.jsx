@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
-import Comments from '../components/Comments'
+import Giscus from '../components/Giscus'
 
 const MangaDetail = () => {
   const { slug } = useParams()
@@ -414,9 +414,9 @@ const MangaDetail = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.7 }}
         >
-          <Comments 
-            identifier={`manga-${manga.slug}`}
-            title={manga.title}
+          <Giscus 
+            term={manga.title}
+            category="Manga"
           />
         </motion.div>
       </div>

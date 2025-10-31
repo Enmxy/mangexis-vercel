@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getAllNews } from '../utils/newsService'
+import Giscus from '../components/Giscus'
 import Poll from '../components/Poll'
 
 const NewsDetail = () => {
@@ -143,6 +144,20 @@ const NewsDetail = () => {
             )}
           </div>
         </motion.article>
+
+        {/* Comments Section */}
+        <div className="mt-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Giscus 
+              term={news.title}
+              category="Haberler"
+            />
+          </motion.div>
+        </div>
 
         {/* Related News */}
         {relatedNews.length > 0 && (

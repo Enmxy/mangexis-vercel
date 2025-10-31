@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { startAutoRefresh, stopAutoRefresh } from '../utils/autoRefresh'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Slider from '../components/Slider'
@@ -26,6 +27,15 @@ const HomePage = () => {
   useEffect(() => {
     loadSliders()
     loadAllMangas()
+    
+    // Auto refresh every 5 minutes
+    startAutoRefresh(async () => {
+      await loadAllMangas()
+    }, 5)
+    
+    return () => {
+      stopAutoRefresh()
+    }
   }, [])
 
   const loadSliders = async () => {
