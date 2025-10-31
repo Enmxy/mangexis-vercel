@@ -15,7 +15,7 @@ const getRepoInfo = () => ({
   repo: process.env.REPO_NAME || 'Mangexis'
 })
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',

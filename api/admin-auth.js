@@ -132,7 +132,7 @@ const clearFailedAttempts = (ip) => {
   loginAttempts.delete(ip)
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
@@ -262,6 +262,6 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('Auth error:', error)
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json({ error: 'Server error', details: error.message })
   }
 }
