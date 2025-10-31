@@ -133,13 +133,26 @@ const ChapterAdd = () => {
         ]
       }
 
+      // Get auth token
+      const token = localStorage.getItem('admin_token')
+      if (!token) {
+        alert('❌ Oturum süresi dolmuş. Lütfen tekrar giriş yapın.')
+        navigate('/admin/login')
+        return
+      }
+
       // Call API to add chapter
-      const response = await fetch(`/api/manga-operations?action=addChapter&slug=${formData.mangaSlug}`, {
+      const response = await fetch('/api/manga-operations', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(chapterData)
+        body: JSON.stringify({
+          operation: 'ADD_CHAPTER',
+          slug: formData.mangaSlug,
+          chapter: chapterData
+        })
       })
 
       const result = await response.json()
