@@ -29,9 +29,10 @@ const HomePage = () => {
     loadSliders()
     loadAllMangas()
     
-    // Auto refresh every 5 minutes
+    // Auto refresh every 5 seconds - silent background update
     startAutoRefresh(async () => {
       await loadAllMangas()
+      await loadSliders()
     }, 5)
     
     return () => {

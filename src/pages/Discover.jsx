@@ -1,8 +1,11 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import MangaCard from '../components/MangaCard'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
+import { startAutoRefresh, stopAutoRefresh } from '../utils/autoRefresh'
+import SearchFilter from '../components/SearchFilter'
+import MangaCard from '../components/MangaCard'
 
 const Discover = () => {
   // Filter States
@@ -16,6 +19,15 @@ const Discover = () => {
   // Load mangas from API/localStorage + static data
   useEffect(() => {
     loadAllMangas()
+    
+    // Auto refresh every 5 seconds
+    startAutoRefresh(async () => {
+      await loadAllMangas()
+    }, 5)
+    
+    return () => {
+      stopAutoRefresh()
+    }
   }, [])
 
   const loadAllMangas = async () => {

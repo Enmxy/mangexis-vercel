@@ -1,14 +1,14 @@
 // Otomatik sayfa yenileme - Görünmez ve yumuşak
-// Her 5 dakikada bir arka planda içerik günceller
+// Her 5 saniyede bir arka planda içerik günceller
 
 let refreshInterval = null
 let isRefreshing = false
 
-export const startAutoRefresh = (callback, intervalMinutes = 5) => {
+export const startAutoRefresh = (callback, intervalSeconds = 5) => {
   // Zaten çalışıyorsa başlatma
   if (refreshInterval) return
 
-  const intervalMs = intervalMinutes * 60 * 1000
+  const intervalMs = intervalSeconds * 1000
 
   refreshInterval = setInterval(async () => {
     if (isRefreshing) return
