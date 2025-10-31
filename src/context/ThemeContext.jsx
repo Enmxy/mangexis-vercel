@@ -12,15 +12,9 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check localStorage or system preference
+    // Check localStorage only, default to dark
     const saved = localStorage.getItem('theme')
-    if (saved) return saved
-    
-    // Check system preference
-    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      return 'light'
-    }
-    return 'dark'
+    return saved || 'dark'
   })
 
   useEffect(() => {

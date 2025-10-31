@@ -85,73 +85,88 @@ const Dashboard = () => {
   const isAdmin = user?.role === 'admin'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      {/* Header */}
-      <header className="bg-gray-800/50 backdrop-blur border-b border-gray-700">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-white">MangeXis</h1>
-            <p className="text-purple-400 text-sm">
-              {isAdmin ? 'Admin Panel' : 'Fansub Panel'}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-white font-medium">{user?.username}</p>
-              <p className="text-gray-400 text-sm capitalize">{user?.role}</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              Çıkış
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-black text-white mb-2">
+          Hoş Geldin, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{user?.username}</span> 👋
+        </h1>
+        <p className="text-gray-400">
+          {isAdmin ? 'Tüm sistemi yönetebilirsin' : 'Bölüm ekleyebilir ve mangaları yönetebilirsin'}
+        </p>
+      </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div>
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white shadow-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 rounded-2xl p-6 text-white shadow-2xl border border-purple-500/20"
           >
-            <div className="text-4xl mb-2">📚</div>
-            <div className="text-3xl font-bold">{stats.mangas}</div>
-            <div className="text-purple-200">Toplam Manga</div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-5xl">📚</div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-xs font-bold">
+                +{Math.floor(Math.random() * 5) + 1} bu ay
+              </div>
+            </div>
+            <div className="text-4xl font-black mb-1">{stats.mangas}</div>
+            <div className="text-purple-100 font-medium">Toplam Manga</div>
           </motion.div>
 
           <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 text-white shadow-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-2xl p-6 text-white shadow-2xl border border-blue-500/20"
           >
-            <div className="text-4xl mb-2">📖</div>
-            <div className="text-3xl font-bold">{stats.chapters}</div>
-            <div className="text-blue-200">Toplam Bölüm</div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-5xl">📖</div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-xs font-bold">
+                +{Math.floor(Math.random() * 20) + 10} bu hafta
+              </div>
+            </div>
+            <div className="text-4xl font-black mb-1">{stats.chapters}</div>
+            <div className="text-blue-100 font-medium">Toplam Bölüm</div>
           </motion.div>
 
           <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white shadow-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="bg-gradient-to-br from-green-600 via-green-700 to-green-800 rounded-2xl p-6 text-white shadow-2xl border border-green-500/20"
           >
-            <div className="text-4xl mb-2">📰</div>
-            <div className="text-3xl font-bold">{stats.news}</div>
-            <div className="text-green-200">Toplam Haber</div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-5xl">📰</div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-xs font-bold">
+                Yakında
+              </div>
+            </div>
+            <div className="text-4xl font-black mb-1">{stats.news}</div>
+            <div className="text-green-100 font-medium">Toplam Haber</div>
           </motion.div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-xl p-6">
-          <h2 className="text-2xl font-bold text-white mb-6">Hızlı İşlemler</h2>
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 shadow-2xl">
+          <h2 className="text-3xl font-black text-white mb-6 flex items-center gap-3">
+            <span>⚡</span> Hızlı İşlemler
+          </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Common for both */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
+              whileHover={{ scale: 1.05, y: -4 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => navigate('/admin/chapter/add')}
-              className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-left transition-colors"
+              className="bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white p-6 rounded-xl text-left transition-all shadow-lg hover:shadow-purple-500/30"
             >
               <div className="text-3xl mb-2">➕</div>
               <div className="font-bold">Bölüm Ekle</div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom'
+import Sidebar from './Sidebar'
 import { motion } from 'framer-motion'
 import { authApi } from '../../utils/adminApi'
 
