@@ -134,7 +134,7 @@ const PageBuilder = () => {
 
     setLoading(true)
     try {
-      const response = await fetch('/.netlify/functions/custom-pages', {
+      const response = await fetch('/api/custom-pages', {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(currentPage)
