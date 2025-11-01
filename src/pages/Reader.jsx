@@ -423,18 +423,22 @@ const Reader = () => {
                     )}
                   </div>
                   {/* Fansub Selector - Mobile */}
-                  {chapter.fansubs && chapter.fansubs.length > 1 && (
-                    <select
-                      value={selectedFansub}
-                      onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
-                      className="px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
-                    >
-                      {chapter.fansubs.map((fansub, index) => (
-                        <option key={index} value={index}>
-                          {fansub.name || `Fansub ${index + 1}`}
-                        </option>
-                      ))}
-                    </select>
+                  {chapter.fansubs && chapter.fansubs.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#EDEDED]/60 text-xs font-medium">Çeviri:</span>
+                      <select
+                        value={selectedFansub}
+                        onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
+                        className="flex-1 px-2 py-1 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
+                        disabled={chapter.fansubs.length === 1}
+                      >
+                        {chapter.fansubs.map((fansub, index) => (
+                          <option key={index} value={index}>
+                            {fansub.name || `Fansub ${index + 1}`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   )}
                 </div>
               </div>
@@ -555,18 +559,29 @@ const Reader = () => {
                   </div>
 
                   {/* Fansub Selector - Desktop */}
-                  {chapter.fansubs && chapter.fansubs.length > 1 && (
-                    <select
-                      value={selectedFansub}
-                      onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
-                      className="px-3 py-2 bg-[#EDEDED] text-[#0A0A0A] rounded text-xs font-bold cursor-pointer focus:outline-none focus:bg-white transition-all"
-                    >
-                      {chapter.fansubs.map((fansub, index) => (
-                        <option key={index} value={index}>
-                          {fansub.name || `Fansub ${index + 1}`}
-                        </option>
-                      ))}
-                    </select>
+                  {chapter.fansubs && chapter.fansubs.length > 0 && (
+                    <div className="flex items-center gap-2 bg-[#EDEDED] rounded px-3 py-2">
+                      <svg className="w-4 h-4 text-[#0A0A0A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      <select
+                        value={selectedFansub}
+                        onChange={(e) => setSelectedFansub(parseInt(e.target.value))}
+                        className="bg-transparent text-[#0A0A0A] text-xs font-bold cursor-pointer focus:outline-none"
+                        disabled={chapter.fansubs.length === 1}
+                      >
+                        {chapter.fansubs.map((fansub, index) => (
+                          <option key={index} value={index}>
+                            {fansub.name || `Fansub ${index + 1}`}
+                          </option>
+                        ))}
+                      </select>
+                      {chapter.fansubs.length > 1 && (
+                        <span className="text-[#0A0A0A]/60 text-[10px]">
+                          ({chapter.fansubs.length} çeviri)
+                        </span>
+                      )}
+                    </div>
                   )}
 
                   {/* Zoom Controls */}
