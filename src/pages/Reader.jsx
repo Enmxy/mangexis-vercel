@@ -5,6 +5,7 @@ import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import { startAutoRefresh, stopAutoRefresh } from '../utils/autoRefresh'
 import Giscus from '../components/Giscus'
+import OptimizedImage from '../components/OptimizedImage'
 import imageUpscaler from '../utils/imageUpscaler'
 import { addToHistory } from '../utils/readingHistory'
 
@@ -719,34 +720,19 @@ const Reader = () => {
         }}
       >
         {images.map((imageUrl, index) => (
-          <motion.div
+          <div
             key={index}
             ref={(el) => (imageRefs.current[index] = el)}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "200px" }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
             className="w-full"
           >
-            <img
+            <OptimizedImage
               src={imageUrl}
-              alt={`Page ${index + 1}`}
-              loading="lazy"
-              draggable="false"
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              className="w-full h-auto block select-none pointer-events-none"
-              style={{
-                transition: 'opacity 0.3s ease-out',
-                maxWidth: '100%',
-                height: 'auto',
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                MozUserSelect: 'none',
-                msUserSelect: 'none'
-              }}
+              alt={`Sayfa ${index + 1}`}
+              index={index}
+              preloadNext={index < images.length - 1}
+              className="pointer-events-none"
             />
-          </motion.div>
+          </div>
         ))}
 
         {/* End of Chapter - Comments */}
