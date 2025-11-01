@@ -32,7 +32,9 @@ const MangaForm = () => {
   })
   const [currentFansub, setCurrentFansub] = useState({
     name: '',
-    images: ['']
+    images: [''],
+    website: '',
+    discord: ''
   })
 
   const availableGenres = [
@@ -202,12 +204,19 @@ const MangaForm = () => {
       return
     }
 
+    const fansubData = {
+      name: currentFansub.name,
+      images: validImages,
+      website: currentFansub.website || '',
+      discord: currentFansub.discord || ''
+    }
+
     setNewChapter({
       ...newChapter,
-      fansubs: [...newChapter.fansubs, { name: currentFansub.name, images: validImages }]
+      fansubs: [...newChapter.fansubs, fansubData]
     })
 
-    setCurrentFansub({ name: '', images: [''] })
+    setCurrentFansub({ name: '', images: [''], website: '', discord: '' })
     alert(`✅ "${currentFansub.name}" fansub eklendi! (${validImages.length} sayfa)`)
   }
 
@@ -265,7 +274,7 @@ const MangaForm = () => {
       images: [''],
       fansubs: []
     })
-    setCurrentFansub({ name: '', images: [''] })
+    setCurrentFansub({ name: '', images: [''], website: '', discord: '' })
     
     const fansubInfo = newChapter.fansubs.length > 0 
       ? `\n${newChapter.fansubs.length} fansub ekli`
@@ -730,6 +739,23 @@ const MangaForm = () => {
                   placeholder="Fansub adı (örn: TurkAnime, MangaTR)"
                   className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
                 />
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="url"
+                    value={currentFansub.website}
+                    onChange={(e) => setCurrentFansub({ ...currentFansub, website: e.target.value })}
+                    placeholder="Website (opsiyonel)"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors text-sm"
+                  />
+                  <input
+                    type="url"
+                    value={currentFansub.discord}
+                    onChange={(e) => setCurrentFansub({ ...currentFansub, discord: e.target.value })}
+                    placeholder="Discord sunucusu (opsiyonel)"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors text-sm"
+                  />
+                </div>
                 
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">Fansub Sayfaları</label>
