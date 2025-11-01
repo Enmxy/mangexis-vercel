@@ -376,8 +376,8 @@ const MangaForm = () => {
           </p>
         </div>
         <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/admin/mangas')}
           className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
         >
@@ -392,6 +392,7 @@ const MangaForm = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
           className="bg-gray-800 rounded-xl p-6 border border-gray-700"
         >
           <h2 className="text-lg font-semibold text-white mb-4">Temel Bilgiler</h2>
@@ -534,8 +535,9 @@ const MangaForm = () => {
             {formData.genres.map((genre) => (
               <motion.span
                 key={genre}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2 }}
                 className="px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg flex items-center gap-2"
               >
                 {genre}
@@ -860,3 +862,4 @@ const MangaForm = () => {
 }
 
 export default MangaForm
+

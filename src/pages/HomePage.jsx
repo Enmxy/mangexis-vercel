@@ -549,7 +549,6 @@ const HomePage = () => {
             )}
           </motion.div>
         </div>
-      </div>
     </>
   )
 }
