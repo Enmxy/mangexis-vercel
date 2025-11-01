@@ -9,7 +9,7 @@ const AdminLogin = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Check if already logged in
+  // Check if already logged in or IP-based login
   useEffect(() => {
     const token = localStorage.getItem('admin_token')
     if (token) {
@@ -35,6 +35,25 @@ const AdminLogin = () => {
         })
         .catch(() => {
           localStorage.removeItem('admin_token')
+        })
+    } else {
+      // Check IP-based login
+      fetch('/api/admin-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check-ip' })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.method === 'ip') {
+            // IP is allowed - auto login
+            localStorage.setItem('admin_token', data.token)
+            localStorage.setItem('admin_role', data.user.role)
+            navigate('/admin/dashboard')
+          }
+        })
+        .catch(err => {
+          console.log('IP check failed:', err)
         })
     }
   }, [navigate])

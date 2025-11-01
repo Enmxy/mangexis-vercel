@@ -33,6 +33,12 @@ if (!process.env.ADMIN_PASSWORD_HASH || !process.env.FANSUB_PASSWORD_HASH) {
   console.warn('⚠️  WARNING: Using fallback password hashes. Set environment variables for production!')
 }
 
+// IP-based authentication (comma-separated list in env)
+const getAllowedIPs = () => {
+  const ips = process.env.ALLOWED_ADMIN_IPS || ''
+  return ips.split(',').map(ip => ip.trim()).filter(ip => ip.length > 0)
+}
+
 // Security Configuration
 const MAX_LOGIN_ATTEMPTS = 5
 const LOCKOUT_DURATION = 30 * 60 * 1000 // 30 minutes
@@ -150,6 +156,44 @@ export default async function handler(req, res) {
   try {
     const { username, password, action } = req.body
     const clientIP = getClientIP(req)
+
+    // IP-based auto login
+    if (action === 'check-ip') {
+      const allowedIPs = getAllowedIPs()
+      
+      if (allowedIPs.includes(clientIP)) {
+        // IP is allowed - create admin token
+        const now = Date.now()
+        const token = jwt.sign(
+          { 
+            username: 'admin-ip',
+            role: 'admin',
+            ip: clientIP,
+            iat: now,
+            sessionStart: now
+          },
+          JWT_SECRET,
+          { expiresIn: '2h' }
+        )
+
+        logSecurityEvent('IP_AUTO_LOGIN', clientIP, { allowed: true })
+
+        return res.status(200).json({
+          success: true,
+          token,
+          user: { username: 'admin-ip', role: 'admin' },
+          sessionTimeout: SESSION_TIMEOUT,
+          method: 'ip'
+        })
+      }
+
+      // IP not in allowed list
+      return res.status(200).json({
+        success: false,
+        message: 'IP not allowed',
+        requiresLogin: true
+      })
+    }
 
     // Login
     if (action === 'login') {
