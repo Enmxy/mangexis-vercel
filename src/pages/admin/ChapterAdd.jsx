@@ -282,13 +282,13 @@ const ChapterAdd = () => {
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
                       currentStep === step.num
                         ? 'bg-white text-purple-900'
                         : currentStep > step.num
                         ? 'bg-green-500 text-white'
                         : 'bg-white/20 text-white'
-                    }">
+                    }`}>
                       {currentStep > step.num ? (
                         <svg
                           className="w-4 h-4"

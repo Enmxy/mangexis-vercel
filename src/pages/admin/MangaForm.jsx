@@ -543,7 +543,46 @@ const MangaForm = () => {
             ))}
           </div>
 
-{{ ... }}
+          {/* Available Genres */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {availableGenres.filter(g => !formData.genres.includes(g)).map((genre) => (
+              <button
+                key={genre}
+                type="button"
+                onClick={() => handleAddGenre(genre)}
+                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+              >
+                + {genre}
+              </button>
+            ))}
+          </div>
+
+          {/* Custom Genre */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newGenre}
+              onChange={(e) => setNewGenre(e.target.value)}
+              placeholder="Özel tür ekle..."
+              className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+            />
+            <button
+              type="button"
+              onClick={handleAddCustomGenre}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Ekle
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Chapters */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-gray-800 rounded-xl p-6 border border-gray-700"
+        >
           <h2 className="text-lg font-semibold text-white mb-4">Bölümler</h2>
           
           {/* Existing Chapters */}
@@ -561,7 +600,14 @@ const MangaForm = () => {
                 {formData.chapters
                   .sort((a, b) => a.chapter - b.chapter)
                   .map((chapter, index) => (
-{{ ... }}
+                    <div
+                      key={index}
+                      className="bg-gray-700 rounded-lg p-3 flex items-center justify-between hover:bg-gray-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
+                          {chapter.chapter}
+                        </div>
                         <div>
                           <p className="text-white font-medium">Bölüm {chapter.chapter}</p>
                           <p className="text-gray-400 text-xs">{chapter.images?.length || 0} sayfa</p>
@@ -594,7 +640,27 @@ const MangaForm = () => {
 
           {/* Add New Chapter */}
           <div className="bg-gray-700/50 rounded-lg p-4 space-y-4">
-{{ ... }}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Bölüm Numarası
+              </label>
+              <input
+                type="number"
+                value={newChapter.chapter}
+                onChange={(e) => setNewChapter({ ...newChapter, chapter: parseInt(e.target.value) })}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Sayfa Linkleri
+              </label>
+              <div className="space-y-2">
+                {newChapter.images.map((image, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="url"
                       value={image}
                       onChange={(e) => handleImageChange(index, e.target.value)}
                       placeholder={`Sayfa ${index + 1} URL`}
@@ -615,7 +681,11 @@ const MangaForm = () => {
                 ))}
               </div>
               <button
-{{ ... }}
+                type="button"
+                onClick={handleAddImageField}
+                className="mt-2 text-purple-400 hover:text-purple-300 text-sm transition-colors"
+              >
+                + Sayfa Ekle
               </button>
             </div>
 
@@ -650,7 +720,24 @@ const MangaForm = () => {
                   ))}
                 </div>
               )}
-{{ ... }}
+
+              {/* Add Fansub Form */}
+              <div className="bg-gray-600/30 rounded-lg p-3 space-y-3">
+                <input
+                  type="text"
+                  value={currentFansub.name}
+                  onChange={(e) => setCurrentFansub({ ...currentFansub, name: e.target.value })}
+                  placeholder="Fansub adı (örn: TurkAnime, MangaTR)"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                />
+                
+                <div>
+                  <label className="block text-sm text-gray-300 mb-2">Fansub Sayfaları</label>
+                  <div className="space-y-2">
+                    {currentFansub.images.map((image, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="url"
                           value={image}
                           onChange={(e) => handleFansubImageChange(index, e.target.value)}
                           placeholder={`Sayfa ${index + 1} URL`}
@@ -693,7 +780,20 @@ const MangaForm = () => {
             </div>
 
             <button
-{{ ... }}
+              type="button"
+              onClick={handleAddChapter}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Bölüm Ekle
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Submit */}
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => navigate('/admin/mangas')}
             disabled={saving}
             className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -731,5 +831,6 @@ const MangaForm = () => {
       </form>
     </div>
   )
+}
 
 export default MangaForm
