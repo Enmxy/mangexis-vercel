@@ -752,47 +752,29 @@ const Reader = () => {
               </motion.div>
             )}
             
-            {/* Resim Container with Scroll Arrow */}
+            {/* Resim Container with Custom Cursor */}
             <div 
               ref={(el) => (imageRefs.current[index] = el)}
-              className="relative group"
+              className="relative"
+              style={{
+                cursor: !isMobile && !isLastImage 
+                  ? `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black" stroke="black" stroke-width="2"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>') 12 12, auto`
+                  : 'default'
+              }}
+              onClick={(e) => {
+                if (!isMobile && !isLastImage) {
+                  e.stopPropagation()
+                  handleScrollToNext()
+                }
+              }}
             >
-              <div className="pointer-events-none">
-                <OptimizedImage
-                  src={imageUrl}
-                  alt={`Sayfa ${index + 1}`}
-                  index={index}
-                  preloadNext={index < images.length - 1}
-                />
-              </div>
-              
-              {/* Scroll Down Arrow - Only on Desktop and not last image */}
-              {!isMobile && !isLastImage && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleScrollToNext()
-                  }}
-                  className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-purple-600/80 hover:bg-purple-500 backdrop-blur-sm rounded-full p-4 shadow-xl hover:shadow-2xl hover:scale-110 z-50 cursor-pointer"
-                  style={{ pointerEvents: 'auto' }}
-                  title="Sonraki sayfaya geç"
-                >
-                  <svg 
-                    className="w-6 h-6 text-white" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2.5} 
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3" 
-                    />
-                  </svg>
-                </button>
-              )}
+              <OptimizedImage
+                src={imageUrl}
+                alt={`Sayfa ${index + 1}`}
+                index={index}
+                preloadNext={index < images.length - 1}
+                className="pointer-events-none"
+              />
             </div>
           </div>
         )
