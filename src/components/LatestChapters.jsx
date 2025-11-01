@@ -30,7 +30,7 @@ const LatestChapters = ({ latestChapters }) => {
             transition={{ delay: index * 0.1 }}
           >
             <Link
-              to={`/manga/${item.manga.slug}/read/${item.chapter.id}`}
+              to={`/manga/${item.manga.slug}/chapter/${item.chapter.id}`}
               className="group block bg-gray-900/50 rounded-xl overflow-hidden border border-white/5 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
             >
               {/* Cover Image */}

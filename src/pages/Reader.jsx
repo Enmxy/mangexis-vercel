@@ -684,7 +684,19 @@ const Reader = () => {
           transition: 'max-width 0.3s ease-out'
         }}
       >
-        {images.map((imageUrl, index) => (
+        {images.map((imageUrl, index) => {
+          const isLastImage = index === images.length - 1
+          
+          const handleScrollToNext = () => {
+            if (!isLastImage && imageRefs.current[index + 1]) {
+              imageRefs.current[index + 1].scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              })
+            }
+          }
+          
+          return (
           <div key={index} className="w-full">
             {/* Fansub Info - İlk sayfanın üstünde */}
             {index === 0 && chapter.fansubs && chapter.fansubs[selectedFansub] && (
@@ -740,8 +752,11 @@ const Reader = () => {
               </motion.div>
             )}
             
-            {/* Resim */}
-            <div ref={(el) => (imageRefs.current[index] = el)}>
+            {/* Resim Container with Scroll Arrow */}
+            <div 
+              ref={(el) => (imageRefs.current[index] = el)}
+              className="relative group"
+            >
               <OptimizedImage
                 src={imageUrl}
                 alt={`Sayfa ${index + 1}`}
@@ -749,9 +764,33 @@ const Reader = () => {
                 preloadNext={index < images.length - 1}
                 className="pointer-events-none"
               />
+              
+              {/* Scroll Down Arrow - Only on Desktop and not last image */}
+              {!isMobile && !isLastImage && (
+                <button
+                  onClick={handleScrollToNext}
+                  className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 hover:bg-black/80 backdrop-blur-sm rounded-full p-3 shadow-lg z-10 pointer-events-auto"
+                  aria-label="Sonraki sayfaya geç"
+                >
+                  <svg 
+                    className="w-6 h-6 text-white animate-bounce" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
-        ))}
+        )
+        })}
 
         {/* End of Chapter - Comments */}
         <div className="py-12 px-4">
