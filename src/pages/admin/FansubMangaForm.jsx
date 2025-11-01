@@ -32,6 +32,9 @@ const FansubMangaForm = () => {
   })
   const [currentFansub, setCurrentFansub] = useState({
     name: '',
+    website: '',
+    discord: '',
+    note: '',
     images: ['']
   })
 
@@ -199,10 +202,16 @@ const FansubMangaForm = () => {
 
     setNewChapter({
       ...newChapter,
-      fansubs: [...newChapter.fansubs, { name: currentFansub.name, images: validImages }]
+      fansubs: [...newChapter.fansubs, { 
+        name: currentFansub.name, 
+        images: validImages,
+        website: currentFansub.website || '',
+        discord: currentFansub.discord || '',
+        note: currentFansub.note || ''
+      }]
     })
 
-    setCurrentFansub({ name: '', images: [''] })
+    setCurrentFansub({ name: '', website: '', discord: '', note: '', images: [''] })
     alert(`✅ "${currentFansub.name}" fansub eklendi! (${validImages.length} sayfa)`)
   }
 
@@ -254,7 +263,7 @@ const FansubMangaForm = () => {
       images: [''],
       fansubs: []
     })
-    setCurrentFansub({ name: '', images: [''] })
+    setCurrentFansub({ name: '', website: '', discord: '', note: '', images: [''] })
     
     const fansubInfo = newChapter.fansubs.length > 0 
       ? `\n${newChapter.fansubs.length} fansub ekli`
@@ -629,7 +638,7 @@ const FansubMangaForm = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Sayfa Linkleri
+                Varsayılan Sayfa Linkleri
               </label>
               <div className="space-y-2">
                 {newChapter.images.map((image, index) => (
@@ -660,6 +669,128 @@ const FansubMangaForm = () => {
               >
                 + Sayfa Ekle
               </button>
+            </div>
+
+            {/* Fansub Section */}
+            <div className="border-t border-gray-600 pt-4">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>Fansub Ekle (Opsiyonel)</span>
+              </h3>
+              
+              {/* Added Fansubs List */}
+              {newChapter.fansubs.length > 0 && (
+                <div className="mb-4 space-y-2">
+                  <p className="text-green-400 text-sm font-medium">✅ {newChapter.fansubs.length} fansub eklendi:</p>
+                  {newChapter.fansubs.map((fansub, index) => (
+                    <div key={index} className="bg-gray-700 rounded-lg p-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-medium">{fansub.name}</p>
+                        <p className="text-gray-400 text-xs">{fansub.images.length} sayfa</p>
+                        {fansub.note && <p className="text-yellow-400 text-xs mt-1">📝 {fansub.note}</p>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFansub(index)}
+                        className="text-red-400 hover:text-red-300 px-2 transition-colors"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Current Fansub Form */}
+              <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Fansub Adı *</label>
+                  <input
+                    type="text"
+                    value={currentFansub.name}
+                    onChange={(e) => setCurrentFansub({ ...currentFansub, name: e.target.value })}
+                    placeholder="Örn: MangeXis Fansub"
+                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">Website</label>
+                    <input
+                      type="url"
+                      value={currentFansub.website}
+                      onChange={(e) => setCurrentFansub({ ...currentFansub, website: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1">Discord</label>
+                    <input
+                      type="url"
+                      value={currentFansub.discord}
+                      onChange={(e) => setCurrentFansub({ ...currentFansub, discord: e.target.value })}
+                      placeholder="https://discord.gg/..."
+                      className="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Fansub Notu</label>
+                  <textarea
+                    value={currentFansub.note}
+                    onChange={(e) => setCurrentFansub({ ...currentFansub, note: e.target.value })}
+                    placeholder="Örn: Güncellenmiş çeviri, kalite iyileştirildi..."
+                    rows={2}
+                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-yellow-500 transition-colors resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Fansub Sayfaları *</label>
+                  <div className="space-y-2">
+                    {currentFansub.images.map((image, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="url"
+                          value={image}
+                          onChange={(e) => handleFansubImageChange(index, e.target.value)}
+                          placeholder={`Sayfa ${index + 1} URL`}
+                          className="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
+                        />
+                        {currentFansub.images.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFansubImageField(index)}
+                            className="text-red-400 hover:text-red-300 px-2 transition-colors"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddFansubImageField}
+                    className="mt-2 text-green-400 hover:text-green-300 text-xs transition-colors"
+                  >
+                    + Sayfa Ekle
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddFansub}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                >
+                  ➕ Fansub Ekle
+                </button>
+              </div>
             </div>
 
             <button

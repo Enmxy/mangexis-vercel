@@ -15,12 +15,18 @@ const ChapterAdd = () => {
   const [formData, setFormData] = useState({
     mangaSlug: '',
     chapterNumber: '',
-    chapterTitle: '',
-    fansubName: '',
-    fansubWebsite: '',
-    fansubDiscord: '',
-    images: ''
+    chapterTitle: ''
   })
+  
+  const [fansubs, setFansubs] = useState([{
+    name: '',
+    website: '',
+    discord: '',
+    note: '',
+    images: ''
+  }])
+  
+  const [currentFansubIndex, setCurrentFansubIndex] = useState(0)
 
   useEffect(() => {
     loadMangas()
@@ -45,16 +51,47 @@ const ChapterAdd = () => {
     // Real-time validation
     validateField(name, value)
     
-    // Count images
+    // Auto-advance steps
+    if (name === 'mangaSlug' && value && currentStep === 1) setCurrentStep(2)
+    if (name === 'chapterNumber' && value && currentStep === 2) setCurrentStep(3)
+  }
+  
+  const handleFansubChange = (e, index) => {
+    const { name, value } = e.target
+    const updatedFansubs = [...fansubs]
+    updatedFansubs[index] = {
+      ...updatedFansubs[index],
+      [name]: value
+    }
+    setFansubs(updatedFansubs)
+    
+    // Count images for current fansub
     if (name === 'images') {
       const count = value.split(/[,\n]/).filter(url => url.trim().length > 0).length
       setImageCount(count)
     }
     
     // Auto-advance steps
-    if (name === 'mangaSlug' && value && currentStep === 1) setCurrentStep(2)
-    if (name === 'chapterNumber' && value && currentStep === 2) setCurrentStep(3)
-    if (name === 'fansubName' && value && currentStep === 3) setCurrentStep(4)
+    if (name === 'name' && value && currentStep === 3) setCurrentStep(4)
+  }
+  
+  const addFansub = () => {
+    setFansubs([...fansubs, {
+      name: '',
+      website: '',
+      discord: '',
+      note: '',
+      images: ''
+    }])
+    setCurrentFansubIndex(fansubs.length)
+  }
+  
+  const removeFansub = (index) => {
+    if (fansubs.length > 1) {
+      const updatedFansubs = fansubs.filter((_, i) => i !== index)
+      setFansubs(updatedFansubs)
+      setCurrentFansubIndex(Math.max(0, index - 1))
+    }
   }
   
   const validateField = (name, value) => {
@@ -92,12 +129,15 @@ const ChapterAdd = () => {
     setFormData({
       mangaSlug: mangas[0]?.slug || '',
       chapterNumber: '1',
-      chapterTitle: 'Başlangıç',
-      fansubName: 'MangeXis Fansub',
-      fansubWebsite: 'https://mangexis.com',
-      fansubDiscord: 'https://discord.gg/mangexis',
-      images: 'https://example.com/page1.jpg\nhttps://example.com/page2.jpg\nhttps://example.com/page3.jpg'
+      chapterTitle: 'Başlangıç'
     })
+    setFansubs([{
+      name: 'MangeXis Fansub',
+      website: 'https://mangexis.com',
+      discord: 'https://discord.gg/mangexis',
+      note: 'İlk bölüm - kaliteli çeviri',
+      images: 'https://example.com/page1.jpg\nhttps://example.com/page2.jpg\nhttps://example.com/page3.jpg'
+    }])
     setImageCount(3)
     setCurrentStep(4)
   }
@@ -105,38 +145,46 @@ const ChapterAdd = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.mangaSlug || !formData.chapterNumber || !formData.fansubName || !formData.images) {
-      alert('⚠️ Lütfen tüm zorunlu alanları doldurun!')
+    // Validate
+    if (!formData.mangaSlug || !formData.chapterNumber) {
+      alert('⚠️ Lütfen manga ve bölüm numarasını girin!')
+      return
+    }
+    
+    // Check if at least one fansub has name and images
+    const validFansubs = fansubs.filter(f => f.name && f.images)
+    if (validFansubs.length === 0) {
+      alert('⚠️ En az bir fansub adı ve resim eklemelisiniz!')
       return
     }
 
     setLoading(true)
 
     try {
-      // Parse images (comma or newline separated URLs)
-      const imageLinks = formData.images
-        .split(/[,\n]/)
-        .map(url => url.trim())
-        .filter(url => url.length > 0)
-
-      if (imageLinks.length === 0) {
-        alert('⚠️ En az 1 resim URL\'si gerekli!')
-        setLoading(false)
-        return
-      }
+      // Process fansubs
+      const processedFansubs = validFansubs.map(fansub => {
+        const imageLinks = fansub.images
+          .split(/[,\n]/)
+          .map(url => url.trim())
+          .filter(url => url.length > 0)
+        
+        return {
+          name: fansub.name,
+          images: imageLinks,
+          website: fansub.website || '',
+          discord: fansub.discord || '',
+          note: fansub.note || ''
+        }
+      })
+      
+      // Get all images from first fansub as default imageLinks
+      const defaultImageLinks = processedFansubs[0].images
 
       const chapterData = {
         id: formData.chapterNumber,
         title: formData.chapterTitle || `Bölüm ${formData.chapterNumber}`,
-        imageLinks,
-        fansubs: [
-          {
-            name: formData.fansubName,
-            images: imageLinks,
-            website: formData.fansubWebsite || '',
-            discord: formData.fansubDiscord || ''
-          }
-        ]
+        imageLinks: defaultImageLinks,
+        fansubs: processedFansubs
       }
 
       // Get auth token
@@ -165,15 +213,19 @@ const ChapterAdd = () => {
 
       if (result.success) {
         alert('✅ Bölüm başarıyla eklendi!')
+        // Keep manga selection, reset chapter and fansubs
         setFormData({
           mangaSlug: formData.mangaSlug,
           chapterNumber: '',
-          chapterTitle: '',
-          fansubName: formData.fansubName,
-          fansubWebsite: formData.fansubWebsite,
-          fansubDiscord: formData.fansubDiscord,
-          images: ''
+          chapterTitle: ''
         })
+        // Keep fansub names but clear images
+        setFansubs(fansubs.map(f => ({
+          ...f,
+          images: ''
+        })))
+        setImageCount(0)
+        setCurrentStep(2)
       } else {
         alert('❌ Hata: ' + (result.error || 'Bilinmeyen hata'))
       }
@@ -483,113 +535,151 @@ const ChapterAdd = () => {
           </p>
         </div>
 
-        {/* Fansub Name */}
-        <motion.div 
-          className={`bg-gray-800 rounded-lg p-6 border-2 transition-all ${
+        {/* Fansubs Section - Multiple Fansubs Support */}
+        <motion.div
+          className={`bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border-2 transition-all ${
             currentStep === 3 ? 'border-purple-500 shadow-lg shadow-purple-500/20' : 'border-gray-700'
           }`}
           animate={currentStep === 3 ? { scale: [1, 1.02, 1] } : {}}
           transition={{ duration: 0.5 }}
         >
-          <div className="flex items-center justify-between mb-3">
-            <label className="flex items-center gap-2 text-white font-medium">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
               <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span>Fansub Adı <span className="text-red-500">*</span></span>
-            </label>
-            {currentStep === 3 && (
-              <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
-                3. ADIM
-              </span>
+              <h3 className="text-white font-bold text-lg">Fansub Bilgileri</h3>
+              {currentStep === 3 && (
+                <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse ml-2">
+                  3. ADIM
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={addFansub}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Fansub Ekle
+            </button>
+          </div>
+
+          {/* Fansub Tabs */}
+          {fansubs.length > 1 && (
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+              {fansubs.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setCurrentFansubIndex(index)}
+                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${
+                    currentFansubIndex === index
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Fansub {index + 1}
+                  {fansubs[index].name && ` - ${fansubs[index].name}`}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Current Fansub Form */}
+          <div className="space-y-4">
+            {/* Fansub Name */}
+            <div>
+              <label className="flex items-center gap-2 text-white font-medium mb-2">
+                <span>Fansub Adı <span className="text-red-500">*</span></span>
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={fansubs[currentFansubIndex].name}
+                onChange={(e) => handleFansubChange(e, currentFansubIndex)}
+                placeholder="Örn: MangeXis Fansub, Anime Türkiye..."
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                required
+              />
+            </div>
+
+            {/* Fansub Website */}
+            <div>
+              <label className="flex items-center gap-2 text-white font-medium mb-2">
+                <span>Website</span>
+                <span className="bg-gray-700 text-gray-400 text-xs px-2 py-1 rounded-full">Opsiyonel</span>
+              </label>
+              <input
+                type="url"
+                name="website"
+                value={fansubs[currentFansubIndex].website}
+                onChange={(e) => handleFansubChange(e, currentFansubIndex)}
+                placeholder="Örn: https://mangexis.com"
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            {/* Fansub Discord */}
+            <div>
+              <label className="flex items-center gap-2 text-white font-medium mb-2">
+                <span>Discord</span>
+                <span className="bg-gray-700 text-gray-400 text-xs px-2 py-1 rounded-full">Opsiyonel</span>
+              </label>
+              <input
+                type="url"
+                name="discord"
+                value={fansubs[currentFansubIndex].discord}
+                onChange={(e) => handleFansubChange(e, currentFansubIndex)}
+                placeholder="Örn: https://discord.gg/mangexis"
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+            </div>
+
+            {/* Fansub Note - NEW! */}
+            <div>
+              <label className="flex items-center gap-2 text-white font-medium mb-2">
+                <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <span>Fansub Notu</span>
+                <span className="bg-gray-700 text-gray-400 text-xs px-2 py-1 rounded-full">Opsiyonel</span>
+              </label>
+              <textarea
+                name="note"
+                value={fansubs[currentFansubIndex].note}
+                onChange={(e) => handleFansubChange(e, currentFansubIndex)}
+                placeholder="Örn: Çeviri güncellenmiş, kalite iyileştirildi..."
+                rows={3}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 transition-colors resize-none"
+              />
+              <p className="text-gray-400 text-xs mt-1">Bu fansub'a özel not ekleyebilirsiniz (çeviri kalitesi, güncelleme bilgisi vb.)</p>
+            </div>
+
+            {/* Remove Fansub Button */}
+            {fansubs.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeFansub(currentFansubIndex)}
+                className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Bu Fansub'ı Kaldır
+              </button>
             )}
           </div>
-          <input
-            type="text"
-            name="fansubName"
-            value={formData.fansubName}
-            onChange={handleChange}
-            placeholder="Örn: MangeXis Fansub, Anime Türkiye..."
-            className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
-            required
-          />
-          {validationErrors.fansubName && (
-            <p className="text-red-400 text-sm mt-2 flex items-center gap-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              {validationErrors.fansubName}
-            </p>
-          )}
-          {formData.fansubName && (
-            <p className="text-green-400 text-sm mt-2 flex items-center gap-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Harika! Fansub: {formData.fansubName}
-            </p>
-          )}
-          <p className="text-gray-400 text-xs mt-2 flex items-center gap-1">
+
+          <p className="text-gray-400 text-xs mt-4 flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Çeviri grubunuzun adını yazın
+            Aynı bölüme farklı fansub grupları ekleyebilirsiniz. Her fansub için ayrı sayfalar (resimler) yüklenebilir.
           </p>
         </motion.div>
-
-        {/* Fansub Website */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center gap-2 mb-3">
-            <label className="flex items-center gap-2 text-white font-medium">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-              </svg>
-              <span>Fansub Website</span>
-            </label>
-            <span className="bg-gray-700 text-gray-400 text-xs px-2 py-1 rounded-full">Opsiyonel</span>
-          </div>
-          <input
-            type="url"
-            name="fansubWebsite"
-            value={formData.fansubWebsite}
-            onChange={handleChange}
-            placeholder="Örn: https://mangexis.com"
-            className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
-          />
-          <p className="text-gray-400 text-xs mt-2 flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Fansub grubunuzun resmi web sitesi (varsa)
-          </p>
-        </div>
-
-        {/* Fansub Discord */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center gap-2 mb-3">
-            <label className="flex items-center gap-2 text-white font-medium">
-              <svg className="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-              </svg>
-              <span>Discord Sunucusu</span>
-            </label>
-            <span className="bg-gray-700 text-gray-400 text-xs px-2 py-1 rounded-full">Opsiyonel</span>
-          </div>
-          <input
-            type="url"
-            name="fansubDiscord"
-            value={formData.fansubDiscord}
-            onChange={handleChange}
-            placeholder="Örn: https://discord.gg/mangexis"
-            className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-colors"
-          />
-          <p className="text-gray-400 text-xs mt-2 flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Discord sunucu davet linki (varsa)
-          </p>
-        </div>
 
         {/* Images */}
         <motion.div 
@@ -619,10 +709,18 @@ const ChapterAdd = () => {
               )}
             </div>
           </div>
+          <div className="mb-3 bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
+            <p className="text-blue-400 text-sm font-medium">
+              📝 Fansub: {fansubs[currentFansubIndex].name || `Fansub ${currentFansubIndex + 1}`}
+            </p>
+            <p className="text-gray-400 text-xs mt-1">
+              Bu fansub için yüklenecek sayfaları girin
+            </p>
+          </div>
           <textarea
             name="images"
-            value={formData.images}
-            onChange={handleChange}
+            value={fansubs[currentFansubIndex].images}
+            onChange={(e) => handleFansubChange(e, currentFansubIndex)}
             placeholder="Her satıra bir resim URL'si yazın:&#10;&#10;https://example.com/page1.jpg&#10;https://example.com/page2.jpg&#10;https://example.com/page3.jpg&#10;https://example.com/page4.jpg&#10;...&#10;&#10;veya vergülle ayırın: url1.jpg, url2.jpg, url3.jpg"
             rows={12}
             className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors resize-none font-mono text-sm"
