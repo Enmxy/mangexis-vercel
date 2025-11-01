@@ -335,7 +335,7 @@ const Reader = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/95 border-b border-[#EDEDED]/10 backdrop-blur-sm"
+            className="fixed top-0 md:top-16 left-0 right-0 z-40 bg-[#0A0A0A]/95 border-b border-[#EDEDED]/10 backdrop-blur-sm"
           >
             <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2 sm:py-3">
               {/* Mobile Layout */}
@@ -695,11 +695,31 @@ const Reader = () => {
           
           const handleScrollToNext = () => {
             if (!isLastImage) {
-              // Scroll down by 70% of viewport height for smoother experience
-              window.scrollBy({
-                top: window.innerHeight * 0.7,
-                behavior: 'smooth'
-              })
+              // Scroll down smoothly by 50% of viewport height
+              const scrollAmount = window.innerHeight * 0.5
+              const start = window.pageYOffset
+              const target = start + scrollAmount
+              const duration = 600 // ms
+              let startTime = null
+
+              const animation = (currentTime) => {
+                if (startTime === null) startTime = currentTime
+                const timeElapsed = currentTime - startTime
+                const progress = Math.min(timeElapsed / duration, 1)
+                
+                // Easing function for smooth animation
+                const easeInOutQuad = progress < 0.5
+                  ? 2 * progress * progress
+                  : 1 - Math.pow(-2 * progress + 2, 2) / 2
+                
+                window.scrollTo(0, start + (scrollAmount * easeInOutQuad))
+                
+                if (timeElapsed < duration) {
+                  requestAnimationFrame(animation)
+                }
+              }
+              
+              requestAnimationFrame(animation)
             }
           }
           
