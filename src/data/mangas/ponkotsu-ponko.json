@@ -77,6 +77,65 @@
           "discord": "https://discord.com/invite/GqmN4HA"
         }
       ]
+    },
+    {
+      "id": "2",
+      "title": "Bölüm 2",
+      "imageLinks": [
+        "https://i.ibb.co/yFQCGH89/image.png",
+        "https://i.ibb.co/LdWpVg2y/1.png",
+        "https://i.ibb.co/TD3qwqJq/2.png",
+        "https://i.ibb.co/BKNznckk/3.png",
+        "https://i.ibb.co/Xk4t41zc/4.png",
+        "https://i.ibb.co/WvMQTmsK/5.png",
+        "https://i.ibb.co/BHYpT2Kp/6.png",
+        "https://i.ibb.co/1GZ7BZ6L/7.png",
+        "https://i.ibb.co/wF8Q5L3B/8.png",
+        "https://i.ibb.co/jkM3tH62/9.png",
+        "https://i.ibb.co/35M5MbCy/10.png",
+        "https://i.ibb.co/mFCppD1N/11.png",
+        "https://i.ibb.co/Sw5n0RV5/12.png",
+        "https://i.ibb.co/FkpSFRZ6/13.png",
+        "https://i.ibb.co/xt5vrLhs/14.png",
+        "https://i.ibb.co/SXT1YnJ5/15.png",
+        "https://i.ibb.co/0jRrHZt0/16.png",
+        "https://i.ibb.co/VWSdwcd6/17.png",
+        "https://i.ibb.co/SXqkbWCX/18.png",
+        "https://i.ibb.co/NfQ6r13/19.png",
+        "https://i.ibb.co/pBMpn8xF/20.png",
+        "https://i.ibb.co/xq311qkL/30.png"
+      ],
+      "fansubs": [
+        {
+          "name": "Nox Subs",
+          "images": [
+            "https://i.ibb.co/yFQCGH89/image.png",
+            "https://i.ibb.co/LdWpVg2y/1.png",
+            "https://i.ibb.co/TD3qwqJq/2.png",
+            "https://i.ibb.co/BKNznckk/3.png",
+            "https://i.ibb.co/Xk4t41zc/4.png",
+            "https://i.ibb.co/WvMQTmsK/5.png",
+            "https://i.ibb.co/BHYpT2Kp/6.png",
+            "https://i.ibb.co/1GZ7BZ6L/7.png",
+            "https://i.ibb.co/wF8Q5L3B/8.png",
+            "https://i.ibb.co/jkM3tH62/9.png",
+            "https://i.ibb.co/35M5MbCy/10.png",
+            "https://i.ibb.co/mFCppD1N/11.png",
+            "https://i.ibb.co/Sw5n0RV5/12.png",
+            "https://i.ibb.co/FkpSFRZ6/13.png",
+            "https://i.ibb.co/xt5vrLhs/14.png",
+            "https://i.ibb.co/SXT1YnJ5/15.png",
+            "https://i.ibb.co/0jRrHZt0/16.png",
+            "https://i.ibb.co/VWSdwcd6/17.png",
+            "https://i.ibb.co/SXqkbWCX/18.png",
+            "https://i.ibb.co/NfQ6r13/19.png",
+            "https://i.ibb.co/pBMpn8xF/20.png",
+            "https://i.ibb.co/xq311qkL/30.png"
+          ],
+          "website": "https://noxsubs.net/",
+          "discord": "https://discord.com/invite/GqmN4HA"
+        }
+      ]
     }
   ]
 }
