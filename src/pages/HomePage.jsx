@@ -221,22 +221,25 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/5 to-transparent h-[600px] -z-10" />
           
           {/* Hero Slider */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-7xl mx-auto px-4 sm:px-6 py-8"
-          >
-            {sliders.length > 0 ? (
-              <Slider slides={sliders} />
-            ) : (
-              <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-12 text-center border border-gray-700">
-                <div className="text-6xl mb-4">🎬</div>
-                <h3 className="text-white text-xl font-bold mb-2">Henüz Slider Eklenmemiş</h3>
-                <p className="text-gray-400">Admin panelden slider ekleyerek başlayın</p>
-              </div>
-            )}
-          </motion.div>
+          {sliders.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-6 sm:mb-12 max-w-7xl mx-auto px-4 sm:px-6 py-8"
+            >
+              {sliders.length > 0 ? (
+                <Slider slides={sliders} />
+              ) : (
+                <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-12 text-center border border-gray-700">
+                  <div className="text-6xl mb-4">🎬</div>
+                  <h3 className="text-white text-xl font-bold mb-2">Henüz Slider Eklenmemiş</h3>
+                  <p className="text-gray-400">Admin panelden slider ekleyerek başlayın</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </div>
 
           {/* Continue Reading Section */}
           {continueReading.length > 0 && (

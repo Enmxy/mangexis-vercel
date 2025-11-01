@@ -19,13 +19,28 @@ const Reader = () => {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [zoomLevel, setZoomLevel] = useState(() => {
-    // Mobile: 100%, Desktop: 50%
+    // Mobile: fit-width, Desktop: 50%
     return window.innerWidth < 768 ? 100 : 50
   })
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageInput, setPageInput] = useState('1')
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
+
+  // Check if mobile
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (mobile && zoomLevel < 100) {
+        setZoomLevel(100)
+      }
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Load manga data
   useEffect(() => {
@@ -203,23 +218,19 @@ const Reader = () => {
     }
   }, [zoomLevel])
 
-  // Tap controls
+  // Tap controls - Mobile only
   const handleTap = (e) => {
+    if (!isMobile) return
+    
     const clickX = e.clientX
     const windowWidth = window.innerWidth
     
-    if (clickX < windowWidth * 0.25) {
-      // Left tap - Previous chapter
-      if (prevChapter) {
-        navigate(`/manga/${slug}/chapter/${prevChapter.id}`)
-        window.scrollTo(0, 0)
-      }
-    } else if (clickX > windowWidth * 0.75) {
-      // Right tap - Next chapter
-      if (nextChapter) {
-        navigate(`/manga/${slug}/chapter/${nextChapter.id}`)
-        window.scrollTo(0, 0)
-      }
+    if (clickX < windowWidth * 0.3) {
+      // Left tap - Previous page
+      jumpToPage(currentPage - 1)
+    } else if (clickX > windowWidth * 0.7) {
+      // Right tap - Next page  
+      jumpToPage(currentPage + 1)
     } else {
       // Center tap - Toggle bar
       setShowBar(!showBar)
@@ -247,7 +258,7 @@ const Reader = () => {
   }
 
   const handleZoomReset = () => {
-    setZoomLevel(50)
+    setZoomLevel(isMobile ? 100 : 50)
   }
 
   const jumpToPage = (pageNumber) => {
