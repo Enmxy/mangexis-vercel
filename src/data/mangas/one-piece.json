@@ -132,6 +132,69 @@
           "discord": "https://discord.com/invite/8zBMSGZ"
         }
       ]
+    },
+    {
+      "id": "2",
+      "title": "Bölüm 2",
+      "imageLinks": [
+        "https://i.ibb.co/jZVxvbJd/01.jpg",
+        "https://i.ibb.co/pr59D46R/02.jpg",
+        "https://i.ibb.co/Mx6xPcJV/03.jpg",
+        "https://i.ibb.co/jv4zjj13/04.jpg",
+        "https://i.ibb.co/R4bB0k18/05.jpg",
+        "https://i.ibb.co/VWH56LdT/06.jpg",
+        "https://i.ibb.co/FbpG6n33/07.jpg",
+        "https://i.ibb.co/mrGhjJvn/08.jpg",
+        "https://i.ibb.co/1JpwVG4s/09.jpg",
+        "https://i.ibb.co/Yvp3fwY/10.jpg",
+        "https://i.ibb.co/8GjnVnK/11.jpg",
+        "https://i.ibb.co/V0wQJ9Vk/12.jpg",
+        "https://i.ibb.co/hJjJWxxq/13.jpg",
+        "https://i.ibb.co/TMPBqsSC/14.jpg",
+        "https://i.ibb.co/fd5HcmCb/15.jpg",
+        "https://i.ibb.co/zhrzndNP/16.jpg",
+        "https://i.ibb.co/QFWhB2Qk/17.jpg",
+        "https://i.ibb.co/zhH61Wq6/18.jpg",
+        "https://i.ibb.co/W4kFSrX7/19.jpg",
+        "https://i.ibb.co/G34VYL0k/20.jpg",
+        "https://i.ibb.co/DgfDxSYb/21.jpg",
+        "https://i.ibb.co/HLQFKsFQ/22.jpg",
+        "https://i.ibb.co/wZfD4xPj/23.jpg",
+        "https://i.ibb.co/G3xXs5qq/24.jpg"
+      ],
+      "fansubs": [
+        {
+          "name": "Manga Denizi Fansub",
+          "images": [
+            "https://i.ibb.co/jZVxvbJd/01.jpg",
+            "https://i.ibb.co/pr59D46R/02.jpg",
+            "https://i.ibb.co/Mx6xPcJV/03.jpg",
+            "https://i.ibb.co/jv4zjj13/04.jpg",
+            "https://i.ibb.co/R4bB0k18/05.jpg",
+            "https://i.ibb.co/VWH56LdT/06.jpg",
+            "https://i.ibb.co/FbpG6n33/07.jpg",
+            "https://i.ibb.co/mrGhjJvn/08.jpg",
+            "https://i.ibb.co/1JpwVG4s/09.jpg",
+            "https://i.ibb.co/Yvp3fwY/10.jpg",
+            "https://i.ibb.co/8GjnVnK/11.jpg",
+            "https://i.ibb.co/V0wQJ9Vk/12.jpg",
+            "https://i.ibb.co/hJjJWxxq/13.jpg",
+            "https://i.ibb.co/TMPBqsSC/14.jpg",
+            "https://i.ibb.co/fd5HcmCb/15.jpg",
+            "https://i.ibb.co/zhrzndNP/16.jpg",
+            "https://i.ibb.co/QFWhB2Qk/17.jpg",
+            "https://i.ibb.co/zhH61Wq6/18.jpg",
+            "https://i.ibb.co/W4kFSrX7/19.jpg",
+            "https://i.ibb.co/G34VYL0k/20.jpg",
+            "https://i.ibb.co/DgfDxSYb/21.jpg",
+            "https://i.ibb.co/HLQFKsFQ/22.jpg",
+            "https://i.ibb.co/wZfD4xPj/23.jpg",
+            "https://i.ibb.co/G3xXs5qq/24.jpg"
+          ],
+          "website": "https://www.mangadenizi.net/",
+          "discord": "https://discord.com/invite/8zBMSGZ"
+        }
+      ]
     }
   ]
 }
