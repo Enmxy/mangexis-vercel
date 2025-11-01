@@ -757,31 +757,37 @@ const Reader = () => {
               ref={(el) => (imageRefs.current[index] = el)}
               className="relative group"
             >
-              <OptimizedImage
-                src={imageUrl}
-                alt={`Sayfa ${index + 1}`}
-                index={index}
-                preloadNext={index < images.length - 1}
-                className="pointer-events-none"
-              />
+              <div className="pointer-events-none">
+                <OptimizedImage
+                  src={imageUrl}
+                  alt={`Sayfa ${index + 1}`}
+                  index={index}
+                  preloadNext={index < images.length - 1}
+                />
+              </div>
               
               {/* Scroll Down Arrow - Only on Desktop and not last image */}
               {!isMobile && !isLastImage && (
                 <button
-                  onClick={handleScrollToNext}
-                  className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 hover:bg-black/80 backdrop-blur-sm rounded-full p-3 shadow-lg z-10 pointer-events-auto"
-                  aria-label="Sonraki sayfaya geç"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleScrollToNext()
+                  }}
+                  className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-purple-600/80 hover:bg-purple-500 backdrop-blur-sm rounded-full p-4 shadow-xl hover:shadow-2xl hover:scale-110 z-50 cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
+                  title="Sonraki sayfaya geç"
                 >
                   <svg 
-                    className="w-6 h-6 text-white animate-bounce" 
+                    className="w-6 h-6 text-white" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path 
                       strokeLinecap="round" 
                       strokeLinejoin="round" 
-                      strokeWidth={2} 
+                      strokeWidth={2.5} 
                       d="M19 14l-7 7m0 0l-7-7m7 7V3" 
                     />
                   </svg>
@@ -825,10 +831,13 @@ const Reader = () => {
             </div>
 
             {/* Comments Section */}
-            <Giscus 
-              term={`${manga.title} - Bölüm ${chapter.id}`}
-              category="Bölümler"
-            />
+            {manga && chapter && (
+              <Giscus 
+                key={`${manga.slug}-${chapter.id}`}
+                term={`${manga.title} - Bölüm ${chapter.id}`}
+                category="Bölümler"
+              />
+            )}
           </div>
         </div>
       </div>
