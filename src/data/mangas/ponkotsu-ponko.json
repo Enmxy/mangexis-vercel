@@ -12,5 +12,71 @@
     "Seinen"
   ],
   "fansub": "Nox Subs",
-  "chapters": []
+  "chapters": [
+    {
+      "id": "1",
+      "title": "Başlangıç",
+      "imageLinks": [
+        "https://i.ibb.co/yFQCGH89/image.png",
+        "https://i.ibb.co/vxzCJGzy/1.png",
+        "https://i.ibb.co/4nRW0Wx4/2.png",
+        "https://i.ibb.co/G485wbdm/3.png",
+        "https://i.ibb.co/TMcHDR5W/4.png",
+        "https://i.ibb.co/PvJSpJKr/5.png",
+        "https://i.ibb.co/Rp9dTj4r/6.png",
+        "https://i.ibb.co/zVMtr1H8/7.png",
+        "https://i.ibb.co/BV34LfcR/8.png",
+        "https://i.ibb.co/39dzJfLP/9.png",
+        "https://i.ibb.co/LXtbQXHg/10.png",
+        "https://i.ibb.co/N5Pj2m5/11.png",
+        "https://i.ibb.co/xK44yrrz/12.png",
+        "https://i.ibb.co/XxQfnfvp/13.png",
+        "https://i.ibb.co/QvThw4NH/14.png",
+        "https://i.ibb.co/nsTFhV5b/15.png",
+        "https://i.ibb.co/rGfRGqsn/16.png",
+        "https://i.ibb.co/HT32C60x/17.png",
+        "https://i.ibb.co/x8tXBDhF/18.png",
+        "https://i.ibb.co/K1JBBKc/19.png",
+        "https://i.ibb.co/jkcdN1Gf/20.png",
+        "https://i.ibb.co/9m4mKpkj/21.png",
+        "https://i.ibb.co/QFvdfWWP/22.png",
+        "https://i.ibb.co/xtP96rsz/23.png",
+        "https://i.ibb.co/xq311qkL/30.png"
+      ],
+      "fansubs": [
+        {
+          "name": "Nox Subs",
+          "images": [
+            "https://i.ibb.co/yFQCGH89/image.png",
+            "https://i.ibb.co/vxzCJGzy/1.png",
+            "https://i.ibb.co/4nRW0Wx4/2.png",
+            "https://i.ibb.co/G485wbdm/3.png",
+            "https://i.ibb.co/TMcHDR5W/4.png",
+            "https://i.ibb.co/PvJSpJKr/5.png",
+            "https://i.ibb.co/Rp9dTj4r/6.png",
+            "https://i.ibb.co/zVMtr1H8/7.png",
+            "https://i.ibb.co/BV34LfcR/8.png",
+            "https://i.ibb.co/39dzJfLP/9.png",
+            "https://i.ibb.co/LXtbQXHg/10.png",
+            "https://i.ibb.co/N5Pj2m5/11.png",
+            "https://i.ibb.co/xK44yrrz/12.png",
+            "https://i.ibb.co/XxQfnfvp/13.png",
+            "https://i.ibb.co/QvThw4NH/14.png",
+            "https://i.ibb.co/nsTFhV5b/15.png",
+            "https://i.ibb.co/rGfRGqsn/16.png",
+            "https://i.ibb.co/HT32C60x/17.png",
+            "https://i.ibb.co/x8tXBDhF/18.png",
+            "https://i.ibb.co/K1JBBKc/19.png",
+            "https://i.ibb.co/jkcdN1Gf/20.png",
+            "https://i.ibb.co/9m4mKpkj/21.png",
+            "https://i.ibb.co/QFvdfWWP/22.png",
+            "https://i.ibb.co/xtP96rsz/23.png",
+            "https://i.ibb.co/xq311qkL/30.png"
+          ],
+          "website": "https://noxsubs.net/",
+          "discord": "https://discord.com/invite/GqmN4HA"
+        }
+      ]
+    }
+  ]
 }
