@@ -15,5 +15,23 @@
     "Süper Güç"
   ],
   "fansub": "",
-  "chapters": []
+  "chapters": [
+    {
+      "id": "1",
+      "title": "Bölüm 1",
+      "imageLinks": [
+        "https://ibb.co/m5SymGMz"
+      ],
+      "fansubs": [
+        {
+          "name": "Manga Denizi",
+          "images": [
+            "https://ibb.co/m5SymGMz"
+          ],
+          "website": "https://mangadenizi.net/",
+          "discord": "https://discord.com/invite/8zBMSGZ"
+        }
+      ]
+    }
+  ]
 }
