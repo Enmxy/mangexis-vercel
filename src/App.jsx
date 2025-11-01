@@ -149,6 +149,7 @@ function App() {
         <Route path="mangas" element={<MangaList />} />
         <Route path="mangas/new" element={<MangaForm />} />
         <Route path="mangas/edit/:slug" element={<MangaForm />} />
+        <Route path="chapter-add" element={<ChapterAdd />} />
         <Route path="news" element={<NewsList />} />
         <Route path="news/new" element={<NewsForm />} />
         <Route path="news/edit/:id" element={<NewsForm />} />
