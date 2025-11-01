@@ -9,6 +9,9 @@ import OptimizedImage from '../components/OptimizedImage'
 import imageUpscaler from '../utils/imageUpscaler'
 import { addToHistory } from '../utils/readingHistory'
 import { initImageProtection, protectImage } from '../utils/imageProtection'
+import Navbar from '../components/Navbar'
+import MobileBottomNav from '../components/MobileBottomNav'
+import Footer from '../components/Footer'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -321,6 +324,9 @@ const Reader = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]" style={{ scrollBehavior: 'smooth' }}>
+      {/* Navbar */}
+      <Navbar />
+      
       {/* Fixed Reader Bar */}
       <AnimatePresence>
         {showBar && (
@@ -688,10 +694,11 @@ const Reader = () => {
           const isLastImage = index === images.length - 1
           
           const handleScrollToNext = () => {
-            if (!isLastImage && imageRefs.current[index + 1]) {
-              imageRefs.current[index + 1].scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            if (!isLastImage) {
+              // Scroll down by 70% of viewport height for smoother experience
+              window.scrollBy({
+                top: window.innerHeight * 0.7,
+                behavior: 'smooth'
               })
             }
           }
@@ -758,7 +765,7 @@ const Reader = () => {
               className="relative"
               style={{
                 cursor: !isMobile && !isLastImage 
-                  ? `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black" stroke="black" stroke-width="2"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>') 12 12, auto`
+                  ? `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23a855f7" stroke="%23a855f7" stroke-width="2"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>') 12 12, auto`
                   : 'default'
               }}
               onClick={(e) => {
@@ -842,6 +849,12 @@ const Reader = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Footer */}
+      <Footer />
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   )
 }
