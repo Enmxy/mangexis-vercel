@@ -4,7 +4,17 @@ const API_BASE = '/api/slider-operations'
 
 export const getAllSliders = async () => {
   try {
-    const response = await fetch(API_BASE)
+    // Cache-busting: her istekte fresh data al
+    const timestamp = new Date().getTime()
+    const url = `${API_BASE}?t=${timestamp}`
+    
+    const response = await fetch(url, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      },
+      cache: 'no-cache'
+    })
     const data = await response.json()
     
     if (data.success) {

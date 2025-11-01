@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { protectImage } from '../utils/imageProtection'
 
 /**
  * OptimizedImage - Yüksek kaliteli, hızlı yüklenen resim componenti
@@ -80,9 +81,14 @@ const OptimizedImage = ({
   }, [])
 
   // Resim yüklendiğinde
-  const handleImageLoad = () => {
+  const handleImageLoad = (e) => {
     setImageState('loaded')
     if (onLoad) onLoad()
+    
+    // Image protection uygula
+    if (e.target) {
+      protectImage(e.target)
+    }
     
     // Sonraki resmi preload et
     if (preloadNext) {
@@ -131,7 +137,7 @@ const OptimizedImage = ({
           draggable="false"
           onContextMenu={(e) => e.preventDefault()}
           onDragStart={(e) => e.preventDefault()}
-          className={`w-full h-auto block select-none transition-opacity duration-500 ${
+          className={`w-full h-auto block select-none transition-opacity duration-500 reader-image ${
             imageState === 'loaded' ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
@@ -141,6 +147,7 @@ const OptimizedImage = ({
             WebkitUserSelect: 'none',
             MozUserSelect: 'none',
             msUserSelect: 'none',
+            pointerEvents: 'none',
             // Resim kalitesini korumak için
             imageRendering: 'high-quality',
             WebkitOptimizeContrast: 'optimize',

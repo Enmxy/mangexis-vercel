@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import { isBot, checkRateLimit, addSecurityHeaders } from './_rateLimit.js'
 
 // CRITICAL SECURITY: All credentials MUST be in environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-fallback-secret-CHANGE-IN-PRODUCTION'
@@ -75,24 +76,7 @@ const getClientIP = (req) => {
          'unknown'
 }
 
-// Rate limiting check
-const checkRateLimit = (ip) => {
-  const now = Date.now()
-  const tracker = rateLimitTracker.get(ip)
-  
-  if (!tracker || now - tracker.windowStart > RATE_LIMIT_WINDOW) {
-    rateLimitTracker.set(ip, { count: 1, windowStart: now })
-    return true
-  }
-  
-  if (tracker.count >= MAX_REQUESTS_PER_WINDOW) {
-    logSecurityEvent('RATE_LIMIT_EXCEEDED', ip, { count: tracker.count })
-    return false
-  }
-  
-  tracker.count++
-  return true
-}
+// Note: Using shared checkRateLimit from _rateLimit.js for consistency
 
 // Check if IP is locked out
 const isLockedOut = (ip) => {
@@ -139,14 +123,39 @@ const clearFailedAttempts = (ip) => {
 }
 
 export default async function handler(req, res) {
+  // Add security headers
+  addSecurityHeaders(res)
+  
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Content-Type', 'application/json')
 
   // Handle OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
+  }
+
+  // Bot protection
+  const userAgent = req.headers['user-agent'] || ''
+  if (isBot(userAgent)) {
+    console.log('🚫 Bot blocked on admin-auth:', userAgent)
+    return res.status(403).json({ success: false, error: 'Automated access is not allowed' })
+  }
+
+  // Rate limiting (using shared rate limiter)
+  const clientIP = getClientIP(req)
+  const rateLimit = checkRateLimit(clientIP, userAgent)
+  
+  if (!rateLimit.allowed) {
+    console.log('⚠️ Rate limit exceeded on admin-auth:', clientIP)
+    res.setHeader('Retry-After', rateLimit.retryAfter)
+    return res.status(429).json({ 
+      success: false, 
+      error: rateLimit.message,
+      retryAfter: rateLimit.retryAfter
+    })
   }
 
   if (req.method !== 'POST') {

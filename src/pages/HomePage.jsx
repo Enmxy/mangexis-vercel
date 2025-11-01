@@ -6,6 +6,7 @@ import Slider from '../components/Slider'
 import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
 import FeatureSection from '../components/FeatureSection'
+import LatestChapters from '../components/LatestChapters'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import { getAllSliders } from '../utils/sliderService'
@@ -29,11 +30,11 @@ const HomePage = () => {
     loadSliders()
     loadAllMangas()
     
-    // Auto refresh every 5 seconds - silent background update
+    // Auto refresh every 10 seconds - cache bypass ile silent update
     startAutoRefresh(async () => {
       await loadAllMangas()
       await loadSliders()
-    }, 5)
+    })
     
     return () => {
       stopAutoRefresh()
@@ -75,23 +76,26 @@ const HomePage = () => {
       
       allMangas.forEach(manga => {
         if (manga.chapters && manga.chapters.length > 0) {
-          manga.chapters.forEach(chapter => {
-            chapters.push({
-              ...chapter,
-              manga: {
-                slug: manga.slug,
-                title: manga.title,
-                cover: manga.cover
-              }
-            })
+          // Get the latest chapter from each manga
+          const latestChapter = manga.chapters.reduce((latest, current) => {
+            return parseInt(current.id) > parseInt(latest.id) ? current : latest
+          })
+          
+          chapters.push({
+            manga: {
+              slug: manga.slug,
+              title: manga.title,
+              cover: manga.cover
+            },
+            chapter: latestChapter
           })
         }
       })
       
-      // Sort by chapter ID (newest first) and take top 12
+      // Sort by chapter ID (newest first) and take top 4
       const sorted = chapters
-        .sort((a, b) => parseInt(b.id) - parseInt(a.id))
-        .slice(0, 12)
+        .sort((a, b) => parseInt(b.chapter.id) - parseInt(a.chapter.id))
+        .slice(0, 4)
       
       setLatestChapters(sorted)
     } catch (error) {
@@ -420,66 +424,16 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* Latest Chapters Section */}
-        {latestChapters.length > 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <h2 className="text-2xl font-bold text-white">Yeni Eklenen Bölümler</h2>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {latestChapters.map((chapter, index) => (
-                  <motion.div
-                    key={`${chapter.manga.slug}-${chapter.id}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Link to={`/manga/${chapter.manga.slug}/chapter/${chapter.id}`}>
-                      <div className="group bg-gray-800 hover:bg-gray-750 rounded-xl overflow-hidden border border-gray-700 hover:border-blue-500 transition-all duration-200">
-                        <div className="flex gap-3 p-3">
-                          <img
-                            src={chapter.manga.cover}
-                            alt={chapter.manga.title}
-                            className="w-16 h-20 object-cover rounded-lg flex-shrink-0"
-                            onError={(e) => { e.target.src = 'https://via.placeholder.com/64x80?text=?' }}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-white font-semibold text-sm mb-1 truncate group-hover:text-blue-400 transition-colors">
-                              {chapter.manga.title}
-                            </h3>
-                            <p className="text-blue-400 text-xs font-medium mb-1">
-                              Bölüm {chapter.id}
-                            </p>
-                            {chapter.title && chapter.title !== `Bölüm ${chapter.id}` && (
-                              <p className="text-gray-400 text-xs truncate">
-                                {chapter.title}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-1 mt-2">
-                              <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded-full font-medium">
-                                YENİ
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        )}
+        {/* Latest Chapters Section - New Component */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            <LatestChapters latestChapters={latestChapters} />
+          </motion.div>
+        </div>
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

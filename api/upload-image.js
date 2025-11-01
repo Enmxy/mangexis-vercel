@@ -1,4 +1,9 @@
+import { isBot, checkRateLimit, addSecurityHeaders } from './_rateLimit.js'
+
 export default async function handler(req, res) {
+  // Add security headers
+  addSecurityHeaders(res)
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
@@ -7,6 +12,27 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
+  }
+
+  // Bot protection
+  const userAgent = req.headers['user-agent'] || ''
+  if (isBot(userAgent)) {
+    console.log('🚫 Bot blocked on upload:', userAgent)
+    return res.status(403).json({ success: false, error: 'Automated access is not allowed' })
+  }
+
+  // Rate limiting (stricter for uploads)
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || 'unknown'
+  const rateLimit = checkRateLimit(ip, userAgent)
+  
+  if (!rateLimit.allowed) {
+    console.log('⚠️ Rate limit exceeded on upload:', ip)
+    res.setHeader('Retry-After', rateLimit.retryAfter)
+    return res.status(429).json({ 
+      success: false, 
+      error: rateLimit.message,
+      retryAfter: rateLimit.retryAfter
+    })
   }
 
   if (req.method !== 'POST') {

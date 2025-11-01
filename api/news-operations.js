@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { Octokit } from '@octokit/rest'
+import { isBot, checkRateLimit, addSecurityHeaders } from './_rateLimit.js'
 const BRANCH = 'main'
 const JWT_SECRET = process.env.JWT_SECRET || 'mangexis-super-secret-key-change-in-production'
 
@@ -17,6 +18,9 @@ const getRepoInfo = () => ({
 })
 
 export default async function handler(req, res) {
+  // Add security headers
+  addSecurityHeaders(res)
+  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -31,6 +35,27 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
+  }
+
+  // Bot protection
+  const userAgent = req.headers['user-agent'] || ''
+  if (isBot(userAgent)) {
+    console.log('🚫 Bot blocked:', userAgent)
+    return res.status(403).json({ success: false, error: 'Automated access is not allowed' })
+  }
+
+  // Rate limiting
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || 'unknown'
+  const rateLimit = checkRateLimit(ip, userAgent)
+  
+  if (!rateLimit.allowed) {
+    console.log('⚠️ Rate limit exceeded:', ip)
+    res.setHeader('Retry-After', rateLimit.retryAfter)
+    return res.status(429).json({ 
+      success: false, 
+      error: rateLimit.message,
+      retryAfter: rateLimit.retryAfter
+    })
   }
 
   try {

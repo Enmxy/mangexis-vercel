@@ -20,10 +20,10 @@ const Discover = () => {
   useEffect(() => {
     loadAllMangas()
     
-    // Auto refresh every 5 seconds
+    // Auto refresh every 10 seconds - cache bypass ile
     startAutoRefresh(async () => {
       await loadAllMangas()
-    }, 5)
+    })
     
     return () => {
       stopAutoRefresh()

@@ -34,7 +34,8 @@ const MangaForm = () => {
     name: '',
     images: [''],
     website: '',
-    discord: ''
+    discord: '',
+    note: ''
   })
 
   const availableGenres = [
@@ -208,7 +209,8 @@ const MangaForm = () => {
       name: currentFansub.name,
       images: validImages,
       website: currentFansub.website || '',
-      discord: currentFansub.discord || ''
+      discord: currentFansub.discord || '',
+      note: currentFansub.note || ''
     }
 
     setNewChapter({
@@ -216,7 +218,7 @@ const MangaForm = () => {
       fansubs: [...newChapter.fansubs, fansubData]
     })
 
-    setCurrentFansub({ name: '', images: [''], website: '', discord: '' })
+    setCurrentFansub({ name: '', images: [''], website: '', discord: '', note: '' })
     alert(`✅ "${currentFansub.name}" fansub eklendi! (${validImages.length} sayfa)`)
   }
 
@@ -274,7 +276,7 @@ const MangaForm = () => {
       images: [''],
       fansubs: []
     })
-    setCurrentFansub({ name: '', images: [''], website: '', discord: '' })
+    setCurrentFansub({ name: '', images: [''], website: '', discord: '', note: '' })
     
     const fansubInfo = newChapter.fansubs.length > 0 
       ? `\n${newChapter.fansubs.length} fansub ekli`
@@ -756,6 +758,13 @@ const MangaForm = () => {
                     onChange={(e) => setCurrentFansub({ ...currentFansub, discord: e.target.value })}
                     placeholder="Discord sunucusu (opsiyonel)"
                     className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors text-sm"
+                  />
+                  <textarea
+                    value={currentFansub.note}
+                    onChange={(e) => setCurrentFansub({ ...currentFansub, note: e.target.value })}
+                    placeholder="Fansuber notu (opsiyonel) - Örn: Çeviri güncellendi, kalite iyileştirildi..."
+                    rows={3}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors text-sm resize-none"
                   />
                 </div>
                 

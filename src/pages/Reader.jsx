@@ -8,6 +8,7 @@ import Giscus from '../components/Giscus'
 import OptimizedImage from '../components/OptimizedImage'
 import imageUpscaler from '../utils/imageUpscaler'
 import { addToHistory } from '../utils/readingHistory'
+import { initImageProtection, protectImage } from '../utils/imageProtection'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -28,6 +29,11 @@ const Reader = () => {
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
+  // Initialize image protection
+  useEffect(() => {
+    initImageProtection()
+  }, [])
+
   // Check if mobile
   useEffect(() => {
     const handleResize = () => {
@@ -46,10 +52,10 @@ const Reader = () => {
   useEffect(() => {
     loadManga()
     
-    // Auto refresh every 5 seconds
+    // Auto refresh every 10 seconds - cache bypass ile
     startAutoRefresh(async () => {
       await loadManga()
-    }, 5)
+    })
     
     return () => {
       stopAutoRefresh()

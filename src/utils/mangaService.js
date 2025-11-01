@@ -7,7 +7,7 @@ const UPLOAD_URL = '/api/upload-image';
 // Check if running in development mode
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-export const uploadImage = async (file) => {
+export const uploadImage = async (file, maxRetries = 3) => {
   if (isDevelopment) {
     // Development mode: return mock URL
     return new Promise((resolve) => {
@@ -20,42 +20,73 @@ export const uploadImage = async (file) => {
     });
   }
 
-  try {
-    const reader = new FileReader();
-    
-    return new Promise((resolve, reject) => {
-      reader.onload = async (e) => {
-        try {
-          const response = await fetch(UPLOAD_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              image: e.target.result,
-              filename: file.name
-            })
-          });
-
-          const data = await response.json();
-          
-          if (data.success) {
-            resolve(data.url);
-          } else {
-            reject(new Error('Upload failed'));
-          }
-        } catch (error) {
-          reject(error);
-        }
-      };
+  // Retry logic with exponential backoff
+  let lastError;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`📤 Upload attempt ${attempt}/${maxRetries} for ${file.name}`);
       
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  } catch (error) {
-    console.error('Upload error:', error);
-    throw error;
+      const reader = new FileReader();
+      
+      const imageData = await new Promise((resolve, reject) => {
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        // High quality: read as data URL with no compression
+        reader.readAsDataURL(file);
+      });
+
+      // Upload with retry-friendly timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+      try {
+        const response = await fetch(UPLOAD_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            image: imageData,
+            filename: file.name,
+            quality: 100 // Request maximum quality
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.url) {
+          console.log(`✅ Upload successful: ${file.name}`);
+          return data.url;
+        } else {
+          throw new Error(data.error || 'Upload failed - no URL returned');
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        throw fetchError;
+      }
+    } catch (error) {
+      lastError = error;
+      console.warn(`⚠️ Attempt ${attempt} failed:`, error.message);
+      
+      // If not last attempt, wait before retry (exponential backoff)
+      if (attempt < maxRetries) {
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Max 5s
+        console.log(`⏳ Retrying in ${waitTime}ms...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
   }
+
+  // All retries failed
+  console.error(`❌ Upload failed after ${maxRetries} attempts:`, lastError);
+  throw new Error(`Upload failed after ${maxRetries} attempts: ${lastError.message}`);
 };
 
 export const saveManga = async (mangaData) => {
@@ -167,12 +198,19 @@ export const getAllMangas = async () => {
   }
 
   try {
+    // Cache-busting: timestamp ekleyerek her istekte fresh data al
+    const timestamp = new Date().getTime();
+    const url = `${API_URL}?t=${timestamp}`;
+    
     // Public endpoint - no token required
-    const response = await fetch(API_URL, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
       },
+      cache: 'no-cache', // Browser cache'i bypass et
       body: JSON.stringify({
         operation: 'GET_ALL_MANGAS'
       })
