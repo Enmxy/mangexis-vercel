@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 
 const Navbar = () => {
   const location = useLocation()
@@ -51,6 +52,30 @@ const Navbar = () => {
                 </motion.div>
               </Link>
             ))}
+            
+            {/* User Authentication */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-lg shadow-purple-500/30"
+                >
+                  Giriş Yap
+                </motion.button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: 'w-9 h-9 ring-2 ring-purple-500/50 hover:ring-purple-400 transition-all',
+                    userButtonPopoverCard: 'bg-gray-900 border border-gray-800',
+                    userButtonPopoverActionButton: 'hover:bg-gray-800'
+                  }
+                }}
+              />
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
@@ -107,6 +132,33 @@ const Navbar = () => {
                     </motion.div>
                   </Link>
                 ))}
+                
+                {/* Mobile User Auth */}
+                <div className="pt-3 border-t border-white/10">
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <motion.button
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition-all shadow-lg"
+                      >
+                        🔑 Giriş Yap
+                      </motion.button>
+                    </SignInButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <div className="flex items-center gap-3 px-4 py-2">
+                      <UserButton 
+                        appearance={{
+                          elements: {
+                            avatarBox: 'w-10 h-10 ring-2 ring-purple-500/50',
+                          }
+                        }}
+                      />
+                      <span className="text-white text-sm font-medium">Profilim</span>
+                    </div>
+                  </SignedIn>
+                </div>
               </div>
             </motion.div>
           )}

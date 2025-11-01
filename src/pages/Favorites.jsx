@@ -1,23 +1,39 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useFavorites } from '../hooks/useFavorites'
+import { useUser } from '@clerk/clerk-react'
+import { getAllMangas } from '../utils/mangaService'
+import MangaCard from '../components/MangaCard'
 
 const Favorites = () => {
-  const [favorites, setFavorites] = useState([])
+  const { favorites: favoriteSlugs, migrateFavorites, isSignedIn } = useFavorites()
+  const { user } = useUser()
+  const [favoriteMangas, setFavoriteMangas] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadFavorites()
-  }, [])
+    // Migrate localStorage favorites on first load
+    if (isSignedIn) {
+      migrateFavorites()
+    }
+  }, [isSignedIn])
 
-  const loadFavorites = () => {
-    const saved = JSON.parse(localStorage.getItem('favorites') || '[]')
-    setFavorites(saved)
-  }
+  useEffect(() => {
+    loadFavoriteMangas()
+  }, [favoriteSlugs])
 
-  const removeFavorite = (slug) => {
-    const updated = favorites.filter(fav => fav.slug !== slug)
-    localStorage.setItem('favorites', JSON.stringify(updated))
-    setFavorites(updated)
+  const loadFavoriteMangas = async () => {
+    try {
+      setLoading(true)
+      const allMangas = await getAllMangas()
+      const filtered = allMangas.filter(manga => favoriteSlugs.includes(manga.slug))
+      setFavoriteMangas(filtered)
+    } catch (error) {
+      console.error('Error loading favorites:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -33,55 +49,34 @@ const Favorites = () => {
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">Favorilerim</h1>
           <div className="w-24 h-1.5 bg-gradient-to-r from-white to-transparent rounded-full mb-4"></div>
           <p className="text-gray-400">
-            {favorites.length > 0 
-              ? `${favorites.length} manga favorilerinizde` 
-              : 'Henüz favori manganız yok'}
+            {favoriteMangas.length > 0 
+              ? `${favoriteMangas.length} manga favorilerinizde` 
+              : isSignedIn 
+                ? 'Henüz favori manganız yok' 
+                : 'Favorileri görüntülemek için giriş yapın'}
           </p>
+          {isSignedIn && user && (
+            <p className="text-purple-400 text-sm mt-2">
+              ✨ {user.username || user.firstName || 'Kullanıcı'} olarak giriş yaptınız
+            </p>
+          )}
         </motion.div>
 
-        {/* Favorites Grid */}
-        {favorites.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+          </div>
+        ) : favoriteMangas.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {favorites.map((manga, index) => (
+            {favoriteMangas.map((manga, index) => (
               <motion.div
                 key={manga.slug}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="relative group"
               >
-                <Link to={`/manga/${manga.slug}`}>
-                  <div className="relative overflow-hidden rounded-xl border border-white/10 hover:border-white/30 transition-all duration-300">
-                    <img
-                      src={manga.cover}
-                      alt={manga.title}
-                      className="w-full h-auto aspect-[2/3] object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Info Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                      <h3 className="text-white font-bold text-sm mb-1 line-clamp-2">
-                        {manga.title}
-                      </h3>
-                      <p className="text-gray-300 text-xs">
-                        {manga.chapters?.length || 0} bölüm
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Remove Button */}
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => removeFavorite(manga.slug)}
-                  className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 rounded-full transition-all z-10 opacity-0 group-hover:opacity-100"
-                >
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </motion.button>
+                <MangaCard manga={manga} />
               </motion.div>
             ))}
           </div>
@@ -97,9 +92,13 @@ const Favorites = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Favori manga bulunamadı</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              {isSignedIn ? 'Favori manga bulunamadı' : 'Giriş Yapın'}
+            </h2>
             <p className="text-gray-400 mb-8">
-              Manga detay sayfasından favorilere ekleyerek başlayın
+              {isSignedIn 
+                ? 'Manga kartlarındaki ❤️ ikonuna tıklayarak favorilere ekleyin' 
+                : 'Favorilerinizi görmek ve cihazlar arası senkronize etmek için giriş yapın'}
             </p>
             <Link to="/">
               <motion.button

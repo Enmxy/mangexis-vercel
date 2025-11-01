@@ -11,6 +11,7 @@
     "generate-hash": "node scripts/generate-password-hash.cjs"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.53.4",
     "@octokit/rest": "^20.1.2",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^10.16.16",

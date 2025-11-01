@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { ClerkProvider } from '@clerk/clerk-react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileBottomNav from './components/MobileBottomNav'
@@ -32,9 +33,15 @@ import ChapterAdd from './pages/admin/ChapterAdd'
 import PagesList from './pages/admin/PagesList'
 import PageBuilder from './pages/admin/PageBuilder'
 
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!clerkPubKey) {
+  throw new Error('Missing Clerk Publishable Key')
+}
+
 function App() {
   return (
-    <>
+    <ClerkProvider publishableKey={clerkPubKey}>
       <InstallPWA />
       <Routes>
       {/* Public Routes */}
@@ -161,7 +168,7 @@ function App() {
         <Route path="pages/edit/:slug" element={<PageBuilder />} />
       </Route>
       </Routes>
-    </>
+    </ClerkProvider>
   )
 }
 
