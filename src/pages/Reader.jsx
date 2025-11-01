@@ -324,8 +324,10 @@ const Reader = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]" style={{ scrollBehavior: 'smooth' }}>
-      {/* Navbar */}
-      <Navbar />
+      {/* Navbar - Only on Mobile */}
+      <div className="md:hidden">
+        <Navbar />
+      </div>
       
       {/* Fixed Reader Bar */}
       <AnimatePresence>
@@ -335,7 +337,7 @@ const Reader = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="fixed top-0 md:top-16 left-0 right-0 z-40 bg-[#0A0A0A]/95 border-b border-[#EDEDED]/10 backdrop-blur-sm"
+            className="fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/95 border-b border-[#EDEDED]/10 backdrop-blur-sm"
           >
             <div className="max-w-5xl mx-auto px-2 sm:px-4 py-2 sm:py-3">
               {/* Mobile Layout */}
@@ -785,7 +787,7 @@ const Reader = () => {
               className="relative"
               style={{
                 cursor: !isMobile && !isLastImage 
-                  ? `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23a855f7" stroke="%23a855f7" stroke-width="2"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>') 12 12, auto`
+                  ? `url('/cursor.svg') 16 16, auto`
                   : 'default'
               }}
               onClick={(e) => {
