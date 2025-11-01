@@ -106,7 +106,9 @@ const Slider = ({ slides }) => {
                   {/* Description - Hidden on mobile */}
                   {slides[currentIndex].description && (
                     <p className="hidden sm:block text-gray-300 text-sm sm:text-base lg:text-lg mb-6 line-clamp-2 max-w-2xl">
-                      {slides[currentIndex].description}
+                      {slides[currentIndex].description.length > 120 
+                        ? slides[currentIndex].description.substring(0, 120) + '...' 
+                        : slides[currentIndex].description}
                     </p>
                   )}
 
