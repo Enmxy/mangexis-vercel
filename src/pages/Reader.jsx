@@ -9,6 +9,7 @@ import { addToHistory } from '../utils/readingHistory'
 import { initImageProtection, protectImage } from '../utils/imageProtection'
 import MobileBottomNav from '../components/MobileBottomNav'
 import Footer from '../components/Footer'
+import RatingStars from '../components/RatingStars'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -26,6 +27,9 @@ const Reader = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageInput, setPageInput] = useState('1')
+  const [pageMode, setPageMode] = useState('single') // 'single' or 'double'
+  const [lastTap, setLastTap] = useState(0)
+  const [tempZoom, setTempZoom] = useState(false)
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
 
@@ -225,10 +229,34 @@ const Reader = () => {
     }
   }, [zoomLevel])
 
+  // Double-tap to zoom
+  const handleDoubleTap = () => {
+    if (tempZoom) {
+      setZoomLevel(100)
+      setTempZoom(false)
+    } else {
+      setZoomLevel(150)
+      setTempZoom(true)
+    }
+  }
+
   // Tap controls - Mobile only
   const handleTap = (e) => {
     if (!isMobile) return
     
+    const currentTime = new Date().getTime()
+    const tapLength = currentTime - lastTap
+    
+    // Double tap detection (within 300ms)
+    if (tapLength < 300 && tapLength > 0) {
+      handleDoubleTap()
+      setLastTap(0)
+      return
+    }
+    
+    setLastTap(currentTime)
+    
+    // Single tap logic
     const clickX = e.clientX
     const windowWidth = window.innerWidth
     
@@ -639,6 +667,26 @@ const Reader = () => {
                     </motion.button>
                   </div>
 
+                  {/* Page Mode Toggle */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setPageMode(pageMode === 'single' ? 'double' : 'single')}
+                    className="px-3 py-2 bg-[#EDEDED] text-[#0A0A0A] hover:bg-white rounded transition-all flex items-center gap-1.5"
+                    title={pageMode === 'single' ? 'Tek Sayfa' : 'Çift Sayfa'}
+                  >
+                    {pageMode === 'single' ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    )}
+                    <span className="text-xs font-bold">{pageMode === 'single' ? 'Tek' : 'Çift'}</span>
+                  </motion.button>
+
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -659,14 +707,24 @@ const Reader = () => {
                 </div>
               </div>
 
-              {/* Progress Bar */}
+              {/* Progress Bar - Clickable */}
               <div className="mt-2">
-                <div className="w-full h-1 bg-[#EDEDED]/10 overflow-hidden">
+                <div 
+                  className="w-full h-2 bg-[#EDEDED]/10 overflow-hidden cursor-pointer rounded-full hover:h-3 transition-all"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    const clickX = e.clientX - rect.left
+                    const percentage = clickX / rect.width
+                    const targetPage = Math.ceil(percentage * images.length)
+                    jumpToPage(targetPage)
+                  }}
+                  title="Tıklayarak sayfalara git"
+                >
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${scrollProgress}%` }}
                     transition={{ duration: 0.1 }}
-                    className="h-full bg-[#EDEDED]"
+                    className="h-full bg-[#EDEDED] rounded-full"
                   />
                 </div>
               </div>
@@ -710,68 +768,117 @@ const Reader = () => {
           transition: 'max-width 0.3s ease-out'
         }}
       >
-        {images.map((imageUrl, index) => {
-          const isLastImage = index === images.length - 1
-          
-          const handleScrollToNext = () => {
-            if (!isLastImage) {
-              // Scroll down smoothly by 50% of viewport height
-              const scrollAmount = window.innerHeight * 0.5
-              const start = window.pageYOffset
-              const target = start + scrollAmount
-              const duration = 600 // ms
-              let startTime = null
+        {pageMode === 'single' ? (
+          // Single Page Mode
+          images.map((imageUrl, index) => {
+            const isLastImage = index === images.length - 1
+            
+            const handleScrollToNext = () => {
+              if (!isLastImage) {
+                const scrollAmount = window.innerHeight * 0.5
+                const start = window.pageYOffset
+                const duration = 600
+                let startTime = null
 
-              const animation = (currentTime) => {
-                if (startTime === null) startTime = currentTime
-                const timeElapsed = currentTime - startTime
-                const progress = Math.min(timeElapsed / duration, 1)
-                
-                // Easing function for smooth animation
-                const easeInOutQuad = progress < 0.5
-                  ? 2 * progress * progress
-                  : 1 - Math.pow(-2 * progress + 2, 2) / 2
-                
-                window.scrollTo(0, start + (scrollAmount * easeInOutQuad))
-                
-                if (timeElapsed < duration) {
-                  requestAnimationFrame(animation)
+                const animation = (currentTime) => {
+                  if (startTime === null) startTime = currentTime
+                  const timeElapsed = currentTime - startTime
+                  const progress = Math.min(timeElapsed / duration, 1)
+                  
+                  const easeInOutQuad = progress < 0.5
+                    ? 2 * progress * progress
+                    : 1 - Math.pow(-2 * progress + 2, 2) / 2
+                  
+                  window.scrollTo(0, start + (scrollAmount * easeInOutQuad))
+                  
+                  if (timeElapsed < duration) {
+                    requestAnimationFrame(animation)
+                  }
                 }
+                
+                requestAnimationFrame(animation)
               }
-              
-              requestAnimationFrame(animation)
             }
-          }
-          
-          return (
-          <div key={index} className="w-full">
-            {/* Resim Container with Custom Cursor */}
-            <div 
-              ref={(el) => (imageRefs.current[index] = el)}
-              className="relative"
-              style={{
-                cursor: !isMobile && !isLastImage 
-                  ? `url('/cursor.svg') 16 16, auto`
-                  : 'default'
-              }}
-              onClick={(e) => {
-                if (!isMobile && !isLastImage) {
-                  e.stopPropagation()
-                  handleScrollToNext()
-                }
-              }}
-            >
-              <OptimizedImage
-                src={imageUrl}
-                alt={`Sayfa ${index + 1}`}
-                index={index}
-                preloadNext={index < images.length - 1}
-                className="pointer-events-none"
-              />
+            
+            return (
+            <div key={index} className="w-full">
+              <div 
+                ref={(el) => (imageRefs.current[index] = el)}
+                className="relative"
+                style={{
+                  cursor: !isMobile && !isLastImage 
+                    ? `url('/cursor.svg') 16 16, auto`
+                    : 'default'
+                }}
+                onClick={(e) => {
+                  if (!isMobile && !isLastImage) {
+                    e.stopPropagation()
+                    handleScrollToNext()
+                  }
+                }}
+              >
+                <OptimizedImage
+                  src={imageUrl}
+                  alt={`Sayfa ${index + 1}`}
+                  index={index}
+                  preloadNext={index < images.length - 1}
+                  className="pointer-events-none"
+                />
+              </div>
             </div>
-          </div>
-        )
-        })}
+          )
+          })
+        ) : (
+          // Double Page Mode
+          images.reduce((acc, imageUrl, index) => {
+            if (index % 2 === 0) {
+              const nextImage = images[index + 1]
+              const isLastPair = index >= images.length - 2
+              
+              acc.push(
+                <div key={`pair-${index}`} className="w-full mb-4">
+                  <div 
+                    ref={(el) => (imageRefs.current[index] = el)}
+                    className="flex gap-2 justify-center"
+                    style={{
+                      cursor: !isMobile && !isLastPair
+                        ? `url('/cursor.svg') 16 16, auto`
+                        : 'default'
+                    }}
+                    onClick={(e) => {
+                      if (!isMobile && !isLastPair) {
+                        e.stopPropagation()
+                        jumpToPage(index + 3)
+                      }
+                    }}
+                  >
+                    <div className="flex-1 max-w-[49%]">
+                      <OptimizedImage
+                        src={imageUrl}
+                        alt={`Sayfa ${index + 1}`}
+                        index={index}
+                        preloadNext={true}
+                        className="pointer-events-none w-full"
+                      />
+                    </div>
+                    {nextImage && (
+                      <div className="flex-1 max-w-[49%]">
+                        <OptimizedImage
+                          src={nextImage}
+                          alt={`Sayfa ${index + 2}`}
+                          index={index + 1}
+                          preloadNext={index + 2 < images.length}
+                          className="pointer-events-none w-full"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            }
+            return acc
+          }, [])
+        )}
 
         {/* Fansub Credits - After All Images */}
         {chapter.fansubs && chapter.fansubs[selectedFansub] && (
@@ -847,6 +954,17 @@ const Reader = () => {
         {/* End of Chapter - Comments */}
         <div className="py-12 px-4">
           <div className="max-w-3xl mx-auto">
+            {/* Rating Section */}
+            <div className="mb-8 pb-8 border-b border-[#EDEDED]/10">
+              <div className="text-center">
+                <h3 className="text-[#EDEDED] text-lg md:text-xl font-bold mb-3">Bu bölümü nasıl buldunuz?</h3>
+                <p className="text-[#EDEDED]/70 text-sm mb-4">Manga'yı değerlendirin</p>
+                <div className="flex justify-center">
+                  <RatingStars slug={manga.slug} size="lg" />
+                </div>
+              </div>
+            </div>
+
             {/* Chapter Navigation */}
             <div className="flex items-center justify-between mb-8 pb-8 border-b border-[#EDEDED]/10">
               {prevChapter ? (
