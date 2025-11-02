@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { listenContentUpdates } from '../utils/contentUpdateEvent'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import SliderEnhanced from '../components/SliderEnhanced'
+import Slider from '../components/Slider'
 import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
 import FeatureSection from '../components/FeatureSection'
@@ -256,7 +256,7 @@ const HomePage = () => {
               className="mb-6 sm:mb-12 max-w-7xl mx-auto px-4 sm:px-6 py-8"
             >
               {sliders.length > 0 ? (
-                <SliderEnhanced slides={sliders} />
+                <Slider slides={sliders} />
               ) : (
                 <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-12 text-center border border-gray-700">
                   <div className="text-6xl mb-4">🎬</div>
