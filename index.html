@@ -52,6 +52,86 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MangeXis",
+      "alternateName": "MangeXis - Türkçe Manga Okuma Platformu",
+      "url": "https://mangexis.netlify.app/",
+      "description": "Binlerce mangayı ücretsiz okuyun. One Piece, Solo Leveling, Attack on Titan ve daha fazlası. Türkiye'nin en hızlı manga sitesi.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://mangexis.netlify.app/discover?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MangeXis",
+        "url": "https://mangexis.netlify.app/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://mangexis.netlify.app/icon-512.png"
+        }
+      },
+      "inLanguage": "tr"
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "MangeXis",
+      "url": "https://mangexis.netlify.app/",
+      "logo": "https://mangexis.netlify.app/icon-512.png",
+      "sameAs": [],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Support",
+        "availableLanguage": "Turkish"
+      }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "MangeXis Ana Sayfa Bölümleri",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Ana Sayfa",
+          "url": "https://mangexis.netlify.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Manga Keşfet",
+          "url": "https://mangexis.netlify.app/discover"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Hakkımızda",
+          "url": "https://mangexis.netlify.app/about"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Sorumluluk Reddi",
+          "url": "https://mangexis.netlify.app/disclaimer"
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
