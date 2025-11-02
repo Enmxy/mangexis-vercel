@@ -675,10 +675,35 @@ const Reader = () => {
         )}
       </AnimatePresence>
 
+      {/* Hero Banner - Full Width at Top */}
+      {manga.heroBanner && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden"
+        >
+          <div className="absolute inset-0">
+            <img
+              src={manga.heroBanner}
+              alt={manga.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold drop-shadow-2xl">{manga.title}</h2>
+              <p className="text-white/95 text-base md:text-lg mt-2 drop-shadow-lg">{chapter.title}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Vertical Scroll Images */}
       <div 
         ref={scrollContainerRef}
-        className="mx-auto pt-20"
+        className="mx-auto pt-6"
         onClick={handleTap}
         style={{
           maxWidth: `${zoomLevel}%`,
@@ -720,29 +745,6 @@ const Reader = () => {
           
           return (
           <div key={index} className="w-full">
-            {/* Hero Banner - Only on first page */}
-            {index === 0 && manga.heroBanner && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="relative w-full h-64 md:h-72 mb-6 overflow-hidden"
-              >
-                <div className="absolute inset-0">
-                  <img
-                    src={manga.heroBanner}
-                    alt={manga.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-                  <h2 className="text-white text-xl md:text-2xl font-bold drop-shadow-2xl">{manga.title}</h2>
-                  <p className="text-white/90 text-sm md:text-base mt-1 drop-shadow-lg">{chapter.title}</p>
-                </div>
-              </motion.div>
-            )}
-
             {/* Fansub Info - İlk sayfanın üstünde */}
             {index === 0 && chapter.fansubs && chapter.fansubs[selectedFansub] && (
               <motion.div

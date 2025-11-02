@@ -117,9 +117,8 @@ const MangaDetail = () => {
               src={manga.heroBanner}
               alt={manga.title}
               className="w-full h-full object-cover"
-              style={{ filter: 'grayscale(100%) contrast(1.1) brightness(0.4)' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black" />
           </div>
         )}
 
