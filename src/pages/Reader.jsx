@@ -5,7 +5,7 @@ import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import Giscus from '../components/Giscus'
 import OptimizedImage from '../components/OptimizedImage'
-import adaptiveLoader from '../utils/adaptiveImageLoader'
+import imageEnhancer from '../utils/simpleImageEnhancer'
 import { addToHistory } from '../utils/readingHistory'
 import { initImageProtection, protectImage } from '../utils/imageProtection'
 
@@ -27,23 +27,12 @@ const Reader = () => {
   const [pageInput, setPageInput] = useState('1')
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
-  const [optimizedImages, setOptimizedImages] = useState({})
-  const [gpuSettings, setGpuSettings] = useState(null)
+  const [enhancedImages, setEnhancedImages] = useState({})
 
-  // Initialize image protection and adaptive loader
+  // Initialize image protection
   useEffect(() => {
     initImageProtection()
-    const initLoader = async () => {
-      const settings = await adaptiveLoader.init()
-      setGpuSettings(settings)
-      console.log('🎮 GPU Performance Score:', settings.score, '/5')
-      console.log('📊 Quality Settings:', {
-        resolution: settings.resolutionScale === 1.0 ? 'Orijinal' : settings.resolutionScale + 'x Geliştirilmiş',
-        upscaling: settings.enableUpscaling ? '✅ Aktif' : '🔄 Standart',
-        sharpening: settings.enableSharpening ? '✅ Aktif' : '🔄 Standart'
-      })
-    }
-    initLoader()
+    console.log('✨ Hafif kalite iyileştirme aktif')
   }, [])
 
   // Check if mobile
@@ -65,8 +54,7 @@ const Reader = () => {
     loadManga()
     
     return () => {
-      // Cleanup adaptive loader cache
-      adaptiveLoader.clearCache()
+      imageEnhancer.clearCache()
     }
   }, [slug])
 
@@ -101,77 +89,67 @@ const Reader = () => {
 
   const images = getCurrentImages()
 
-  // Optimize images based on GPU capabilities
+  // Enhance first few images for smooth reading
   useEffect(() => {
-    if (!images.length || !gpuSettings) return
+    if (!images.length) return
     
-    const optimizeImages = async () => {
-      const newOptimized = {}
+    const enhanceInitialImages = async () => {
+      const newEnhanced = {}
       
-      // Only optimize for powerful GPUs (score >= 4)
-      if (gpuSettings.score >= 4) {
-        for (let i = 0; i < Math.min(3, images.length); i++) {
-          try {
-            const optimizedSrc = await adaptiveLoader.loadImage(images[i])
-            newOptimized[i] = optimizedSrc
-          } catch (error) {
-            console.warn('Image optimization failed:', error)
-          }
+      // Enhance first 3 images
+      for (let i = 0; i < Math.min(3, images.length); i++) {
+        try {
+          const enhancedSrc = await imageEnhancer.enhanceImage(images[i])
+          newEnhanced[i] = enhancedSrc
+        } catch (error) {
+          console.warn('Enhancement failed:', error)
         }
       }
       
-      setOptimizedImages(newOptimized)
+      setEnhancedImages(newEnhanced)
       
-      // Prefetch upcoming images
+      // Prefetch next 3 images
       if (images.length > 3) {
-        adaptiveLoader.prefetchImages(images.slice(3, 3 + gpuSettings.prefetchCount))
+        imageEnhancer.prefetchImages(images.slice(3), 3)
       }
     }
     
-    optimizeImages()
+    enhanceInitialImages()
     
     return () => {
-      // Cleanup optimized URLs
-      Object.values(optimizedImages).forEach(url => {
-        if (url && url.startsWith('blob:')) {
-          URL.revokeObjectURL(url)
-        }
-      })
+      imageEnhancer.clearCache()
     }
-  }, [images, gpuSettings, selectedFansub])
+  }, [images, selectedFansub])
 
-  // Dynamic image optimization on scroll
+  // Enhance images as user scrolls
   useEffect(() => {
     const handleScroll = async () => {
-      if (!gpuSettings || !images.length) return
+      if (!images.length) return
       
-      // Find visible images
       const viewportHeight = window.innerHeight
-      const scrollY = window.scrollY
       
       imageRefs.current.forEach(async (ref, index) => {
-        if (!ref || optimizedImages[index]) return
+        if (!ref || enhancedImages[index]) return
         
         const rect = ref.getBoundingClientRect()
-        const isNearViewport = rect.top < viewportHeight * 2 && rect.bottom > -viewportHeight
+        const isNearViewport = rect.top < viewportHeight * 1.5 && rect.bottom > -viewportHeight
         
-        // Only optimize for powerful GPUs
-        if (isNearViewport && gpuSettings.score >= 4) {
+        if (isNearViewport) {
           try {
-            const optimizedSrc = await adaptiveLoader.loadImage(images[index])
-            setOptimizedImages(prev => ({ ...prev, [index]: optimizedSrc }))
+            const enhancedSrc = await imageEnhancer.enhanceImage(images[index])
+            setEnhancedImages(prev => ({ ...prev, [index]: enhancedSrc }))
           } catch (error) {
-            console.warn('Failed to optimize image:', index)
+            console.warn('Enhancement failed:', index)
           }
         }
       })
     }
     
-    const debouncedScroll = debounce(handleScroll, 300)
+    const debouncedScroll = debounce(handleScroll, 200)
     window.addEventListener('scroll', debouncedScroll, { passive: true })
     
     return () => window.removeEventListener('scroll', debouncedScroll)
-  }, [images, gpuSettings, optimizedImages])
+  }, [images, enhancedImages])
 
   // Debounce helper
   const debounce = (func, wait) => {
@@ -883,16 +861,12 @@ const Reader = () => {
               }}
             >
               <OptimizedImage
-                src={optimizedImages[index] || imageUrl}
+                src={enhancedImages[index] || imageUrl}
                 alt={`Sayfa ${index + 1}`}
                 index={index}
                 preloadNext={index < images.length - 1}
                 className="pointer-events-none"
-                style={{
-                  imageRendering: 'auto',
-                  filter: gpuSettings?.score >= 5 ? 'contrast(1.02)' : 'none'
-                }}
-               />
+              />
             </div>
           </div>
         )
