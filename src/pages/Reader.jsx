@@ -7,6 +7,8 @@ import Giscus from '../components/Giscus'
 import OptimizedImage from '../components/OptimizedImage'
 import { addToHistory } from '../utils/readingHistory'
 import { initImageProtection, protectImage } from '../utils/imageProtection'
+import MobileBottomNav from '../components/MobileBottomNav'
+import Footer from '../components/Footer'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -30,7 +32,6 @@ const Reader = () => {
   // Initialize image protection
   useEffect(() => {
     initImageProtection()
-    console.log('✨ Hafif kalite iyileştirme aktif')
   }, [])
 
   // Check if mobile
