@@ -4,8 +4,12 @@ import { useEffect } from 'react'
  * Otomatik sayfa yenileme hook'u
  * Her 10 saniyede bir sayfayı yeniler, ancak kullanıcının scroll pozisyonunu korur
  */
-const useAutoRefresh = (intervalSeconds = 10) => {
+const useAutoRefresh = (intervalSeconds = 10, { enabled = true } = {}) => {
   useEffect(() => {
+    if (!enabled) {
+      return undefined
+    }
+
     // Scroll pozisyonunu kaydet
     const saveScrollPosition = () => {
       const scrollData = {
@@ -15,6 +19,7 @@ const useAutoRefresh = (intervalSeconds = 10) => {
         path: window.location.pathname
       }
       sessionStorage.setItem('autoRefresh_scrollPos', JSON.stringify(scrollData))
+      sessionStorage.setItem('autoRefresh_skipIntro', 'true')
     }
 
     // Scroll pozisyonunu geri yükle
@@ -34,6 +39,7 @@ const useAutoRefresh = (intervalSeconds = 10) => {
           
           // Kullanıldı, temizle
           sessionStorage.removeItem('autoRefresh_scrollPos')
+          sessionStorage.removeItem('autoRefresh_skipIntro')
         }
       } catch (error) {
         console.error('Scroll pozisyonu geri yüklenirken hata:', error)
@@ -61,7 +67,7 @@ const useAutoRefresh = (intervalSeconds = 10) => {
       clearInterval(refreshInterval)
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [intervalSeconds])
+  }, [intervalSeconds, enabled])
 }
 
 export default useAutoRefresh

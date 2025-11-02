@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
 import useAutoRefresh from './hooks/useAutoRefresh'
 import Navbar from './components/Navbar'
@@ -43,8 +43,11 @@ if (!clerkPubKey) {
 }
 
 function App() {
-  // Otomatik sayfa yenileme - her 10 saniyede scroll pozisyonunu koruyarak
-  useAutoRefresh(10)
+  const location = useLocation()
+  const isReaderRoute = /^\/manga\/.+\/chapter\/.+/.test(location.pathname)
+
+  // Otomatik sayfa yenileme - Reader sayfası hariç her 10 saniyede scroll pozisyonunu koruyarak
+  useAutoRefresh(10, { enabled: !isReaderRoute })
   
   return (
     <ClerkProvider publishableKey={clerkPubKey}>

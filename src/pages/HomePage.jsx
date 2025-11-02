@@ -18,7 +18,14 @@ const HomePage = () => {
   const [genreFilter, setGenreFilter] = useState('all')
   const [allMangas, setAllMangas] = useState(mangaList)
   const [filteredMangas, setFilteredMangas] = useState(mangaList)
-  const [showIntro, setShowIntro] = useState(true)
+  const [showIntro, setShowIntro] = useState(() => {
+    const shouldSkip = sessionStorage.getItem('autoRefresh_skipIntro') === 'true'
+    if (shouldSkip) {
+      // Flag tüketilsin
+      sessionStorage.removeItem('autoRefresh_skipIntro')
+    }
+    return !shouldSkip
+  })
   const [loading, setLoading] = useState(true)
   const [continueReading, setContinueReading] = useState([])
   const [recentlyUpdated, setRecentlyUpdated] = useState([])
@@ -150,11 +157,15 @@ const HomePage = () => {
 
   // Hide intro animation after 2.5 seconds
   useEffect(() => {
+    if (!showIntro) {
+      return undefined
+    }
+
     const timer = setTimeout(() => {
       setShowIntro(false)
     }, 2500)
     return () => clearTimeout(timer)
-  }, [])
+  }, [showIntro])
 
   useEffect(() => {
     let filtered = allMangas
