@@ -399,6 +399,16 @@ const MangaForm = () => {
     reader.readAsDataURL(file)
   }
 
+  const handleCropFromUrl = (url, type) => {
+    if (!url || !url.trim()) {
+      alert('⚠️ Önce bir resim URL\'si girin!')
+      return
+    }
+    setImageToCrop(url)
+    setCropType(type)
+    setCropModalOpen(true)
+  }
+
   const handleCropComplete = async (croppedImageUrl) => {
     setUploading(true)
     setUploadProgress('Kırpılan resim yükleniyor...')
@@ -561,6 +571,19 @@ const MangaForm = () => {
                   className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
                   placeholder="https://... (Opsiyonel - Detay sayfasında gösterilir)"
                 />
+                {formData.heroBanner && (
+                  <button
+                    type="button"
+                    onClick={() => handleCropFromUrl(formData.heroBanner, 'banner')}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                    title="Mevcut resmi kırp"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+                    </svg>
+                    <span className="hidden sm:inline">Kırp</span>
+                  </button>
+                )}
                 <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -575,7 +598,7 @@ const MangaForm = () => {
                   />
                 </label>
               </div>
-              <p className="text-gray-500 text-xs mt-1">Manga detay sayfasının üst kısmında gösterilecek büyük banner resmi (opsiyonel) - Yükleme sonrası kırpabilirsiniz</p>
+              <p className="text-gray-500 text-xs mt-1">Manga detay sayfasının üst kısmında gösterilecek büyük banner resmi (opsiyonel) - URL girdikten sonra "Kırp" butonuyla düzenleyebilirsiniz</p>
               {formData.heroBanner && (
                 <div className="mt-3">
                   <img

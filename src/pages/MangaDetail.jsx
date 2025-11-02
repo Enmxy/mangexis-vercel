@@ -112,14 +112,14 @@ const MangaDetail = () => {
       >
         {/* Hero Banner Background (if exists) */}
         {manga.heroBanner && (
-          <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden h-[280px] md:h-[320px]">
             <img
               src={manga.heroBanner}
               alt={manga.title}
               className="w-full h-full object-cover"
-              style={{ filter: 'grayscale(100%) contrast(1.15) brightness(0.3)' }}
+              style={{ filter: 'grayscale(100%) contrast(1.1) brightness(0.4)' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black" />
           </div>
         )}
 
@@ -190,8 +190,7 @@ const MangaDetail = () => {
                 alt={manga.title}
                 className="w-full h-auto rounded-md shadow-2xl"
                 style={{ 
-                  filter: 'grayscale(100%) contrast(1.2) brightness(0.95)',
-                  boxShadow: '0 20px 60px rgba(255, 255, 255, 0.12), 0 8px 16px rgba(0, 0, 0, 0.7)'
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.3)'
                 }}
               />
             </div>
