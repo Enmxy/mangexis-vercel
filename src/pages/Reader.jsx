@@ -690,7 +690,7 @@ const Reader = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
             <div className="max-w-7xl mx-auto">
               <h2 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold drop-shadow-2xl">{manga.title}</h2>
