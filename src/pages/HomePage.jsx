@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { listenContentUpdates } from '../utils/contentUpdateEvent'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import Slider from '../components/Slider'
+import SliderEnhanced from '../components/SliderEnhanced'
 import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
 import FeatureSection from '../components/FeatureSection'
 import LatestChapters from '../components/LatestChapters'
+import AIRecommendations from '../components/AIRecommendations'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import { getAllSliders } from '../utils/sliderService'
@@ -255,7 +256,7 @@ const HomePage = () => {
               className="mb-6 sm:mb-12 max-w-7xl mx-auto px-4 sm:px-6 py-8"
             >
               {sliders.length > 0 ? (
-                <Slider slides={sliders} />
+                <SliderEnhanced slides={sliders} />
               ) : (
                 <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-12 text-center border border-gray-700">
                   <div className="text-6xl mb-4">🎬</div>
@@ -266,6 +267,7 @@ const HomePage = () => {
             </motion.div>
           )}
         </div>
+
 
           {/* Continue Reading Section */}
           {continueReading.length > 0 && (
@@ -525,6 +527,9 @@ const HomePage = () => {
             )}
           </motion.div>
         </div>
+
+        {/* AI Recommendations Section - Bottom */}
+        <AIRecommendations />
     </>
   )
 }
