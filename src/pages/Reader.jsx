@@ -3,15 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
-import { startAutoRefresh, stopAutoRefresh } from '../utils/autoRefresh'
 import Giscus from '../components/Giscus'
 import OptimizedImage from '../components/OptimizedImage'
-import imageUpscaler from '../utils/imageUpscaler'
+import adaptiveLoader from '../utils/adaptiveImageLoader'
 import { addToHistory } from '../utils/readingHistory'
 import { initImageProtection, protectImage } from '../utils/imageProtection'
-import Navbar from '../components/Navbar'
-import MobileBottomNav from '../components/MobileBottomNav'
-import Footer from '../components/Footer'
 
 const Reader = () => {
   const { slug, chapterId } = useParams()
@@ -31,10 +27,23 @@ const Reader = () => {
   const [pageInput, setPageInput] = useState('1')
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
+  const [optimizedImages, setOptimizedImages] = useState({})
+  const [gpuSettings, setGpuSettings] = useState(null)
 
-  // Initialize image protection
+  // Initialize image protection and adaptive loader
   useEffect(() => {
     initImageProtection()
+    const initLoader = async () => {
+      const settings = await adaptiveLoader.init()
+      setGpuSettings(settings)
+      console.log('🎮 GPU Performance Score:', settings.score, '/5')
+      console.log('📊 Quality Settings:', {
+        resolution: settings.resolutionScale === 1.0 ? 'Orijinal' : settings.resolutionScale + 'x Geliştirilmiş',
+        upscaling: settings.enableUpscaling ? '✅ Aktif' : '🔄 Standart',
+        sharpening: settings.enableSharpening ? '✅ Aktif' : '🔄 Standart'
+      })
+    }
+    initLoader()
   }, [])
 
   // Check if mobile
@@ -55,13 +64,9 @@ const Reader = () => {
   useEffect(() => {
     loadManga()
     
-    // Auto refresh every 10 seconds - cache bypass ile
-    startAutoRefresh(async () => {
-      await loadManga()
-    })
-    
     return () => {
-      stopAutoRefresh()
+      // Cleanup adaptive loader cache
+      adaptiveLoader.clearCache()
     }
   }, [slug])
 
@@ -95,6 +100,91 @@ const Reader = () => {
   }
 
   const images = getCurrentImages()
+
+  // Optimize images based on GPU capabilities
+  useEffect(() => {
+    if (!images.length || !gpuSettings) return
+    
+    const optimizeImages = async () => {
+      const newOptimized = {}
+      
+      // Only optimize for powerful GPUs (score >= 4)
+      if (gpuSettings.score >= 4) {
+        for (let i = 0; i < Math.min(3, images.length); i++) {
+          try {
+            const optimizedSrc = await adaptiveLoader.loadImage(images[i])
+            newOptimized[i] = optimizedSrc
+          } catch (error) {
+            console.warn('Image optimization failed:', error)
+          }
+        }
+      }
+      
+      setOptimizedImages(newOptimized)
+      
+      // Prefetch upcoming images
+      if (images.length > 3) {
+        adaptiveLoader.prefetchImages(images.slice(3, 3 + gpuSettings.prefetchCount))
+      }
+    }
+    
+    optimizeImages()
+    
+    return () => {
+      // Cleanup optimized URLs
+      Object.values(optimizedImages).forEach(url => {
+        if (url && url.startsWith('blob:')) {
+          URL.revokeObjectURL(url)
+        }
+      })
+    }
+  }, [images, gpuSettings, selectedFansub])
+
+  // Dynamic image optimization on scroll
+  useEffect(() => {
+    const handleScroll = async () => {
+      if (!gpuSettings || !images.length) return
+      
+      // Find visible images
+      const viewportHeight = window.innerHeight
+      const scrollY = window.scrollY
+      
+      imageRefs.current.forEach(async (ref, index) => {
+        if (!ref || optimizedImages[index]) return
+        
+        const rect = ref.getBoundingClientRect()
+        const isNearViewport = rect.top < viewportHeight * 2 && rect.bottom > -viewportHeight
+        
+        // Only optimize for powerful GPUs
+        if (isNearViewport && gpuSettings.score >= 4) {
+          try {
+            const optimizedSrc = await adaptiveLoader.loadImage(images[index])
+            setOptimizedImages(prev => ({ ...prev, [index]: optimizedSrc }))
+          } catch (error) {
+            console.warn('Failed to optimize image:', index)
+          }
+        }
+      })
+    }
+    
+    const debouncedScroll = debounce(handleScroll, 300)
+    window.addEventListener('scroll', debouncedScroll, { passive: true })
+    
+    return () => window.removeEventListener('scroll', debouncedScroll)
+  }, [images, gpuSettings, optimizedImages])
+
+  // Debounce helper
+  const debounce = (func, wait) => {
+    let timeout
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout)
+        func(...args)
+      }
+      clearTimeout(timeout)
+      timeout = setTimeout(later, wait)
+    }
+  }
 
   // Save reading progress and history
   useEffect(() => {
@@ -324,11 +414,6 @@ const Reader = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]" style={{ scrollBehavior: 'smooth' }}>
-      {/* Navbar - Only on Mobile */}
-      <div className="md:hidden">
-        <Navbar />
-      </div>
-      
       {/* Fixed Reader Bar */}
       <AnimatePresence>
         {showBar && (
@@ -798,12 +883,16 @@ const Reader = () => {
               }}
             >
               <OptimizedImage
-                src={imageUrl}
+                src={optimizedImages[index] || imageUrl}
                 alt={`Sayfa ${index + 1}`}
                 index={index}
                 preloadNext={index < images.length - 1}
                 className="pointer-events-none"
-              />
+                style={{
+                  imageRendering: 'auto',
+                  filter: gpuSettings?.score >= 5 ? 'contrast(1.02)' : 'none'
+                }}
+               />
             </div>
           </div>
         )
