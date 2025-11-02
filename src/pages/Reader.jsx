@@ -151,8 +151,8 @@ const Reader = () => {
     return () => window.removeEventListener('scroll', debouncedScroll)
   }, [images, enhancedImages])
 
-  // Debounce helper
-  const debounce = (func, wait) => {
+  // Debounce helper (function declaration to ensure hoisting)
+  function debounce(func, wait) {
     let timeout
     return function executedFunction(...args) {
       const later = () => {
