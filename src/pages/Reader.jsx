@@ -5,7 +5,6 @@ import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import Giscus from '../components/Giscus'
 import OptimizedImage from '../components/OptimizedImage'
-import imageEnhancer from '../utils/simpleImageEnhancer'
 import { addToHistory } from '../utils/readingHistory'
 import { initImageProtection, protectImage } from '../utils/imageProtection'
 
@@ -27,7 +26,6 @@ const Reader = () => {
   const [pageInput, setPageInput] = useState('1')
   const scrollContainerRef = useRef(null)
   const imageRefs = useRef([])
-  const [enhancedImages, setEnhancedImages] = useState({})
 
   // Initialize image protection
   useEffect(() => {
@@ -54,7 +52,7 @@ const Reader = () => {
     loadManga()
     
     return () => {
-      imageEnhancer.clearCache()
+      // cleanup
     }
   }, [slug])
 
@@ -89,80 +87,11 @@ const Reader = () => {
 
   const images = getCurrentImages()
 
-  // Enhance first few images for smooth reading
-  useEffect(() => {
-    if (!images.length) return
-    
-    const enhanceInitialImages = async () => {
-      const newEnhanced = {}
-      
-      // Enhance first 3 images
-      for (let i = 0; i < Math.min(3, images.length); i++) {
-        try {
-          const enhancedSrc = await imageEnhancer.enhanceImage(images[i])
-          newEnhanced[i] = enhancedSrc
-        } catch (error) {
-          console.warn('Enhancement failed:', error)
-        }
-      }
-      
-      setEnhancedImages(newEnhanced)
-      
-      // Prefetch next 3 images
-      if (images.length > 3) {
-        imageEnhancer.prefetchImages(images.slice(3), 3)
-      }
-    }
-    
-    enhanceInitialImages()
-    
-    return () => {
-      imageEnhancer.clearCache()
-    }
-  }, [images, selectedFansub])
+  // Image enhancement removed
 
-  // Enhance images as user scrolls
-  useEffect(() => {
-    const handleScroll = async () => {
-      if (!images.length) return
-      
-      const viewportHeight = window.innerHeight
-      
-      imageRefs.current.forEach(async (ref, index) => {
-        if (!ref || enhancedImages[index]) return
-        
-        const rect = ref.getBoundingClientRect()
-        const isNearViewport = rect.top < viewportHeight * 1.5 && rect.bottom > -viewportHeight
-        
-        if (isNearViewport) {
-          try {
-            const enhancedSrc = await imageEnhancer.enhanceImage(images[index])
-            setEnhancedImages(prev => ({ ...prev, [index]: enhancedSrc }))
-          } catch (error) {
-            console.warn('Enhancement failed:', index)
-          }
-        }
-      })
-    }
-    
-    const debouncedScroll = debounce(handleScroll, 200)
-    window.addEventListener('scroll', debouncedScroll, { passive: true })
-    
-    return () => window.removeEventListener('scroll', debouncedScroll)
-  }, [images, enhancedImages])
+  // On-scroll enhancement removed
 
-  // Debounce helper (function declaration to ensure hoisting)
-  function debounce(func, wait) {
-    let timeout
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout)
-        func(...args)
-      }
-      clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-    }
-  }
+  // Debounce removed
 
   // Save reading progress and history
   useEffect(() => {
@@ -861,7 +790,7 @@ const Reader = () => {
               }}
             >
               <OptimizedImage
-                src={enhancedImages[index] || imageUrl}
+                src={imageUrl}
                 alt={`Sayfa ${index + 1}`}
                 index={index}
                 preloadNext={index < images.length - 1}
