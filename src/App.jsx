@@ -30,6 +30,8 @@ import NewsForm from './pages/admin/NewsForm'
 import SliderList from './pages/admin/SliderList'
 import SliderForm from './pages/admin/SliderForm'
 import ChapterAdd from './pages/admin/ChapterAdd'
+import ChapterEdit from './pages/admin/ChapterEdit'
+import ChapterList from './pages/admin/ChapterList'
 import PagesList from './pages/admin/PagesList'
 import PageBuilder from './pages/admin/PageBuilder'
 
@@ -147,6 +149,8 @@ function App() {
       <Route path="/fansub" element={<FansubLayout />}>
         <Route index element={<ChapterAdd />} />
         <Route path="chapter-add" element={<ChapterAdd />} />
+        <Route path="chapters" element={<ChapterList />} />
+        <Route path="chapter-edit/:slug/:chapterId" element={<ChapterEdit />} />
       </Route>
       
       {/* Admin Routes - Full Access */}
@@ -157,6 +161,8 @@ function App() {
         <Route path="mangas/new" element={<MangaForm />} />
         <Route path="mangas/edit/:slug" element={<MangaForm />} />
         <Route path="chapter-add" element={<ChapterAdd />} />
+        <Route path="chapters" element={<ChapterList />} />
+        <Route path="chapter-edit/:slug/:chapterId" element={<ChapterEdit />} />
         <Route path="news" element={<NewsList />} />
         <Route path="news/new" element={<NewsForm />} />
         <Route path="news/edit/:id" element={<NewsForm />} />

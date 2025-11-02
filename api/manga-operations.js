@@ -233,6 +233,67 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, message: 'Chapter added successfully' })
       }
 
+      case 'UPDATE_CHAPTER': {
+        const path = `src/data/mangas/${slug}.json`
+        const { chapterId, chapter: chapterData } = req.body
+
+        if (!chapterId || !chapterData) {
+          throw new Error('Chapter ID and data required')
+        }
+
+        // Get current manga file
+        const getResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${BRANCH}`,
+          { headers: githubHeaders }
+        )
+
+        if (!getResponse.ok) {
+          throw new Error('Manga not found')
+        }
+
+        const currentFile = await getResponse.json()
+        const mangaContent = JSON.parse(Buffer.from(currentFile.content, 'base64').toString('utf-8'))
+
+        // Find and update chapter
+        if (!mangaContent.chapters) {
+          throw new Error('No chapters found')
+        }
+
+        const chapterIndex = mangaContent.chapters.findIndex(ch => ch.id === chapterId)
+        if (chapterIndex === -1) {
+          throw new Error(`Chapter ${chapterId} not found`)
+        }
+
+        // Update chapter data
+        mangaContent.chapters[chapterIndex] = chapterData
+
+        // Sort chapters by ID
+        mangaContent.chapters.sort((a, b) => parseInt(a.id) - parseInt(b.id))
+
+        // Update file
+        const content = Buffer.from(JSON.stringify(mangaContent, null, 2)).toString('base64')
+        const updateResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+          {
+            method: 'PUT',
+            headers: githubHeaders,
+            body: JSON.stringify({
+              message: `Update chapter ${chapterId} in ${mangaContent.title}`,
+              content,
+              sha: currentFile.sha,
+              branch: BRANCH
+            })
+          }
+        )
+
+        if (!updateResponse.ok) {
+          const error = await updateResponse.json()
+          throw new Error(error.message || 'Failed to update chapter')
+        }
+
+        return res.status(200).json({ success: true, message: 'Chapter updated successfully' })
+      }
+
       case 'DELETE_MANGA': {
         const path = `src/data/mangas/${slug}.json`
 

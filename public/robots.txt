@@ -2,10 +2,12 @@
 User-agent: Googlebot
 Allow: /
 Disallow: /admin/
+Disallow: /fansub/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /admin/
+Disallow: /fansub/
 
 # Block HTTrack and website copiers
 User-agent: HTTrack
@@ -60,7 +62,8 @@ Disallow: /
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /fansub/
 Disallow: /netlify/
-Crawl-delay: 10
+Crawl-delay: 5
 
 Sitemap: https://mangexis.netlify.app/sitemap.xml
