@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getAllMangas } from '../../utils/mangaService'
+import { notifyContentUpdate, UPDATE_TYPES } from '../../utils/contentUpdateEvent'
 
 const ChapterAdd = () => {
   const navigate = useNavigate()
@@ -212,6 +213,12 @@ const ChapterAdd = () => {
       const result = await response.json()
 
       if (result.success) {
+        // Ana sayfayı otomatik güncellemek için event tetikle
+        notifyContentUpdate(UPDATE_TYPES.CHAPTER_ADDED, {
+          mangaSlug: formData.mangaSlug,
+          chapterNumber: formData.chapterNumber
+        })
+        
         alert('✅ Bölüm başarıyla eklendi!')
         // Keep manga selection, reset chapter and fansubs
         setFormData({

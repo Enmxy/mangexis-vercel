@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { startAutoRefresh, stopAutoRefresh } from '../utils/autoRefresh'
+import { listenContentUpdates } from '../utils/contentUpdateEvent'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Slider from '../components/Slider'
@@ -37,14 +37,25 @@ const HomePage = () => {
     loadSliders()
     loadAllMangas()
     
-    // Auto refresh every 10 seconds - cache bypass ile silent update
-    startAutoRefresh(async () => {
+    // İçerik güncellemelerini dinle (admin panelden ekleme yapıldığında)
+    const unsubscribe = listenContentUpdates(async (event) => {
+      console.log('🔄 İçerik güncellendi:', event.type)
+      
+      // Scroll pozisyonunu kaydet
+      const scrollY = window.scrollY
+      
+      // İçeriği sessizce yenile
       await loadAllMangas()
       await loadSliders()
+      
+      // Scroll pozisyonunu geri yükle
+      setTimeout(() => {
+        window.scrollTo(0, scrollY)
+      }, 100)
     })
     
     return () => {
-      stopAutoRefresh()
+      unsubscribe()
     }
   }, [])
 

@@ -1,6 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
-import useAutoRefresh from './hooks/useAutoRefresh'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileBottomNav from './components/MobileBottomNav'
@@ -46,9 +45,6 @@ function App() {
   const location = useLocation()
   const isReaderRoute = /^\/manga\/.+\/chapter\/.+/.test(location.pathname)
 
-  // Otomatik sayfa yenileme - Reader sayfası hariç her 10 saniyede scroll pozisyonunu koruyarak
-  useAutoRefresh(10, { enabled: !isReaderRoute })
-  
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
       <InstallPWA />

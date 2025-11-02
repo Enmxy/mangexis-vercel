@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { notifyContentUpdate, UPDATE_TYPES } from '../../utils/contentUpdateEvent'
 import { mangaList } from '../../data/mangaData'
 import { saveManga, updateManga, uploadImage, getAllMangas } from '../../utils/mangaService'
 
@@ -349,10 +350,24 @@ const MangaForm = () => {
       if (isEdit) {
         const result = await updateManga(slug, formattedData)
         console.log('Update result:', result)
+        
+        // Ana sayfayı otomatik güncellemek için event tetikle
+        notifyContentUpdate(UPDATE_TYPES.CONTENT_UPDATED, {
+          type: 'manga_updated',
+          slug: formattedData.slug
+        })
+        
         alert(`✅ Manga başarıyla güncellendi!\n\nBölüm sayısı: ${formattedData.chapters.length}`)
       } else {
         const result = await saveManga(formattedData)
         console.log('Save result:', result)
+        
+        // Ana sayfayı otomatik güncellemek için event tetikle
+        notifyContentUpdate(UPDATE_TYPES.MANGA_ADDED, {
+          slug: formattedData.slug,
+          title: formattedData.title
+        })
+        
         alert(`✅ Manga başarıyla eklendi!\n\nBaşlık: ${formattedData.title}\nBölüm: ${formattedData.chapters.length}\n\nManga listesinde görünecek.`)
       }
       navigate('/admin/mangas')

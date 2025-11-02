@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { saveSlider, updateSlider, getAllSliders } from '../../utils/sliderService'
+import { notifyContentUpdate, UPDATE_TYPES } from '../../utils/contentUpdateEvent'
 
 const SliderForm = () => {
   const { id } = useParams()
@@ -60,6 +61,7 @@ const SliderForm = () => {
       if (isEdit) {
         const result = await updateSlider(formData)
         if (result.success) {
+          notifyContentUpdate(UPDATE_TYPES.CONTENT_UPDATED, { type: 'slider_updated' })
           alert('✅ Slider başarıyla güncellendi!')
           navigate('/admin/sliders')
         } else {
@@ -68,6 +70,7 @@ const SliderForm = () => {
       } else {
         const result = await saveSlider(formData)
         if (result.success) {
+          notifyContentUpdate(UPDATE_TYPES.SLIDER_ADDED, { title: formData.title })
           alert('✅ Slider başarıyla eklendi!')
           navigate('/admin/sliders')
         } else {
