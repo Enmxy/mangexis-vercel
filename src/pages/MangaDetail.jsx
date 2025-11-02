@@ -103,51 +103,73 @@ const MangaDetail = () => {
         }}
       />
 
-      {/* Desktop/Mobile Navigation Bar */}
-      <div className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
-          <Link to="/">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="p-2 -ml-2 text-white hover:opacity-70 transition-opacity"
-            >
-              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </motion.button>
-          </Link>
-          
-          <motion.button
-            onClick={toggleFavorite}
-            whileTap={{ scale: 0.95 }}
-            className="p-2 -mr-2 text-white hover:opacity-70 transition-opacity"
-          >
-            <svg className="w-5 h-5 md:w-6 md:h-6" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Hero Banner - Full Width (if exists) */}
-      {manga.heroBanner && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative w-full h-48 md:h-64 overflow-hidden"
-        >
-          <div className="absolute inset-0">
+      {/* Header Section with Navigation */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="relative w-full border-b border-white/10"
+      >
+        {/* Hero Banner Background (if exists) */}
+        {manga.heroBanner && (
+          <div className="absolute inset-0 overflow-hidden">
             <img
               src={manga.heroBanner}
               alt={manga.title}
               className="w-full h-full object-cover"
-              style={{ filter: 'grayscale(100%) contrast(1.1) brightness(0.7)' }}
+              style={{ filter: 'grayscale(100%) contrast(1.15) brightness(0.3)' }}
             />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black" />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
-        </motion.div>
-      )}
+        )}
+
+        {/* Navigation Bar */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+          <div className="flex items-center justify-between mb-6">
+            <Link to="/">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="p-2 -ml-2 text-white hover:opacity-70 transition-opacity"
+              >
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </motion.button>
+            </Link>
+            
+            <motion.button
+              onClick={toggleFavorite}
+              whileTap={{ scale: 0.95 }}
+              className="p-2 -mr-2 text-white hover:opacity-70 transition-opacity"
+            >
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            </motion.button>
+          </div>
+
+          {/* Title in Header */}
+          <div className="text-center md:text-left">
+            <h1 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight mb-3"
+              style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Roboto", sans-serif' }}
+            >
+              {manga.title}
+            </h1>
+            <div className="flex items-center justify-center md:justify-start gap-3 text-sm md:text-base text-[#BFBFBF]">
+              <span>{manga.chapters.length} Bölüm</span>
+              <span className="w-1 h-1 bg-[#BFBFBF] rounded-full" />
+              <span className="capitalize">{manga.status === 'ongoing' ? 'Devam Ediyor' : manga.status === 'completed' ? 'Tamamlandı' : 'Ara Verildi'}</span>
+              {manga.fansub && (
+                <>
+                  <span className="w-1 h-1 bg-[#BFBFBF] rounded-full" />
+                  <span>{manga.fansub}</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
@@ -168,8 +190,8 @@ const MangaDetail = () => {
                 alt={manga.title}
                 className="w-full h-auto rounded-md shadow-2xl"
                 style={{ 
-                  filter: 'grayscale(100%) contrast(1.05)',
-                  boxShadow: '0 20px 60px rgba(255, 255, 255, 0.08), 0 8px 16px rgba(0, 0, 0, 0.6)'
+                  filter: 'grayscale(100%) contrast(1.2) brightness(0.95)',
+                  boxShadow: '0 20px 60px rgba(255, 255, 255, 0.12), 0 8px 16px rgba(0, 0, 0, 0.7)'
                 }}
               />
             </div>
@@ -207,26 +229,6 @@ const MangaDetail = () => {
             transition={{ delay: 0.15, duration: 0.4 }}
             className="flex flex-col max-w-[600px] mx-auto lg:mx-0 lg:max-w-none"
           >
-            {/* Title */}
-            <h1 
-              className="text-2xl md:text-3xl lg:text-[32px] font-bold text-white leading-tight tracking-tight text-center lg:text-left"
-              style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Roboto", sans-serif' }}
-            >
-              {manga.title}
-            </h1>
-
-            {/* Metadata Row */}
-            <div className="flex items-center justify-center lg:justify-start gap-4 mt-3 text-sm md:text-base text-[#BFBFBF]">
-              <span>{manga.chapters.length} Bölüm</span>
-              <span className="w-1 h-1 bg-[#BFBFBF] rounded-full" />
-              <span className="capitalize">{manga.status === 'ongoing' ? 'Devam Ediyor' : manga.status === 'completed' ? 'Tamamlandı' : 'Ara Verildi'}</span>
-              {manga.fansub && (
-                <>
-                  <span className="w-1 h-1 bg-[#BFBFBF] rounded-full" />
-                  <span>{manga.fansub}</span>
-                </>
-              )}
-            </div>
 
             {/* Genre Tags */}
             <div className="flex flex-wrap gap-2 justify-center lg:justify-start mt-6">

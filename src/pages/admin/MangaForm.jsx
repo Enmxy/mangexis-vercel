@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { notifyContentUpdate, UPDATE_TYPES } from '../../utils/contentUpdateEvent'
 import { mangaList } from '../../data/mangaData'
 import { saveManga, updateManga, uploadImage, getAllMangas } from '../../utils/mangaService'
+import ImageCropModal from '../../components/ImageCropModal'
 
 const MangaForm = () => {
   const navigate = useNavigate()
@@ -25,6 +26,9 @@ const MangaForm = () => {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
   const [saving, setSaving] = useState(false)
+  const [cropModalOpen, setCropModalOpen] = useState(false)
+  const [imageToCrop, setImageToCrop] = useState(null)
+  const [cropType, setCropType] = useState('') // 'cover' or 'banner'
 
   const [newGenre, setNewGenre] = useState('')
   const [newChapter, setNewChapter] = useState({
@@ -382,8 +386,60 @@ const MangaForm = () => {
     }
   }
 
+  const handleBannerFileSelect = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setImageToCrop(reader.result)
+      setCropType('banner')
+      setCropModalOpen(true)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleCropComplete = async (croppedImageUrl) => {
+    setUploading(true)
+    setUploadProgress('Kırpılan resim yükleniyor...')
+
+    try {
+      // Convert blob URL to File
+      const blob = await fetch(croppedImageUrl).then(r => r.blob())
+      const file = new File([blob], 'cropped-banner.jpg', { type: 'image/jpeg' })
+      
+      const url = await uploadImage(file)
+      
+      if (cropType === 'banner') {
+        setFormData({ ...formData, heroBanner: url })
+        setUploadProgress('Banner yüklendi!')
+      } else if (cropType === 'cover') {
+        setFormData({ ...formData, cover: url })
+        setUploadProgress('Kapak yüklendi!')
+      }
+      
+      setTimeout(() => setUploadProgress(''), 2000)
+    } catch (error) {
+      alert('Yükleme hatası: ' + error.message)
+      setUploadProgress('')
+    } finally {
+      setUploading(false)
+      URL.revokeObjectURL(croppedImageUrl)
+    }
+  }
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <>
+      {/* Image Crop Modal */}
+      <ImageCropModal
+        isOpen={cropModalOpen}
+        onClose={() => setCropModalOpen(false)}
+        imageSrc={imageToCrop}
+        onCropComplete={handleCropComplete}
+        aspect={cropType === 'banner' ? 16/9 : 2/3}
+      />
+
+      <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -497,14 +553,29 @@ const MangaForm = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Kapak Bölümü (Hero Banner)
               </label>
-              <input
-                type="url"
-                value={formData.heroBanner}
-                onChange={(e) => setFormData({ ...formData, heroBanner: e.target.value })}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
-                placeholder="https://... (Opsiyonel - Detay sayfasında gösterilir)"
-              />
-              <p className="text-gray-500 text-xs mt-1">Manga detay sayfasının üst kısmında gösterilecek büyük banner resmi (opsiyonel)</p>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="url"
+                  value={formData.heroBanner}
+                  onChange={(e) => setFormData({ ...formData, heroBanner: e.target.value })}
+                  className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                  placeholder="https://... (Opsiyonel - Detay sayfasında gösterilir)"
+                />
+                <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="hidden sm:inline">Seç & Kırp</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleBannerFileSelect(e)}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+              <p className="text-gray-500 text-xs mt-1">Manga detay sayfasının üst kısmında gösterilecek büyük banner resmi (opsiyonel) - Yükleme sonrası kırpabilirsiniz</p>
               {formData.heroBanner && (
                 <div className="mt-3">
                   <img
@@ -911,6 +982,7 @@ const MangaForm = () => {
         </div>
       </form>
     </div>
+    </>
   )
 }
 
