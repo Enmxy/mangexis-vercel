@@ -14,6 +14,7 @@ const MangaForm = () => {
     title: '',
     slug: '',
     cover: '',
+    heroBanner: '',
     description: '',
     status: 'ongoing',
     genres: [],
@@ -67,6 +68,7 @@ const MangaForm = () => {
           title: manga.title,
           slug: manga.slug,
           cover: manga.cover,
+          heroBanner: manga.heroBanner || '',
           description: manga.description,
           status: manga.status,
           genres: manga.genres || [],
@@ -484,6 +486,33 @@ const MangaForm = () => {
                     className="w-32 h-48 object-cover rounded-lg border border-gray-600"
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/300x400?text=Invalid+URL'
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Hero Banner */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Kapak Bölümü (Hero Banner)
+              </label>
+              <input
+                type="url"
+                value={formData.heroBanner}
+                onChange={(e) => setFormData({ ...formData, heroBanner: e.target.value })}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                placeholder="https://... (Opsiyonel - Detay sayfasında gösterilir)"
+              />
+              <p className="text-gray-500 text-xs mt-1">Manga detay sayfasının üst kısmında gösterilecek büyük banner resmi (opsiyonel)</p>
+              {formData.heroBanner && (
+                <div className="mt-3">
+                  <img
+                    src={formData.heroBanner}
+                    alt="Hero Banner Preview"
+                    className="w-full h-32 object-cover rounded-lg border border-gray-600"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/1200x400?text=Invalid+URL'
                     }}
                   />
                 </div>

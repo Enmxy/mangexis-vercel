@@ -11,12 +11,11 @@ const MangaDetail = () => {
   const [manga, setManga] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
-  const [sortOrder, setSortOrder] = useState('desc')
+  const [showFullDescription, setShowFullDescription] = useState(false)
 
   useEffect(() => {
     loadManga()
     
-    // Auto refresh every 10 seconds - cache bypass ile
     startAutoRefresh(async () => {
       await loadManga()
     })
@@ -58,25 +57,6 @@ const MangaDetail = () => {
     }
   }
 
-  const handleShare = async () => {
-    const shareData = {
-      title: manga.title,
-      text: `${manga.title} - MangeXis'te okuyun!`,
-      url: window.location.href
-    }
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData)
-      } else {
-        await navigator.clipboard.writeText(window.location.href)
-        alert('Link kopyalandı!')
-      }
-    } catch (error) {
-      console.error('Share failed:', error)
-    }
-  }
-
   const loadManga = async () => {
     setLoading(true)
     try {
@@ -94,341 +74,241 @@ const MangaDetail = () => {
 
   if (loading) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin" />
       </div>
     )
   }
 
   if (!manga) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <p className="text-gray-400 text-xl">Manga bulunamadı</p>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-gray-400 text-lg">Manga bulunamadı</p>
       </div>
     )
   }
 
-  const sortedChapters = [...manga.chapters].sort((a, b) => {
-    return sortOrder === 'desc' 
-      ? parseInt(b.id) - parseInt(a.id)
-      : parseInt(a.id) - parseInt(b.id)
-  })
+  const firstChapter = manga.chapters[0]
+  const lastChapter = manga.chapters[manga.chapters.length - 1]
 
   return (
-    <div className="pt-20 min-h-screen">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 -z-20">
-          <div 
-            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-20 scale-110"
-            style={{ backgroundImage: `url(${manga.cover})` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-black" />
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Cover Image */}
-            <motion.div 
-              className="lg:col-span-4 relative"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+    <div className="min-h-screen bg-black">
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-white/10">
+        <div className="h-14 px-4 flex items-center justify-between">
+          <Link to="/">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              className="p-2 -ml-2"
             >
-              <motion.div
-                whileHover={{ scale: 1.02, y: -5 }}
-                transition={{ duration: 0.3 }}
-                className="relative group"
-              >
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl z-10" />
-                <img
-                  src={manga.cover}
-                  alt={manga.title}
-                  className="w-full h-auto rounded-xl shadow-2xl border border-white/10"
-                />
-                <div className="absolute bottom-4 left-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="flex items-center justify-between text-white text-sm">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                      <span>{manga.chapters.length} Bölüm</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </motion.button>
+          </Link>
+          
+          <motion.button
+            onClick={toggleFavorite}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 -mr-2"
+          >
+            <svg className="w-6 h-6 text-white" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+          </motion.button>
+        </div>
+      </div>
 
-            {/* Manga Info */}
-            <div className="lg:col-span-8">
-              {/* Title */}
-              <motion.h1 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
-              >
-                {manga.title}
-              </motion.h1>
-
-              {/* Status & Stats */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex flex-wrap items-center gap-3 mb-6"
-              >
-                <span className={`px-4 py-2 text-sm font-bold rounded-lg ${
-                    manga.status === 'ongoing'
-                      ? 'bg-green-500 text-black'
-                      : 'bg-gray-700 text-white'
-                }`}>
-                  {manga.status === 'ongoing' ? 'DEVAM EDİYOR' : 'BİTTİ'}
-                </span>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  <span className="text-sm text-gray-300">{manga.chapters.length} Bölüm</span>
-                </div>
-              </motion.div>
-
-              {/* Genres */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="mb-6"
-              >
-                <h3 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Türler</h3>
-                <div className="flex flex-wrap gap-2">
-                  {manga.genres.map((genre) => (
-                    <motion.span
-                      key={genre}
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm font-medium hover:bg-white/20 hover:border-white/30 transition-all cursor-pointer"
-                    >
-                      {genre}
-                    </motion.span>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Description */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="mb-8"
-              >
-                <h3 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Açıklama</h3>
-                <p className="text-base text-gray-300 leading-relaxed">
-                  {manga.description}
-                </p>
-              </motion.div>
-
-              {/* Action Buttons */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="flex flex-wrap gap-3 mb-6"
-              >
-                {manga.chapters.length > 0 && (
-                  <Link to={`/manga/${manga.slug}/chapter/${manga.chapters[0].id}`}>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition-all flex items-center gap-2 shadow-lg"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Okumaya Başla
-                    </motion.button>
-                  </Link>
-                )}
-                
-                <motion.button
-                  onClick={toggleFavorite}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2 ${
-                    isFavorite 
-                      ? 'bg-red-500 text-white hover:bg-red-600' 
-                      : 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </motion.button>
-
-                <motion.button
-                  onClick={handleShare}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-6 py-4 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                </motion.button>
-              </motion.div>
-            </div>
+      {/* Hero Banner */}
+      {manga.heroBanner && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full h-48 overflow-hidden"
+        >
+          <div className="absolute inset-0">
+            <img
+              src={manga.heroBanner}
+              alt={manga.title}
+              className="w-full h-full object-cover"
+              style={{ filter: 'grayscale(100%) contrast(1.1) brightness(0.7)' }}
+            />
           </div>
-        </div>
-      </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <h2 className="text-white text-xl font-bold drop-shadow-lg">{manga.title}</h2>
+          </div>
+        </motion.div>
+      )}
 
-      {/* Stats Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-2 gap-6 mb-12">
-          {/* Stats Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-6"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              Okuma İlerlemeniz
-            </h3>
-            <div className="mb-3">
-              <div className="flex justify-between text-sm text-gray-400 mb-2">
-                <span>Bölüm 1 / {manga.chapters.length}</span>
-                <span>0%</span>
-              </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0"></div>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400">Okumaya başlayın ve ilerlemenizi takip edin!</p>
-          </motion.div>
-
-          {/* Manga Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-6"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Manga Bilgileri
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Yayın Durumu:</span>
-                <span className="text-white font-medium">{manga.status === 'ongoing' ? 'Devam Ediyor' : 'Tamamlandı'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Toplam Bölüm:</span>
-                <span className="text-white font-medium">{manga.chapters.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Türler:</span>
-                <span className="text-white font-medium">{manga.genres.length} tür</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Chapter List Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      {/* Cover Section */}
+      <div className="px-4 pt-3 pb-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
+          className="relative w-full max-w-[260px] mx-auto"
         >
-          {/* Section Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-2">Bölümler</h2>
-              <div className="w-20 h-1.5 bg-gradient-to-r from-white to-transparent rounded-full"></div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-400">{manga.chapters.length} bölüm</span>
-              <select 
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
-              >
-                <option>En Yeni</option>
-                <option>En Eski</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Chapter Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {sortedChapters.map((chapter, index) => (
-              <Link
-                key={chapter.id}
-                to={`/manga/${manga.slug}/chapter/${chapter.id}`}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.03, y: -5 }}
-                  className="relative bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer group overflow-hidden"
-                >
-                  {/* Background Gradient on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  {/* Content */}
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-base font-bold text-white group-hover:text-white transition-colors">
-                        {chapter.title}
-                      </h3>
-                      <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span>{chapter.imageLinks.length} sayfa</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* New Badge */}
-                  {index < 3 && (
-                    <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-black text-xs font-bold rounded">
-                      YENİ
-                    </div>
-                  )}
-                </motion.div>
-              </Link>
-            ))}
-          </div>
+          <img
+            src={manga.cover}
+            alt={manga.title}
+            className="w-full h-auto rounded-lg shadow-2xl grayscale"
+            style={{ filter: 'grayscale(100%) contrast(1.1)' }}
+          />
         </motion.div>
       </div>
 
-      {/* Comments Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
+      {/* Title & Meta */}
+      <div className="px-4 pb-4">
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-2xl font-bold text-white text-center mb-2 leading-tight"
         >
-          <Giscus 
-            term={manga.title}
-            category="Manga"
-          />
+          {manga.title}
+        </motion.h1>
+        
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="text-sm text-[#BFBFBF] text-center mb-3"
+        >
+          {manga.chapters.length} Bölüm
+        </motion.p>
+
+        {/* Genre Tags */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-wrap gap-2 justify-center mb-4"
+        >
+          {manga.genres.map((genre) => (
+            <span
+              key={genre}
+              className="px-3 py-1 border border-white/30 rounded-full text-xs text-white"
+            >
+              {genre}
+            </span>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Description */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.25 }}
+        className="px-4 pb-5"
+      >
+        <p className={`text-sm text-[#D9D9D9] leading-relaxed ${!showFullDescription ? 'line-clamp-5' : ''}`}>
+          {manga.description}
+        </p>
+        {manga.description.length > 200 && (
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            className="text-white text-sm mt-2 underline"
+          >
+            {showFullDescription ? 'Daha Az Göster' : 'Devamını Gör'}
+          </button>
+        )}
+      </motion.div>
+
+      {/* Rating */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="px-4 pb-3 flex items-center gap-2"
+      >
+        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+        <span className="text-white text-sm font-medium">4.8</span>
+      </motion.div>
+
+      {/* Action Buttons */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.35 }}
+        className="px-4 pb-6 space-y-3"
+      >
+        {firstChapter && (
+          <Link to={`/manga/${manga.slug}/chapter/${firstChapter.id}`}>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              className="w-full h-12 bg-white text-black rounded-md font-semibold text-sm hover:bg-gray-200 transition-colors"
+            >
+              İlk Bölüm
+            </motion.button>
+          </Link>
+        )}
+        
+        {lastChapter && (
+          <Link to={`/manga/${manga.slug}/chapter/${lastChapter.id}`}>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              className="w-full h-12 bg-transparent border border-white text-white rounded-md font-semibold text-sm hover:bg-white/10 transition-colors"
+            >
+              Son Bölüm
+            </motion.button>
+          </Link>
+        )}
+      </motion.div>
+
+      {/* Divider */}
+      <div className="px-4 pb-4">
+        <div className="h-px bg-white/20" />
+      </div>
+
+      {/* Episodes Section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="px-4 pb-8"
+      >
+        <h2 className="text-lg font-bold text-white mb-4">Bölümler</h2>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {manga.chapters.map((chapter, index) => (
+            <Link
+              key={chapter.id}
+              to={`/manga/${manga.slug}/chapter/${chapter.id}`}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + index * 0.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="h-12 border border-white/30 rounded-md flex items-center justify-center hover:bg-white/5 hover:shadow-lg transition-all"
+              >
+                <span className="text-white text-sm font-medium">
+                  {chapter.title}
+                </span>
+              </motion.div>
+            </Link>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Comments Section */}
+      <div className="px-4 pb-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h2 className="text-lg font-bold text-white mb-4">Yorumlar</h2>
+          <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+            <Giscus 
+              term={manga.title}
+              category="Manga"
+            />
+          </div>
         </motion.div>
       </div>
     </div>

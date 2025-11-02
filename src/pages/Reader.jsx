@@ -720,6 +720,30 @@ const Reader = () => {
           
           return (
           <div key={index} className="w-full">
+            {/* Hero Banner - Only on first page */}
+            {index === 0 && manga.heroBanner && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+                className="relative w-full h-48 mb-6 overflow-hidden rounded-lg"
+              >
+                <div className="absolute inset-0">
+                  <img
+                    src={manga.heroBanner}
+                    alt={manga.title}
+                    className="w-full h-full object-cover"
+                    style={{ filter: 'grayscale(100%) contrast(1.1) brightness(0.7)' }}
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h2 className="text-white text-xl font-bold drop-shadow-lg">{manga.title}</h2>
+                  <p className="text-white/80 text-sm mt-1">{chapter.title}</p>
+                </div>
+              </motion.div>
+            )}
+
             {/* Fansub Info - İlk sayfanın üstünde */}
             {index === 0 && chapter.fansubs && chapter.fansubs[selectedFansub] && (
               <motion.div
