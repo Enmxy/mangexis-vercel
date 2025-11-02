@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
+import useAutoRefresh from './hooks/useAutoRefresh'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileBottomNav from './components/MobileBottomNav'
@@ -42,6 +43,9 @@ if (!clerkPubKey) {
 }
 
 function App() {
+  // Otomatik sayfa yenileme - her 10 saniyede scroll pozisyonunu koruyarak
+  useAutoRefresh(10)
+  
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
       <InstallPWA />
