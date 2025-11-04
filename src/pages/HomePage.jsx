@@ -7,7 +7,7 @@ import SearchFilter from '../components/SearchFilter'
 import MangaCard from '../components/MangaCard'
 import FeatureSection from '../components/FeatureSection'
 import LatestChapters from '../components/LatestChapters'
-import AIRecommendations from '../components/AIRecommendations'
+import AIRecommendationsV2 from '../components/AIRecommendationsV2'
 import { mangaList } from '../data/mangaData'
 import { getAllMangas } from '../utils/mangaService'
 import { getAllSliders } from '../utils/sliderService'
@@ -529,7 +529,7 @@ const HomePage = () => {
         </div>
 
         {/* AI Recommendations Section - Bottom */}
-        <AIRecommendations />
+        <AIRecommendationsV2 />
     </>
   )
 }

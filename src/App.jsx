@@ -17,6 +17,8 @@ import News from './pages/News'
 import NewsDetail from './pages/NewsDetail'
 import ReadingHistory from './pages/ReadingHistory'
 import CustomPage from './pages/CustomPage'
+import UserProfile from './pages/UserProfile'
+import ProfileSetup from './pages/ProfileSetup'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -140,6 +142,23 @@ function App() {
         <div className="min-h-screen bg-black">
           <Navbar />
           <CustomPage />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
+      <Route path="/profile" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <UserProfile />
+          <Footer />
+          <MobileBottomNav />
+        </div>
+      } />
+      <Route path="/profile/setup" element={<ProfileSetup />} />
+      <Route path="/user/:username" element={
+        <div className="min-h-screen bg-black">
+          <Navbar />
+          <UserProfile />
           <Footer />
           <MobileBottomNav />
         </div>
