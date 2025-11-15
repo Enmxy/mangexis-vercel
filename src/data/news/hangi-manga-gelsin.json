@@ -1,0 +1,17 @@
+{
+  "title": "Hangi Manga Gelsin",
+  "slug": "hangi-manga-gelsin",
+  "excerpt": "",
+  "content": "?",
+  "image": "",
+  "date": "2025-11-15",
+  "tags": [],
+  "poll": {
+    "id": "1763218816320",
+    "question": "Hangi Manga Eklensin?",
+    "options": [
+      "Sono Bisuku Dōru wa Koi o Suru",
+      "Dan Da Dan"
+    ]
+  }
+}
