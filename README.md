@@ -199,7 +199,7 @@ MIT License
 
 ## 🎉 Credits
 
-MangeXis tarafından geliştirilmiştir.
+Emre Iskın tarafından geliştirilmiştir.
 
 ---
 
